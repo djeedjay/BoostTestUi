@@ -76,6 +76,7 @@ CMainFrame::CMainFrame(const std::wstring& fileName) :
 void CMainFrame::ExceptionHandler()
 {
 	MessageBox(WStr(GetExceptionMessage()), L"Boost Test", MB_ICONERROR | MB_OK);
+	UpdateUI();
 }
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)

@@ -1,0 +1,4 @@
+Libraries/
+Debug/
+Release/
+*.vcxproj.user

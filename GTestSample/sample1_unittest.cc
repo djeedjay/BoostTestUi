@@ -44,8 +44,8 @@
 // Don't forget gtest.h, which declares the testing framework.
 
 #include <limits.h>
+#include <gtest/gtest-gui.h>
 #include "sample1.h"
-#include "gtest-gui.h"
 
 #ifdef _DEBUG
 #	pragma comment(lib, "gtestd.lib")
