@@ -1,0 +1,147 @@
+//  (C) Copyright Gert-Jan de Vos 2012.
+//  Distributed under the Boost Software License, Version 1.0.
+//  (See accompanying file LICENSE_1_0.txt or copy at 
+//  http://www.boost.org/LICENSE_1_0.txt)
+
+//  See http://www.boost.org/libs/test for the boost test library home page.
+
+#ifndef BOOST_TESTUI_UTILITIES_H
+#define BOOST_TESTUI_UTILITIES_H
+
+#pragma once
+
+#include <sstream>
+#include <boost/noncopyable.hpp>
+
+// Alternative to ATL standard BEGIN_MSG_MAP() with try block:
+#define BEGIN_MSG_MAP_TRY(theClass) \
+	BOOL theClass::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID) \
+	try \
+	{ \
+		BOOL bHandled = TRUE; \
+		(hWnd); \
+		(uMsg); \
+		(wParam); \
+		(lParam); \
+		(lResult); \
+		(bHandled); \
+		switch(dwMsgMapID) \
+		{ \
+		case 0:
+
+#define END_MSG_MAP_CATCH(handler) \
+			break; \
+		default: \
+			ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID); \
+			ATLASSERT(FALSE); \
+			break; \
+		} \
+		return FALSE; \
+		} \
+		catch (...) \
+		{ \
+			handler(); \
+			return FALSE; \
+		}
+
+namespace gj {
+
+class WStr
+{
+public:
+	explicit WStr(const std::string& s) :
+		m_str(s.begin(), s.end())
+	{
+	}
+
+	explicit WStr(const std::wstring& s) :
+		m_str(s)
+	{
+	}
+
+	operator const wchar_t*() const
+	{
+		return m_str.c_str();
+	}
+
+private:
+	std::wstring m_str;
+};
+
+class Timer
+{
+public:
+	Timer();
+
+	void Reset();
+	double Get() const;
+
+private:
+	long long GetTicks() const;
+
+	double m_timerUnit;
+	long long m_offset;
+};
+
+class ScopedCursor : boost::noncopyable
+{
+public:
+	explicit ScopedCursor(HCURSOR cursor) : m_cursor(SetCursor(cursor))
+	{
+	}
+
+	~ScopedCursor()
+	{
+		SetCursor(m_cursor);
+	}
+
+private:
+	HCURSOR m_cursor;
+};
+
+void ThrowLastError(const std::string& what);
+void ThrowLastError(const std::wstring& what);
+
+template <class CharType, class Traits = std::char_traits<CharType>, class Allocator = std::allocator<CharType>>
+class basic_stringbuilder
+{
+public:
+	typedef std::basic_string<CharType, Traits, Allocator> string_type;
+
+	template <typename T>
+	basic_stringbuilder& operator<<(const T& t)
+	{
+		m_ss << t;
+		return *this;
+	}
+
+	string_type str() const
+	{
+		return m_ss.str();
+	}
+
+	const CharType* c_str() const
+	{
+		return m_ss.str().c_str();
+	}
+
+	operator string_type() const
+	{
+		return m_ss.str();
+	}
+
+private:
+	std::basic_ostringstream<CharType, Traits, Allocator> m_ss;
+};
+
+typedef basic_stringbuilder<char> stringbuilder;
+typedef basic_stringbuilder<wchar_t> wstringbuilder;
+
+std::wstring GetExceptionMessage();
+
+std::wstring MultiByteToWideChar(const std::string& str);
+std::string WideCharToMultiByte(const std::wstring& str);
+
+} // namespace gj
+
+#endif // BOOST_TESTUI_UTILITIES_H

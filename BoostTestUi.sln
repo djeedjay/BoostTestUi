@@ -1,0 +1,68 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoostTestUi", "BoostTestUi\BoostTestUi.vcxproj", "{2B211D41-9EA2-42FB-9A85-B0B1C1722EF1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoostTestSample", "BoostTestSample\BoostTestSample.vcxproj", "{849417CD-159A-4D8C-AB17-2CFB259F0BBE}"
+EndProject
+Project("{6141683F-8A12-4E36-9623-2EB02B2C2303}") = "BoostTestUiSetup", "BoostTestUiSetup\BoostTestUiSetup.isproj", "{D7829812-000C-47F5-BF0C-44A022E699F4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2B211D41-9EA2-42FB-9A85-B0B1C1722EF1} = {2B211D41-9EA2-42FB-9A85-B0B1C1722EF1}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GTestSample", "GTestSample\GTestSample.vcxproj", "{FDC692D8-309D-4490-8E9B-445D645233BF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		CD_ROM|Win32 = CD_ROM|Win32
+		Debug|Win32 = Debug|Win32
+		DVD-5|Win32 = DVD-5|Win32
+		Release|Win32 = Release|Win32
+		SingleImage|Win32 = SingleImage|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2B211D41-9EA2-42FB-9A85-B0B1C1722EF1}.CD_ROM|Win32.ActiveCfg = Release|Win32
+		{2B211D41-9EA2-42FB-9A85-B0B1C1722EF1}.CD_ROM|Win32.Build.0 = Release|Win32
+		{2B211D41-9EA2-42FB-9A85-B0B1C1722EF1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2B211D41-9EA2-42FB-9A85-B0B1C1722EF1}.Debug|Win32.Build.0 = Debug|Win32
+		{2B211D41-9EA2-42FB-9A85-B0B1C1722EF1}.DVD-5|Win32.ActiveCfg = Debug|Win32
+		{2B211D41-9EA2-42FB-9A85-B0B1C1722EF1}.DVD-5|Win32.Build.0 = Debug|Win32
+		{2B211D41-9EA2-42FB-9A85-B0B1C1722EF1}.Release|Win32.ActiveCfg = Release|Win32
+		{2B211D41-9EA2-42FB-9A85-B0B1C1722EF1}.Release|Win32.Build.0 = Release|Win32
+		{2B211D41-9EA2-42FB-9A85-B0B1C1722EF1}.SingleImage|Win32.ActiveCfg = Release|Win32
+		{2B211D41-9EA2-42FB-9A85-B0B1C1722EF1}.SingleImage|Win32.Build.0 = Release|Win32
+		{849417CD-159A-4D8C-AB17-2CFB259F0BBE}.CD_ROM|Win32.ActiveCfg = Release|Win32
+		{849417CD-159A-4D8C-AB17-2CFB259F0BBE}.CD_ROM|Win32.Build.0 = Release|Win32
+		{849417CD-159A-4D8C-AB17-2CFB259F0BBE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{849417CD-159A-4D8C-AB17-2CFB259F0BBE}.Debug|Win32.Build.0 = Debug|Win32
+		{849417CD-159A-4D8C-AB17-2CFB259F0BBE}.DVD-5|Win32.ActiveCfg = Debug|Win32
+		{849417CD-159A-4D8C-AB17-2CFB259F0BBE}.DVD-5|Win32.Build.0 = Debug|Win32
+		{849417CD-159A-4D8C-AB17-2CFB259F0BBE}.Release|Win32.ActiveCfg = Release|Win32
+		{849417CD-159A-4D8C-AB17-2CFB259F0BBE}.Release|Win32.Build.0 = Release|Win32
+		{849417CD-159A-4D8C-AB17-2CFB259F0BBE}.SingleImage|Win32.ActiveCfg = Release|Win32
+		{849417CD-159A-4D8C-AB17-2CFB259F0BBE}.SingleImage|Win32.Build.0 = Release|Win32
+		{D7829812-000C-47F5-BF0C-44A022E699F4}.CD_ROM|Win32.ActiveCfg = CD_ROM
+		{D7829812-000C-47F5-BF0C-44A022E699F4}.CD_ROM|Win32.Build.0 = CD_ROM
+		{D7829812-000C-47F5-BF0C-44A022E699F4}.Debug|Win32.ActiveCfg = DVD-5
+		{D7829812-000C-47F5-BF0C-44A022E699F4}.Debug|Win32.Build.0 = DVD-5
+		{D7829812-000C-47F5-BF0C-44A022E699F4}.DVD-5|Win32.ActiveCfg = DVD-5
+		{D7829812-000C-47F5-BF0C-44A022E699F4}.DVD-5|Win32.Build.0 = DVD-5
+		{D7829812-000C-47F5-BF0C-44A022E699F4}.Release|Win32.ActiveCfg = SingleImage
+		{D7829812-000C-47F5-BF0C-44A022E699F4}.Release|Win32.Build.0 = SingleImage
+		{D7829812-000C-47F5-BF0C-44A022E699F4}.SingleImage|Win32.ActiveCfg = SingleImage
+		{D7829812-000C-47F5-BF0C-44A022E699F4}.SingleImage|Win32.Build.0 = SingleImage
+		{FDC692D8-309D-4490-8E9B-445D645233BF}.CD_ROM|Win32.ActiveCfg = Release|Win32
+		{FDC692D8-309D-4490-8E9B-445D645233BF}.CD_ROM|Win32.Build.0 = Release|Win32
+		{FDC692D8-309D-4490-8E9B-445D645233BF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FDC692D8-309D-4490-8E9B-445D645233BF}.Debug|Win32.Build.0 = Debug|Win32
+		{FDC692D8-309D-4490-8E9B-445D645233BF}.DVD-5|Win32.ActiveCfg = Debug|Win32
+		{FDC692D8-309D-4490-8E9B-445D645233BF}.DVD-5|Win32.Build.0 = Debug|Win32
+		{FDC692D8-309D-4490-8E9B-445D645233BF}.Release|Win32.ActiveCfg = Release|Win32
+		{FDC692D8-309D-4490-8E9B-445D645233BF}.Release|Win32.Build.0 = Release|Win32
+		{FDC692D8-309D-4490-8E9B-445D645233BF}.SingleImage|Win32.ActiveCfg = Release|Win32
+		{FDC692D8-309D-4490-8E9B-445D645233BF}.SingleImage|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

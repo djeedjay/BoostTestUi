@@ -1,0 +1,447 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "atlres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""atlres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_MAINFRAME TOOLBAR 16, 15
+BEGIN
+    BUTTON      ID_FILE_OPEN
+    BUTTON      ID_FILE_SAVE
+    SEPARATOR
+    BUTTON      ID_LOG_CLEAR
+    BUTTON      ID_LOG_AUTO_CLEAR
+    BUTTON      ID_LOG_COPY
+    SEPARATOR
+    BUTTON      ID_TEST_RANDOMIZE
+    BUTTON      ID_TEST_DEBUGGER
+    BUTTON      ID_TREE_RUN_CHECKED
+    BUTTON      ID_TEST_ABORT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "&Save Log\tCtrl+S",           ID_FILE_SAVE
+        MENUITEM "Save Log &As...",             ID_FILE_SAVE_AS
+        MENUITEM "Auto Run",                    ID_FILE_AUTO_RUN
+        MENUITEM SEPARATOR
+        POPUP "Create Header"
+        BEGIN
+            MENUITEM "Boost Test...",           ID_FILE_CREATE_BOOST_HPP
+            MENUITEM "Google Test...",          ID_FILE_CREATE_GOOGLE_HPP
+        END
+        MENUITEM SEPARATOR
+		POPUP "Recent Tests"
+        BEGIN
+			MENUITEM "Empty",                   ID_FILE_MRU_FIRST
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&Test"
+    BEGIN
+        MENUITEM "Randomize",                   ID_TEST_RANDOMIZE
+        MENUITEM "Wait for Debugger",           ID_TEST_DEBUGGER
+        MENUITEM SEPARATOR
+        MENUITEM "&Run Checked\tCtrl+R",        ID_TREE_RUN_CHECKED
+        MENUITEM "&Run All\tCtrl+R",            ID_TREE_RUN_ALL
+        MENUITEM "Abort\tCtrl+Break",           ID_TEST_ABORT
+    END
+    POPUP "&Log"
+    BEGIN
+        MENUITEM "Select &All\tCtrl+A",         ID_LOG_SELECTALL
+        MENUITEM "Clear Log\tCtrl+X",           ID_LOG_CLEAR
+        MENUITEM "Auto Clear Log",              ID_LOG_AUTO_CLEAR
+        MENUITEM "&Copy\tCtrl+C",               ID_LOG_COPY
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About BoostTestUi...",       ID_APP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\BoostTestUi.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 187, 127
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About Boost Test UI"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,130,108,50,14
+    CTEXT           "Boost Test UI V1.0",IDC_STATIC,54,22,118,8
+    ICON            IDR_MAINFRAME,IDC_STATIC,21,26,20,20
+    GROUPBOX        "",IDC_STATIC,7,7,173,91
+    CTEXT           "http://www.boost.org/libs/test",IDC_BOOST_URL,16,82,156,8
+    CTEXT           "© Gert-Jan de Vos 2012",IDC_STATIC,54,35,118,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 180
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 98
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS
+BEGIN
+    "C",            ID_LOG_COPY,            VIRTKEY, CONTROL, NOINVERT
+    VK_INSERT,      ID_LOG_COPY,            VIRTKEY, CONTROL, NOINVERT
+    "X",            ID_LOG_CLEAR,           VIRTKEY, CONTROL, NOINVERT
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
+    "A",            ID_LOG_SELECTALL,       VIRTKEY, CONTROL, NOINVERT
+    "R",            ID_TREE_RUN_CHECKED,    VIRTKEY, CONTROL, NOINVERT
+    VK_PAUSE,       ID_TEST_ABORT,          VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "BoostTestUi Module"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "BoostTestUi"
+            VALUE "LegalCopyright", "Copyright 2010"
+            VALUE "OriginalFilename", "BoostTestUi.exe"
+            VALUE "ProductName", "BoostTestUi Module"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDR_MAINFRAME           "BoostTestUi"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_NEW             "Create a new document\nNew"
+    ID_FILE_OPEN            "Open a unit test\nOpen"
+    ID_FILE_CLOSE           "Close the active document\nClose"
+    ID_FILE_SAVE            "Save the unit test log\nSave Log"
+    ID_FILE_SAVE_AS         "Save the unit testlog with a new name\nSave Log As"
+END
+
+STRINGTABLE
+BEGIN
+    ID_TEST_RANDOMIZE       "Run the selected test cases in random order\nRandomize"
+    ID_TEST_DEBUGGER        "Provide a prompt to attach the debugger when the test is run\nWait for Debugger"
+    ID_LOG_AUTO_CLEAR       "Clear log at each test run\nAuto Clear"
+    ID_LOG_AUTOCLEARLOG     "Clear log on "
+    ID_FILE_AUTO_RUN        "Run selected test cases on Load\nAuto Run"
+    ID_FILE_CREATE_BOOST_HPP 
+                            "Create unit_test_gui.hpp for building boost unit tests\nCreate unit_test_gui.hpp"
+    ID_FILE_CREATE_GOOGLE_HPP 
+                            "Create gtest-gui.h for building google unit tests\nCreate gtest-gui.hpp"
+    ID_LOGLEVEL             "Select test log detail\nLog Level"
+    ID_TREE_RUN_CHECKED     "Run the checked unit tests\nRun Checked"
+END
+
+STRINGTABLE
+BEGIN
+    ID_TEST_ABORT           "Abort the running unit test\nAbort"
+    ID_LOG_SELECTALL        "Select all log lines\nSelect All"
+    ID_LOG_COPY             "Copy selected log lines to the clipboard\nCopy"
+    ID_LOG_CLEAR            "Clear log display\nClear Log"
+END
+
+STRINGTABLE
+BEGIN
+    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
+    ID_APP_EXIT             "Quit Boost Test UI\nExit"
+END
+
+STRINGTABLE
+BEGIN
+    ID_EDIT_CLEAR           "Clear the Log\nClear"
+    ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
+    ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
+    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard\nCut"
+    ID_EDIT_FIND            "Find the specified text\nFind"
+    ID_EDIT_PASTE           "Insert Clipboard contents\nPaste"
+    ID_EDIT_REPEAT          "Repeat the last action\nRepeat"
+    ID_EDIT_REPLACE         "Replace specific text with different text\nReplace"
+    ID_EDIT_SELECT_ALL      "Select the entire document\nSelect All"
+    ID_EDIT_UNDO            "Undo the last action\nUndo"
+    ID_EDIT_REDO            "Redo the previously undone action\nRedo"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_TOOLBAR         "Show or hide the toolbar\nToggle ToolBar"
+    ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
+END
+
+STRINGTABLE
+BEGIN
+    ATL_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE
+BEGIN
+    IDPANE_TESTCASE_TOTAL   "Test cases: ####"
+    IDPANE_TESTCASE_RUN     "Tests run: ####"
+    IDPANE_TESTCASE_FAILED  "Failed tests: ####"
+END
+
+STRINGTABLE
+BEGIN
+    ATL_IDS_MRU_FILE        "Open this document"
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United Kingdom) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_TREE_CONTEXTMENU MENU
+BEGIN
+    POPUP "Tree"
+    BEGIN
+        MENUITEM "Run",                         ID_TREE_RUN
+        MENUITEM "Run Checked",                 ID_TREE_RUN_CHECKED
+        MENUITEM "Run All",                     ID_TREE_RUN_ALL
+        MENUITEM SEPARATOR
+        MENUITEM "Wait for Debugger",           ID_TEST_DEBUGGER
+        MENUITEM SEPARATOR
+        MENUITEM "Check All",                   ID_TREE_CHECK_ALL
+        MENUITEM "Uncheck All",                 ID_TREE_UNCHECK_ALL
+        MENUITEM "Check Failed",                ID_TREE_CHECK_FAILED
+    END
+END
+
+IDR_LIST_CONTEXTMENU MENU
+BEGIN
+    POPUP "List"
+    BEGIN
+        MENUITEM "Select &All\tCtrl+A",         ID_LOG_SELECTALL
+        MENUITEM "&Copy\tCtrl+C",               ID_LOG_COPY
+        MENUITEM "Clear Log\tCtrl+X",           ID_LOG_CLEAR
+        MENUITEM "Auto Clear Log",              ID_LOG_AUTO_CLEAR
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_EMPTY               ICON                    "res\\empty.ico"
+IDI_ARROW               ICON                    "res\\arrow.ico"
+IDI_TICK                ICON                    "res\\tick.ico"
+IDI_CROSS               ICON                    "res\\cross.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_AUTORUN DIALOGEX 0, 0, 118, 108
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Auto Run Options"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,7,87,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,61,87,50,14
+    EDITTEXT        IDC_COUNT,43,60,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_COUNT_SPIN,"msctls_updown32",UDS_AUTOBUDDY | UDS_ARROWKEYS,83,60,10,14
+    CONTROL         "Continue on error",IDC_CONTINUE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,36,73,10
+    CONTROL         "Unlimited",IDC_UNLIMITED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,47,45,10
+    LTEXT           "Runs:",IDC_STATIC,19,62,20,8
+    CONTROL         "Randomize",IDC_RANDOMIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,25,51,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_AUTORUN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 111
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 101
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RCDATA
+//
+
+IDR_UNIT_TEST_GUI_HPP   RCDATA                  "unit_test_gui.hpp"
+IDR_GTEST_GUI_H         RCDATA                  "gtest-gui.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    ID_TREE_RUN             "Run\nRun the selected test"
+    ID_TREE_RUN_CHECKED     "Run Checked\nRun all tests with a check mark"
+    ID_TREE_RUN_ALL         "Run All\n Run all tests"
+    ID_TREE_CHECK_ALL       "Check All\nCheck all tests"
+    ID_TREE_UNCHECK_ALL     "Uncheck All\nUncheck all tests"
+END
+
+STRINGTABLE
+BEGIN
+    ID_TREE_CHECK_FAILED    "Check Failed\nCheck only failed tests"
+END
+
+#endif    // English (United Kingdom) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
