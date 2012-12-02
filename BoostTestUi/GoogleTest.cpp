@@ -104,13 +104,15 @@ void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const 
 		std::smatch sm;
 		if (!std::regex_search(line, sm, re))
 			continue;
+
+		bool enabled = sm[1].str().substr(0, 9) != "DISABLED_";
 		if (sm[2].matched)
 		{
-			node.children.push_back(TestSuite(GetId(sm[1]), sm[1]));
+			node.children.push_back(TestSuite(GetId(sm[1]), sm[1], enabled));
 		}
 		else if (!node.children.empty())
 		{
-			node.children.back().children.push_back(TestCase(GetId(FullName(node.children.back().data.name, sm[1])), sm[1]));
+			node.children.back().children.push_back(TestCase(GetId(FullName(node.children.back().data.name, sm[1])), sm[1], enabled));
 		}
 	}
 }
@@ -118,12 +120,13 @@ void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const 
 std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsigned options)
 {
 	std::wostringstream args;
+	args << L"--gtest_also_run_disabled_tests";
 
 	if (options & ExeRunner::Randomize)
-		args << L"--gtest_shuffle ";
+		args << L" --gtest_shuffle ";
 
 	if (options & ExeRunner::WaitForDebugger)
-		args << L"--gui_wait ";
+		args << L" --gui_wait ";
 
 	GetEnableArg getArg;
 	runner.TraverseTestTree(getArg);
@@ -164,6 +167,7 @@ void ArgumentBuilder::FilterMessage(const std::string& msg)
 //	static const std::regex reEnd("^\\[(       OK )|(  FAILED  )\\] ([\\w\\._]+) \\((\\d+) ms\\)"); // VC regex bug??
 	static const std::regex reEnd("^\\[(       OK |  FAILED  )\\] ([\\w\\._]+) \\((\\d+) ms\\)");
 	static const std::regex reFinish("^\\[==========\\] \\d+ tests from ");
+	static const std::regex reAssertion("Assertion failed:");
 
 	Severity::type severity = Severity::Info;
 	std::smatch sm;
@@ -193,6 +197,8 @@ void ArgumentBuilder::FilterMessage(const std::string& msg)
 	}
 	else if (std::regex_search(msg, sm, reFinish))
 		m_pObserver->test_finish();
+	else if (std::regex_search(msg, reAssertion))
+		severity =  Severity::Assertion;
 
 	m_pObserver->test_message(severity, msg);
 }

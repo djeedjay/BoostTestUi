@@ -121,7 +121,7 @@ TEST(FactorialTest, Positive) {
 // Tests IsPrime()
 
 // Tests negative input.
-TEST(IsPrimeTest, Negative) {
+TEST(IsPrimeTest, DISABLED_Negative) {
   // This test belongs to the IsPrimeTest test case.
 
   EXPECT_FALSE(IsPrime(-1));
@@ -143,6 +143,7 @@ TEST(IsPrimeTest, Positive) {
   EXPECT_TRUE(IsPrime(5));
   EXPECT_FALSE(IsPrime(6));
   EXPECT_TRUE(IsPrime(23));
+  assert(1 + 1 == 3);
 }
 
 // Step 3. Call RUN_ALL_TESTS() in main().
