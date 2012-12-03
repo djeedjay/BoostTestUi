@@ -10,7 +10,11 @@
 
 #pragma once
 
+#pragma warning(disable: 4481) // nonstandard extension used: override specifier 'override'
+
+#pragma warning(push, 3) // conversion from 'int' to 'unsigned short', possible loss of data
 #include <boost/thread.hpp>
+#pragma warning(pop)
 #include <boost/noncopyable.hpp>
 #include "TestRunner.h"
 #include "Process.h"
@@ -25,17 +29,17 @@ public:
 	ExeRunner(const std::wstring& fileName, TestObserver& observer);
 	virtual ~ExeRunner();
 
-	virtual TestSuite& RootTestSuite();
-	virtual void TraverseTestTree(TestTreeVisitor& v);
-	virtual void TraverseTestTree(unsigned id, TestTreeVisitor& v);
+	virtual TestSuite& RootTestSuite() override;
+	virtual void TraverseTestTree(TestTreeVisitor& v) override;
+	virtual void TraverseTestTree(unsigned id, TestTreeVisitor& v) override;
 
-	virtual void EnableTestUnit(unsigned id, bool enable);
+	virtual void EnableTestUnit(unsigned id, bool enable) override;
 
-	virtual bool IsRunning() const;
-	virtual void Run(int logLevel, unsigned options);
-	virtual void Continue();
-	virtual void Abort();
-	virtual void Wait();
+	virtual bool IsRunning() const override;
+	virtual void Run(int logLevel, unsigned options) override;
+	virtual void Continue() override;
+	virtual void Abort() override;
+	virtual void Wait() override;
 
 	void OnWaiting();
 	TestUnit& GetTestUnit(unsigned id);

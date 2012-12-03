@@ -169,10 +169,10 @@ std::string get_name(std::istream& is)
 	std::string name;
 	while (is)
 	{
-		char c = is.get();
+		int c = is.get();
 		if (c < ' ')
 			break;
-		name += c;
+		name += static_cast<char>(c);
 	}
 	return name;
 }

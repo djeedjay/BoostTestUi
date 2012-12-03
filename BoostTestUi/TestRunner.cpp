@@ -38,7 +38,7 @@ ArgumentBuilder::~ArgumentBuilder()
 {
 }
 
-void ArgumentBuilder::FilterMessage(const std::string& msg)
+void ArgumentBuilder::FilterMessage(const std::string& /*msg*/)
 {
 }
 

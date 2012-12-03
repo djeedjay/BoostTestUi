@@ -45,7 +45,7 @@ BOOL CLogView::PreTranslateMessage(MSG* pMsg)
 	return FALSE;
 }
 
-LRESULT CLogView::OnCreate(const CREATESTRUCT* pCreate)
+LRESULT CLogView::OnCreate(const CREATESTRUCT* /*pCreate*/)
 {
 	DefWindowProc();
 
@@ -58,7 +58,7 @@ LRESULT CLogView::OnCreate(const CREATESTRUCT* pCreate)
 	return 0;
 }
 
-void CLogView::OnContextMenu(HWND hWnd, CPoint pt)
+void CLogView::OnContextMenu(HWND /*hWnd*/, CPoint pt)
 {
 	if (pt == CPoint(-1, -1))
 	{
@@ -72,7 +72,7 @@ void CLogView::OnContextMenu(HWND hWnd, CPoint pt)
 	}
 
 	UINT flags = 0;
-	int item = HitTest(pt, &flags);
+	HitTest(pt, &flags);
 	if ((flags & LVHT_ONITEM) == 0)
 		return;
 
@@ -226,7 +226,7 @@ void CLogView::Copy()
 
 	HGLOBAL hdst = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, str.size() + 1);
 	char* dst = static_cast<char*>(GlobalLock(hdst));
-	std::copy(str.begin(), str.end(), dst);
+	std::copy(str.begin(), str.end(), stdext::checked_array_iterator<char*>(dst, str.size()));
 	dst[str.size()] = '\0';
 	GlobalUnlock(hdst);
 	if (OpenClipboard())

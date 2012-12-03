@@ -64,7 +64,7 @@ std::string GetUnitTestType(const void* base, const ImageNtHeaders* pNTHeader)
 
 std::string GetUnitTestType(const IMAGE_DOS_HEADER* pDosHeader, size_t size)
 {
-	if (pDosHeader->e_lfanew < 0 || pDosHeader->e_lfanew > size - sizeof(IMAGE_NT_HEADERS32))
+	if (pDosHeader->e_lfanew < 0 || pDosHeader->e_lfanew + sizeof(IMAGE_NT_HEADERS32) > size)
 		return "";
 
 	auto pNTHeader = GetPtr<IMAGE_NT_HEADERS32>(pDosHeader, pDosHeader->e_lfanew);

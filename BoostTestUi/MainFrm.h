@@ -10,11 +10,15 @@
 
 #pragma once
 
+#pragma warning(disable: 4481) // nonstandard extension used: override specifier 'override'
+
 #include <string>
 #include <vector>
 #include <queue>
 #include <memory>
+#pragma warning(push, 3) // conversion from 'int' to 'unsigned short', possible loss of data
 #include <boost/thread.hpp>
+#pragma warning(pop)
 #include "Utilities.h"
 #include "TreeView.h"
 #include "LogView.h"

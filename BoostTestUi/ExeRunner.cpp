@@ -123,7 +123,7 @@ void ExeRunner::Abort()
 	if (!m_pThread)
 		return;
 
-	TerminateProcess(m_pProcess->GetProcessHandle(), -1);
+	TerminateProcess(m_pProcess->GetProcessHandle(), static_cast<unsigned>(-1));
 }
 
 void ExeRunner::Wait()

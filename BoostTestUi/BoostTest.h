@@ -10,6 +10,8 @@
 
 #pragma once
 
+#pragma warning(disable: 4481) // nonstandard extension used: override specifier 'override'
+
 #include "ExeRunner.h"
 
 namespace gj {
@@ -20,11 +22,11 @@ class ArgumentBuilder : public gj::ArgumentBuilder
 public:
 	ArgumentBuilder(ExeRunner& runner, TestObserver& observer);
 
-	virtual std::wstring GetListArg();
-	virtual void LoadTestUnits(TestUnitNode& node, std::istream& is, const std::string& testName);
+	virtual std::wstring GetListArg() override;
+	virtual void LoadTestUnits(TestUnitNode& node, std::istream& is, const std::string& testName) override;
 
-	virtual std::wstring BuildArgs(TestRunner& runner, int logLevel, unsigned options);
-	virtual void FilterMessage(const std::string& msg);
+	virtual std::wstring BuildArgs(TestRunner& runner, int logLevel, unsigned options) override;
+	virtual void FilterMessage(const std::string& msg) override;
 
 private:
 	void HandleClientNotification(const std::string& line);

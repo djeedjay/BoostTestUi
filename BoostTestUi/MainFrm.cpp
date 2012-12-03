@@ -104,7 +104,7 @@ void CMainFrame::UpdateUI()
 	UpdateStatusBar();
 }
 
-LRESULT CMainFrame::OnCreate(const CREATESTRUCT* pCreate)
+LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 {
 	HWND hWndCmdBar = m_CmdBar.Create(*this, rcDefault, nullptr, ATL_SIMPLE_CMDBAR_PANE_STYLE);
 	m_CmdBar.AttachMenu(GetMenu());
@@ -190,7 +190,7 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* pCreate)
 	return 0;
 }
 
-void CMainFrame::OnFileExit(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnFileExit(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	PostMessage(WM_CLOSE);
 }
@@ -232,7 +232,7 @@ public:
 	{
 	}
 
-    virtual void VisitTestCase(TestCase& tc) override
+    virtual void VisitTestCase(TestCase& /*tc*/) override
 	{
 		++m_count;
 	}
@@ -304,7 +304,7 @@ bool operator!=(const FILETIME& ft1, const FILETIME& ft2)
 	return !(ft1 == ft2);
 }
 
-void CMainFrame::OnTimer(UINT_PTR nIDEvent)
+void CMainFrame::OnTimer(UINT_PTR /*nIDEvent*/)
 {
 	if (!m_pRunner || m_pRunner->IsRunning())
 		return;
@@ -333,47 +333,6 @@ FILETIME GetLastWriteTime(const std::wstring& fileName)
 	return GetLastWriteTime(hFile, fileName);
 }
 
-template <typename F>
-class scope_guard
-{
-public: 
-	explicit scope_guard(const F& x) :
-		m_action(x),
-		m_released(false)
-	{
-	}
-
-	void release()
-	{
-		m_released = true;
-	}
-
-	~scope_guard()
-	{
-		if (m_released)
-			return;
-
-		// Catch any exceptions and continue during guard clean up
-		try
-		{
-			m_action();
-		}
-		catch (...)
-		{
-		}
-	}
-
-private:
-	F m_action;
-	bool m_released;
-};
-
-template <typename F>
-scope_guard<F> make_guard(F f)
-{
-	return scope_guard<F>(f);
-}
-
 void CMainFrame::Load(const std::wstring& fileName, int mruId)
 {
 	ScopedCursor cursor(::LoadCursor(nullptr, IDC_WAIT));
@@ -397,7 +356,8 @@ void CMainFrame::Load(const std::wstring& fileName, int mruId)
 	m_failedTestCount = 0;
 	m_treeView.Clear();
 	m_logView.Clear();
-	m_pRunner->TraverseTestTree(GetTestUnits(*this, false));
+	GetTestUnits getUnits(*this, false);
+	m_pRunner->TraverseTestTree(getUnits);
 	m_progressBar.SetPos(0);
 	UpdateUI();
 
@@ -436,7 +396,7 @@ void CMainFrame::CreateHpp(int resourceId, const std::wstring& fileName)
 		ThrowLastError(fileName);
 }
 
-void CMainFrame::OnFileOpen(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnFileOpen(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 //	CFileDialog dlg(TRUE, L".exe", L"", OFN_FILEMUSTEXIST | OFN_HIDEREADONLY, L"Boost Unit Test (*.exe)\0*.exe\0Boost Unit Test Library (*.dll)\0*.dll\0\0", 0, L"Load Unit Test");
 	CFileDialog dlg(TRUE, L".exe", L"", OFN_FILEMUSTEXIST | OFN_HIDEREADONLY, L"Boost Unit Test (*.exe)\0*.exe\0\0", 0);
@@ -448,7 +408,7 @@ void CMainFrame::OnFileOpen(UINT uNotifyCode, int nID, CWindow wndCtl)
 	Load(dlg.m_szFileName);
 }
 
-void CMainFrame::OnFileSave(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnFileSave(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	UISetText(0, WStr(wstringbuilder() << "Saving " << m_logFileName));
 	ScopedCursor cursor(::LoadCursor(nullptr, IDC_WAIT));
@@ -456,7 +416,7 @@ void CMainFrame::OnFileSave(UINT uNotifyCode, int nID, CWindow wndCtl)
 	UpdateStatusBar();
 }
 
-void CMainFrame::OnFileSaveAs(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnFileSaveAs(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	CFileDialog dlg(false, L".txt", m_logFileName.c_str(), OFN_OVERWRITEPROMPT, L"Text Files (*.txt)\0*.txt\0All Files\0*.*\0\0", 0);
 	dlg.m_ofn.nFilterIndex = 0;
@@ -471,13 +431,13 @@ void CMainFrame::OnFileSaveAs(UINT uNotifyCode, int nID, CWindow wndCtl)
 	UpdateStatusBar();
 }
 
-void CMainFrame::OnFileAutoRun(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnFileAutoRun(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_autoRun = !m_autoRun;
 	UISetCheck(ID_FILE_AUTO_RUN, m_autoRun);
 }
 
-void CMainFrame::OnFileCreateBoostHpp(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnFileCreateBoostHpp(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	CFileDialog dlg(FALSE, L".hpp", L"unit_test_gui.hpp", OFN_OVERWRITEPROMPT, L"C++ Header Files (*.hpp)\0*.hpp\0All Files\0*.*\0\0", 0);
 	dlg.m_ofn.nFilterIndex = 0;
@@ -489,7 +449,7 @@ void CMainFrame::OnFileCreateBoostHpp(UINT uNotifyCode, int nID, CWindow wndCtl)
 	CreateHpp(IDR_UNIT_TEST_GUI_HPP, dlg.m_szFileName);
 }
 
-void CMainFrame::OnFileCreateGoogleHpp(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnFileCreateGoogleHpp(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	CFileDialog dlg(FALSE, L".h", L"gtest-gui.h", OFN_OVERWRITEPROMPT, L"C++ Header Files (*.h)\0*.hpp\0All Files\0*.*\0\0", 0);
 	dlg.m_ofn.nFilterIndex = 0;
@@ -501,23 +461,23 @@ void CMainFrame::OnFileCreateGoogleHpp(UINT uNotifyCode, int nID, CWindow wndCtl
 	CreateHpp(IDR_GTEST_GUI_H, dlg.m_szFileName);
 }
 
-void CMainFrame::OnLogAutoClear(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnLogAutoClear(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_logAutoClear = !m_logAutoClear;
 	UISetCheck(ID_LOG_AUTO_CLEAR, m_logAutoClear);
 }
 
-void CMainFrame::OnLogSelectAll(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnLogSelectAll(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_logView.SelectAll();
 }
 
-void CMainFrame::OnLogClear(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnLogClear(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_logView.Clear();
 }
 
-void CMainFrame::OnLogCopy(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnLogCopy(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	ScopedCursor cursor(::LoadCursor(nullptr, IDC_WAIT));
 	m_logView.Copy();
@@ -588,7 +548,7 @@ void CMainFrame::test_unit_start(const TestUnit& tu)
 	});
 }
 
-void CMainFrame::test_unit_finish(const TestUnit& tu, unsigned long elapsed)
+void CMainFrame::test_unit_finish(const TestUnit& tu, unsigned long /*elapsed*/)
 {
 	EnQueue([this, tu]()
 	{
@@ -619,7 +579,7 @@ void CMainFrame::test_unit_skipped(const TestUnit& tu)
 	});
 }
 
-void CMainFrame::test_unit_aborted(const TestUnit& tu)
+void CMainFrame::test_unit_aborted(const TestUnit& /*tu*/)
 {
 }
 
@@ -646,7 +606,7 @@ void CMainFrame::assertion_result(bool passed)
 	});
 }
 
-void CMainFrame::exception_caught(const std::string& what)
+void CMainFrame::exception_caught(const std::string& /*what*/)
 {
 	unsigned id = m_currentId;
 	EnQueue([this, id]()
@@ -666,13 +626,13 @@ void CMainFrame::TestFinished()
 	});
 }
 
-void CMainFrame::OnTestRandomize(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnTestRandomize(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_randomize = !m_randomize;
 	UISetCheck(ID_TEST_RANDOMIZE, m_randomize);
 }
 
-void CMainFrame::OnTestDebugger(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnTestDebugger(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_debugger = !m_debugger;
 	UISetCheck(ID_TEST_DEBUGGER, m_debugger);
@@ -692,7 +652,7 @@ unsigned CMainFrame::GetOptions() const
 	return options;
 }
 
-void CMainFrame::OnTestAbort(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnTestAbort(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_pRunner->Abort();
 }
@@ -704,7 +664,7 @@ void CMainFrame::ShowToolBar(bool visible)
 	UpdateLayout();
 }
 
-void CMainFrame::OnViewToolBar(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnViewToolBar(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 //	ShowToolBar(!::IsWindowVisible(m_hWndToolBar));
 	CReBarCtrl rebar = m_hWndToolBar;
@@ -721,48 +681,48 @@ void CMainFrame::ShowStatusBar(bool visible)
 	UpdateLayout();
 }
 
-void CMainFrame::OnViewStatusBar(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnViewStatusBar(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	ShowStatusBar(!::IsWindowVisible(m_hWndStatusBar));
 }
 
-void CMainFrame::OnAppAbout(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnAppAbout(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	CAboutDlg dlg;
 	dlg.DoModal();
 }
 
-void CMainFrame::OnTreeRun(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnTreeRun(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	RunSingle(m_treeView.GetSelectedTestItem());
 }
 
-void CMainFrame::OnTreeRunChecked(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnTreeRunChecked(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	RunChecked();
 }
 
-void CMainFrame::OnTreeRunAll(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnTreeRunAll(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	RunAll();
 }
 
-void CMainFrame::OnTreeCheckAll(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnTreeCheckAll(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_treeView.CheckAll();
 }
 
-void CMainFrame::OnTreeUncheckAll(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnTreeUncheckAll(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_treeView.UncheckAll();
 }
 
-void CMainFrame::OnTreeCheckFailed(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnTreeCheckFailed(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_treeView.CheckFailed();
 }
 
-void CMainFrame::OnMruMenuItem(UINT uCode, int nID, HWND hwndCtrl)
+void CMainFrame::OnMruMenuItem(UINT /*uCode*/, int nID, HWND /*hwndCtrl*/)
 {
 	wchar_t pathName[m_mru.m_cchMaxItemLen_Max + 1];
 	if (m_mru.GetFromList(nID, pathName, m_mru.m_cchMaxItemLen_Max))

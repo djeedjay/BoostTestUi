@@ -117,7 +117,7 @@ void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const 
 	}
 }
 
-std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsigned options)
+std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int /*logLevel*/, unsigned options)
 {
 	std::wostringstream args;
 	args << L"--gtest_also_run_disabled_tests";

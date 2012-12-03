@@ -38,7 +38,7 @@ BOOL CTreeView::PreTranslateMessage(MSG* pMsg)
 	return FALSE;
 }
 
-LRESULT CTreeView::OnCreate(const CREATESTRUCT* pCreate)
+LRESULT CTreeView::OnCreate(const CREATESTRUCT* /*pCreate*/)
 {
 	DefWindowProc();
 
@@ -53,7 +53,7 @@ LRESULT CTreeView::OnCreate(const CREATESTRUCT* pCreate)
 	return 0;
 }
 
-void CTreeView::OnContextMenu(HWND hWnd, CPoint pt)
+void CTreeView::OnContextMenu(HWND /*hWnd*/, CPoint pt)
 {
 	if (pt == CPoint(-1, -1))
 	{
@@ -109,7 +109,7 @@ LRESULT CTreeView::OnSelChanged(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/
 	return 0;
 }
 
-LRESULT CTreeView::OnClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
+LRESULT CTreeView::OnClick(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 {
 	// Q261289
 	DWORD dwpos = GetMessagePos();
@@ -126,7 +126,7 @@ LRESULT CTreeView::OnClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
 	return 0;
 }
 
-LRESULT CTreeView::OnRClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& bHandled)
+LRESULT CTreeView::OnRClick(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& bHandled)
 {
 	// Q222905
 	SendMessage(WM_CONTEXTMENU, (WPARAM)m_hWnd, GetMessagePos());
@@ -263,7 +263,7 @@ void CTreeView::SetTestItemImage(unsigned id, int img)
 		SetItemImage(it->second, img, img);
 }
 
-void CTreeView::BeginTestSuite(unsigned id)
+void CTreeView::BeginTestSuite(unsigned /*id*/)
 {
 }
 
@@ -313,7 +313,7 @@ void CTreeView::EndTestCase(unsigned id, bool succeeded)
 		SetTestFail(it->second);
 }
 
-void CTreeView::EndTestSuite(unsigned id)
+void CTreeView::EndTestSuite(unsigned /*id*/)
 {
 }
 
