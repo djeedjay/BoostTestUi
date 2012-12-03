@@ -7,7 +7,7 @@
 
 
 #define BOOST_TEST_MODULE Exe TestRunner Test
-#include "unit_test_gui.hpp"
+#include <boost/test/unit_test_gui.hpp>
 
 #ifndef BOOST_TEST_MODULE
 boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])

@@ -70,7 +70,7 @@
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>
-      <AdditionalIncludeDirectories>..\Libraries\wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\Libraries\wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalLibraryDirectories>..\Libraries\boost\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -105,7 +105,7 @@
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>
-      <AdditionalIncludeDirectories>..\Libraries\wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\Libraries\wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalLibraryDirectories>..\Libraries\boost\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -134,11 +134,12 @@
     <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\boost\test\unit_test_gui.hpp" />
+    <ClInclude Include="..\include\gtest\gtest-gui.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="BoostTest.h" />
     <ClInclude Include="ExeRunner.h" />
     <ClInclude Include="GoogleTest.h" />
-    <ClInclude Include="gtest-gui.h" />
     <ClInclude Include="hstream.h" />
     <ClInclude Include="GetUnitTestType.h" />
     <ClInclude Include="LogView.h" />
@@ -151,7 +152,6 @@
     <ClInclude Include="streamredirector.h" />
     <ClInclude Include="TestRunner.h" />
     <ClInclude Include="TreeView.h" />
-    <ClInclude Include="unit_test_gui.hpp" />
     <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <ItemGroup>

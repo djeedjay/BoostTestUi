@@ -419,8 +419,8 @@ END
 // RCDATA
 //
 
-IDR_UNIT_TEST_GUI_HPP   RCDATA                  "unit_test_gui.hpp"
-IDR_GTEST_GUI_H         RCDATA                  "gtest-gui.h"
+IDR_UNIT_TEST_GUI_HPP   RCDATA                  "boost/test/unit_test_gui.hpp"
+IDR_GTEST_GUI_H         RCDATA                  "gtest/gtest-gui.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

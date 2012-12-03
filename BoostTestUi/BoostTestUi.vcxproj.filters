@@ -13,6 +13,9 @@
       <UniqueIdentifier>{e3932378-660d-4ac4-97c3-10a6e43d3bc4}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;jpg;jpeg;jpe;manifest</Extensions>
     </Filter>
+    <Filter Include="Header Files\include">
+      <UniqueIdentifier>{eb5a3b33-0c04-46fe-a4e6-3aac1b378760}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AboutDlg.cpp">
@@ -92,9 +95,6 @@
     <ClInclude Include="hstream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="unit_test_gui.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TreeView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -107,14 +107,17 @@
     <ClInclude Include="GoogleTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gtest-gui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Severity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GetUnitTestType.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\boost\test\unit_test_gui.hpp">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gtest\gtest-gui.h">
+      <Filter>Header Files\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
