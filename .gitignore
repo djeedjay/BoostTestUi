@@ -1,4 +1,7 @@
 Libraries/
 Debug/
 Release/
+ipch/
 *.vcxproj.user
+*.sdf
+*.suo
