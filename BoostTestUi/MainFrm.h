@@ -74,6 +74,7 @@ public:
 	    UPDATE_ELEMENT(ID_FILE_AUTO_RUN, UPDUI_MENUPOPUP)
 	    UPDATE_ELEMENT(ID_LOG_AUTO_CLEAR, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
 	    UPDATE_ELEMENT(ID_TEST_RANDOMIZE, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
+	    UPDATE_ELEMENT(ID_TEST_REPEAT, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
 	    UPDATE_ELEMENT(ID_TEST_DEBUGGER, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
 	    UPDATE_ELEMENT(ID_TREE_RUN, UPDUI_MENUPOPUP)
 	    UPDATE_ELEMENT(ID_TREE_RUN_CHECKED, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
@@ -111,6 +112,7 @@ public:
 	void OnLogClear(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnLogCopy(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestRandomize(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnTestRepeat(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestDebugger(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestAbort(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnViewToolBar(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -158,6 +160,7 @@ private:
 	bool m_autoRun;
 	bool m_logAutoClear;
 	bool m_randomize;
+	bool m_repeat;
 	bool m_debugger;
 	gj::Timer m_timer;
 	int m_testCaseCount;

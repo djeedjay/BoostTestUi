@@ -96,7 +96,8 @@ struct TestRunner
 	enum Options
 	{
 		Randomize = 1 << 0,
-		WaitForDebugger = 1 << 1
+		WaitForDebugger = 1 << 1,
+		Repeat = 1 << 2,
 	};
 	virtual TestSuite& RootTestSuite() = 0;
 	virtual void TraverseTestTree(TestTreeVisitor& v) = 0;

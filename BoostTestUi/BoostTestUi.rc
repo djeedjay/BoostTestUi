@@ -59,6 +59,7 @@ BEGIN
     BUTTON      ID_LOG_COPY
     SEPARATOR
     BUTTON      ID_TEST_RANDOMIZE
+    BUTTON      ID_TEST_REPEAT
     BUTTON      ID_TEST_DEBUGGER
     BUTTON      ID_TREE_RUN_CHECKED
     BUTTON      ID_TEST_ABORT
@@ -88,13 +89,13 @@ BEGIN
         MENUITEM SEPARATOR
         POPUP "Create Header"
         BEGIN
-            MENUITEM "Boost Test...",           ID_FILE_CREATE_BOOST_HPP
-            MENUITEM "Google Test...",          ID_FILE_CREATE_GOOGLE_HPP
+            MENUITEM "Boost Test...",               ID_FILE_CREATE_BOOST_HPP
+            MENUITEM "Google Test...",              ID_FILE_CREATE_GOOGLE_HPP
         END
         MENUITEM SEPARATOR
-		POPUP "Recent Tests"
+        POPUP "Recent Tests"
         BEGIN
-			MENUITEM "Empty",                   ID_FILE_MRU_FIRST
+            MENUITEM "Empty",                       ID_FILE_MRU_FIRST
         END
         MENUITEM SEPARATOR
         MENUITEM "E&xit",                       ID_APP_EXIT
@@ -102,10 +103,11 @@ BEGIN
     POPUP "&Test"
     BEGIN
         MENUITEM "Randomize",                   ID_TEST_RANDOMIZE
-        MENUITEM "Wait for Debugger",           ID_TEST_DEBUGGER
+        MENUITEM "Repeat",                      ID_TEST_REPEAT
+        MENUITEM "&Wait for Debugger",          ID_TEST_DEBUGGER
         MENUITEM SEPARATOR
-        MENUITEM "&Run Checked\tCtrl+R",        ID_TREE_RUN_CHECKED
-        MENUITEM "&Run All\tCtrl+R",            ID_TREE_RUN_ALL
+        MENUITEM "&Run Checked\tF5",            ID_TREE_RUN_CHECKED
+        MENUITEM "Run &All\tF6",                ID_TREE_RUN_ALL
         MENUITEM "Abort\tCtrl+Break",           ID_TEST_ABORT
     END
     POPUP "&Log"
@@ -181,16 +183,18 @@ END
 
 IDR_MAINFRAME ACCELERATORS
 BEGIN
-    "C",            ID_LOG_COPY,            VIRTKEY, CONTROL, NOINVERT
-    VK_INSERT,      ID_LOG_COPY,            VIRTKEY, CONTROL, NOINVERT
-    "X",            ID_LOG_CLEAR,           VIRTKEY, CONTROL, NOINVERT
     "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
     "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
+    "X",            ID_LOG_CLEAR,           VIRTKEY, CONTROL, NOINVERT
+    "C",            ID_LOG_COPY,            VIRTKEY, CONTROL, NOINVERT
+    VK_INSERT,      ID_LOG_COPY,            VIRTKEY, CONTROL, NOINVERT
+    "A",            ID_LOG_SELECTALL,       VIRTKEY, CONTROL, NOINVERT
     VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
     VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
-    "A",            ID_LOG_SELECTALL,       VIRTKEY, CONTROL, NOINVERT
-    "R",            ID_TREE_RUN_CHECKED,    VIRTKEY, CONTROL, NOINVERT
     VK_PAUSE,       ID_TEST_ABORT,          VIRTKEY, CONTROL, NOINVERT
+    "R",            ID_TREE_RUN_CHECKED,    VIRTKEY, CONTROL, NOINVERT
+    VK_F5,          ID_TREE_RUN_CHECKED,    VIRTKEY, NOINVERT
+    VK_F6,          ID_TREE_RUN_ALL,        VIRTKEY, NOINVERT
 END
 
 
@@ -315,7 +319,12 @@ END
 
 STRINGTABLE
 BEGIN
-    ATL_IDS_MRU_FILE        "Open this document"
+    ATL_IDS_MRU_FILE        "Load this unit test"
+END
+
+STRINGTABLE
+BEGIN
+    ID_TEST_REPEAT          "Repeat the selected test cases until a failure occurs\nRepeat"
 END
 
 #endif    // English (United States) resources

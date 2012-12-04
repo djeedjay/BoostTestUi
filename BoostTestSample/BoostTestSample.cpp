@@ -17,10 +17,7 @@ boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
 }
 #endif
 
-#pragma warning(push, 3) // conversion from 'int' to 'unsigned short', possible loss of data
 #include <boost/thread.hpp>
-#pragma warning(pop)
-
 using namespace boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE(FailingTests)

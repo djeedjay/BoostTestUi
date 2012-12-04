@@ -49,13 +49,15 @@
 #define ID_TREE_CHECK_FAILED            32800
 #define IDR_LIST_CONTEXTMENU            32801
 #define ID_TREE_WAITFORDEBUGGER         32802
+#define ID_TEST_REPEAT                  32804
+#define ID_TEST_REPEAT32809             32809
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        209
-#define _APS_NEXT_COMMAND_VALUE         32803
+#define _APS_NEXT_COMMAND_VALUE         32810
 #define _APS_NEXT_CONTROL_VALUE         1010
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

@@ -123,10 +123,13 @@ std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int /*logLevel*/, un
 	args << L"--gtest_also_run_disabled_tests";
 
 	if (options & ExeRunner::Randomize)
-		args << L" --gtest_shuffle ";
+		args << L" --gtest_shuffle";
+
+	if (options & ExeRunner::Repeat)
+		args << L" --gtest_repeat=-1";
 
 	if (options & ExeRunner::WaitForDebugger)
-		args << L" --gui_wait ";
+		args << L" --gui_wait --gtest_break_on_failure";
 
 	GetEnableArg getArg;
 	runner.TraverseTestTree(getArg);

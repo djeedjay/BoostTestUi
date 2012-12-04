@@ -24,6 +24,7 @@ BEGIN_MSG_MAP_TRY(CLogView)
 	REFLECTED_NOTIFY_CODE_HANDLER(NM_CUSTOMDRAW, OnCustomDraw)
 	REFLECTED_NOTIFY_CODE_HANDLER(NM_CLICK, OnClick)
 	REFLECTED_NOTIFY_CODE_HANDLER(NM_DBLCLK, OnDblClick)
+	REFLECTED_NOTIFY_CODE_HANDLER(LVN_GETINFOTIP, OnGetInfoTip)
 	DEFAULT_REFLECTION_HANDLER();
 END_MSG_MAP_CATCH(ExceptionHandler)
 
@@ -49,7 +50,7 @@ LRESULT CLogView::OnCreate(const CREATESTRUCT* /*pCreate*/)
 {
 	DefWindowProc();
 
-	SetExtendedListViewStyle(LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
+	SetExtendedListViewStyle(LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER | LVS_EX_INFOTIP);
 
 	int timeWidth = 90;
 	InsertColumn(0, L"Time", LVCFMT_LEFT, timeWidth, 0);
@@ -300,6 +301,13 @@ LRESULT CLogView::OnDblClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
 	std::smatch sm;
 	if (std::regex_match(line, sm, re1) || std::regex_search(line, sm, re2))
 		ShowSourceLine(sm[1], to_int(sm[2]));
+
+	return 0;
+}
+
+LRESULT CLogView::OnGetInfoTip(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
+{
+	NMLVGETINFOTIP* pGetInfoTip = reinterpret_cast<NMLVGETINFOTIP*>(pnmh);
 
 	return 0;
 }

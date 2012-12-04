@@ -47,6 +47,7 @@ BEGIN_MSG_MAP_TRY(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_LOG_CLEAR, OnLogClear)
 	COMMAND_ID_HANDLER_EX(ID_LOG_COPY, OnLogCopy)
 	COMMAND_ID_HANDLER_EX(ID_TEST_RANDOMIZE, OnTestRandomize)
+	COMMAND_ID_HANDLER_EX(ID_TEST_REPEAT, OnTestRepeat)
 	COMMAND_ID_HANDLER_EX(ID_TEST_DEBUGGER, OnTestDebugger)
 	COMMAND_ID_HANDLER_EX(ID_TEST_ABORT, OnTestAbort)
 	COMMAND_ID_HANDLER_EX(ID_VIEW_TOOLBAR, OnViewToolBar)
@@ -71,6 +72,7 @@ CMainFrame::CMainFrame(const std::wstring& fileName) :
 	m_autoRun(true),
 	m_logAutoClear(false),
 	m_randomize(false),
+	m_repeat(false),
 	m_debugger(false)
 {
 }
@@ -330,7 +332,7 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 
 	if (DragQueryFile(hDropInfo, 0xFFFFFFFF, nullptr, 0) == 1)
 	{
-		std::array<wchar_t, MAX_PATH> fileName;
+		std::vector<wchar_t> fileName(DragQueryFile(hDropInfo, 0, nullptr, 0) + 1);
 		if (DragQueryFile(hDropInfo, 0, fileName.data(), fileName.size()))
 			Load(fileName.data());
 	}
@@ -647,6 +649,12 @@ void CMainFrame::OnTestRandomize(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wn
 	UISetCheck(ID_TEST_RANDOMIZE, m_randomize);
 }
 
+void CMainFrame::OnTestRepeat(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
+{
+	m_repeat = !m_repeat;
+	UISetCheck(ID_TEST_REPEAT, m_repeat);
+}
+
 void CMainFrame::OnTestDebugger(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_debugger = !m_debugger;
@@ -664,6 +672,8 @@ unsigned CMainFrame::GetOptions() const
 		options |= TestRunner::WaitForDebugger;
 	if (m_randomize)
 		options |= TestRunner::Randomize;
+	if (m_repeat)
+		options |= TestRunner::Repeat;
 	return options;
 }
 
@@ -787,6 +797,7 @@ bool CMainFrame::LoadSettings()
 		m_autoRun = (options & Options::AutoRun) != 0;
 		m_logAutoClear = (options & Options::LogAutoClear) != 0;
 		m_randomize = (options & TestRunner::Randomize) != 0;
+		m_repeat = (options & TestRunner::Repeat) != 0;
 		m_debugger = (options & TestRunner::WaitForDebugger) != 0;
 	}
 

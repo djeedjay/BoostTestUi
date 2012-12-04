@@ -138,8 +138,10 @@
     <ClInclude Include="..\include\gtest\gtest-gui.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="BoostTest.h" />
+    <ClInclude Include="boost\test\unit_test_gui.hpp" />
     <ClInclude Include="ExeRunner.h" />
     <ClInclude Include="GoogleTest.h" />
+    <ClInclude Include="gtest\gtest-gui.h" />
     <ClInclude Include="hstream.h" />
     <ClInclude Include="GetUnitTestType.h" />
     <ClInclude Include="LogView.h" />
