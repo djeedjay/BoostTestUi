@@ -12,6 +12,7 @@
 #include <iomanip>
 #include <sstream>
 #include <fstream>
+#include <array>
 #include <boost/filesystem.hpp>
 #include "AboutDlg.h"
 #include "ExeRunner.h"
@@ -33,6 +34,7 @@ BEGIN_MSG_MAP_TRY(CMainFrame)
 	MSG_WM_CLOSE(OnClose)
 	MESSAGE_HANDLER(UM_DEQUEUE, OnDeQueue);
 	MSG_WM_TIMER(OnTimer)
+	MSG_WM_DROPFILES(OnDropFiles)
 	COMMAND_ID_HANDLER_EX(ID_APP_EXIT, OnFileExit)
 	COMMAND_ID_HANDLER_EX(ID_FILE_OPEN, OnFileOpen)
 	COMMAND_ID_HANDLER_EX(ID_FILE_SAVE, OnFileSave)
@@ -187,6 +189,7 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 		Load(m_pathName);
 
 	SetTimer(1, 1000);
+	DragAcceptFiles(true);
 	return 0;
 }
 
@@ -319,6 +322,18 @@ void CMainFrame::OnTimer(UINT_PTR /*nIDEvent*/)
 		return;
 
 	Load(m_pathName);
+}
+
+void CMainFrame::OnDropFiles(HDROP hDropInfo)
+{
+	auto guard = make_guard([hDropInfo]() { DragFinish(hDropInfo); });
+
+	if (DragQueryFile(hDropInfo, 0xFFFFFFFF, nullptr, 0) == 1)
+	{
+		std::array<wchar_t, MAX_PATH> fileName;
+		if (DragQueryFile(hDropInfo, 0, fileName.data(), fileName.size()))
+			Load(fileName.data());
+	}
 }
 
 FILETIME GetLastWriteTime(const std::wstring& fileName)

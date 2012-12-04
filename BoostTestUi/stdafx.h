@@ -19,11 +19,10 @@ using std::max;
 #define _WIN32_IE	0x0603
 #define _RICHEDIT_VER	0x0100
 
+#pragma warning(push, 3)
+#pragma warning(disable: 4996)
 #include <atlbase.h>
 #include <atlapp.h>
-
-extern CAppModule _Module;
-
 #include <atlwin.h>
 #include <atlcrack.h>
 #include <atlframe.h>
@@ -33,6 +32,9 @@ extern CAppModule _Module;
 #include <atlctrlw.h>
 #include <atldlgs.h>
 #include <atlmisc.h>
+#pragma warning(pop)
+
+extern CAppModule _Module;
 
 #if defined _M_IX86
   #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
