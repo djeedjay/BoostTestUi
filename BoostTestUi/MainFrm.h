@@ -98,6 +98,7 @@ public:
 	LRESULT OnCreate(const CREATESTRUCT* pCreate);
 	LRESULT OnDeQueue(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	void OnTimer(UINT_PTR nIDEvent);
+	void OnDropFiles(HDROP hDropInfo);
 	void OnFileExit(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnFileOpen(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnFileSave(UINT uNotifyCode, int nID, CWindow wndCtl);
