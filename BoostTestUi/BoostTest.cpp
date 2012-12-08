@@ -225,14 +225,18 @@ void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const 
 	BoostTest::LoadTestUnits(tree, is);
 }
 
-std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsigned options)
+std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsigned& options)
 {
 	std::wostringstream args;
-	args << L"--log_level=" << GetLogLevelArg(logLevel) << " ";
+	args << L"--log_level=" << GetLogLevelArg(logLevel);
+
 	if (options & ExeRunner::Randomize)
-		args << L"--random=" << GetTickCount() << " ";
+		args << L" --random=1";
+
+	if (options & ExeRunner::Repeat)
+		options &= ~ExeRunner::WaitForDebugger;
 	if (options & ExeRunner::WaitForDebugger)
-		args << L"--gui_wait ";
+		args << L" --gui_wait";
 
 /* Cannot enable disabled test cases:
 	GetEnableArg2 getArg2;
@@ -242,7 +246,7 @@ std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsign
 */
 	GetEnableArg getArg;
 	runner.TraverseTestTree(getArg);
-	args << L"--gui_run=" << getArg.GetArg();
+	args << L" --gui_run=" << getArg.GetArg();
 	return args.str();
 }
 
@@ -254,27 +258,27 @@ void ArgumentBuilder::HandleClientNotification(const std::string& line)
 	ss >> c >> command;
 
 	if (command == "start")
-		m_pObserver->test_start(get_arg<unsigned>(ss));
+		m_pObserver->test_iteration_start(get_arg<unsigned>(ss));
 	else if (command == "finish")
-		m_pObserver->test_finish();
+		m_pObserver->test_iteration_finish();
 	else if (command == "aborted")
 		m_pObserver->test_aborted();
 	else if (command == "unit_start")
-		m_pObserver->test_unit_start(m_pRunner->GetTestUnit(get_arg<unsigned>(ss)));
+		m_pRunner->OnTestUnitStart(get_arg<unsigned>(ss));
 	else if (command == "unit_finish")
 	{
 		unsigned id = get_arg<unsigned>(ss);
 		unsigned elapsed = get_arg<unsigned>(ss);
-		m_pObserver->test_unit_finish(m_pRunner->GetTestUnit(id), elapsed);
+		m_pRunner->OnTestUnitFinish(id, elapsed);
 	}
 	else if (command == "unit_skipped")
-		m_pObserver->test_unit_skipped(m_pRunner->GetTestUnit(get_arg<unsigned>(ss)));
+		m_pRunner->OnTestUnitSkipped(get_arg<unsigned>(ss));
 	else if (command == "unit_aborted")
-		m_pObserver->test_unit_aborted(m_pRunner->GetTestUnit(get_arg<unsigned>(ss)));
+		m_pRunner->OnTestUnitAborted(get_arg<unsigned>(ss));
 	else if (command == "assertion")
-		m_pObserver->assertion_result(get_arg<bool>(ss));
+		m_pRunner->OnTestAssertion(get_arg<bool>(ss));
 	else if (command == "exception")
-		m_pObserver->exception_caught(get_arg<std::string>(ss));
+		m_pRunner->OnTestExceptionCaught(get_arg<std::string>(ss));
 	else if (command == "waiting")
 		m_pRunner->OnWaiting();
 	else

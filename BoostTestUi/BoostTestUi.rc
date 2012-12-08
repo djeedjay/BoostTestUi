@@ -72,6 +72,7 @@ END
 //
 
 IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
+IDI_RUN                 BITMAP                  "res\\run.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -312,6 +313,7 @@ END
 
 STRINGTABLE
 BEGIN
+    IDPANE_TESTCASE_ITERATIONS "Test iterations: ####"
     IDPANE_TESTCASE_TOTAL   "Test cases: ####"
     IDPANE_TESTCASE_RUN     "Tests run: ####"
     IDPANE_TESTCASE_FAILED  "Failed tests: ####"
@@ -379,7 +381,6 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_EMPTY               ICON                    "res\\empty.ico"
-IDI_ARROW               ICON                    "res\\arrow.ico"
 IDI_TICK                ICON                    "res\\tick.ico"
 IDI_CROSS               ICON                    "res\\cross.ico"
 

@@ -15,6 +15,7 @@ namespace gj {
 
 BEGIN_MSG_MAP_TRY(CTreeView)
 	MSG_WM_CREATE(OnCreate)
+	MSG_WM_TIMER(OnTimer)
 	MSG_WM_CONTEXTMENU(OnContextMenu);
 	REFLECTED_NOTIFY_CODE_HANDLER(TVN_SELCHANGED, OnSelChanged)
 	REFLECTED_NOTIFY_CODE_HANDLER(NM_CLICK, OnClick)
@@ -23,7 +24,9 @@ BEGIN_MSG_MAP_TRY(CTreeView)
 END_MSG_MAP_CATCH(ExceptionHandler)
 
 CTreeView::CTreeView(CMainFrame& mainFrame) :
-	m_pMainFrame(&mainFrame)
+	m_pMainFrame(&mainFrame),
+	m_hCurrentItem(nullptr),
+	m_runIndex(0)
 {
 }
 
@@ -43,14 +46,21 @@ LRESULT CTreeView::OnCreate(const CREATESTRUCT* /*pCreate*/)
 	DefWindowProc();
 
 	SetWindowLong(GWL_STYLE, GetWindowLong(GWL_STYLE) | TVS_CHECKBOXES);
-	m_treeImg.Create(16, 16, ILC_COLOR24 | ILC_MASK, 4, 0);
+	m_treeImg.Create(16, 16, ILC_COLOR24 | ILC_MASK, 12, 0);
 	m_iEmpty = m_treeImg.AddIcon(AtlLoadIcon(IDI_EMPTY));
-	m_iArrow = m_treeImg.AddIcon(AtlLoadIcon(IDI_ARROW));
 	m_iTick = m_treeImg.AddIcon(AtlLoadIcon(IDI_TICK));
 	m_iCross = m_treeImg.AddIcon(AtlLoadIcon(IDI_CROSS));
+	m_iRun = m_treeImg.Add(AtlLoadBitmap(IDI_RUN), RGB(255,255,255));
 	SetImageList(m_treeImg, LVSIL_NORMAL);
 
 	return 0;
+}
+
+void CTreeView::OnTimer(UINT_PTR /*nIDEvent*/)
+{
+	m_runIndex = (m_runIndex + 1) % 12;
+	if (m_hCurrentItem)
+		SetItemImage(m_hCurrentItem, m_iRun + m_runIndex);
 }
 
 void CTreeView::OnContextMenu(HWND /*hWnd*/, CPoint pt)
@@ -184,7 +194,7 @@ void CTreeView::CheckTreeItem(HTREEITEM hItem, bool check)
 
 void CTreeView::SetTreeImages(HTREEITEM hItem, int image)
 {
-	SetItemImage(hItem, image, image);
+	SetItemImage(hItem, image);
 
 	HTREEITEM hChild = GetChildItem(hItem);
 	while (hChild)
@@ -256,11 +266,16 @@ unsigned CTreeView::GetSelectedTestItem() const
 	return GetItemData(GetSelectedItem());
 }
 
+void CTreeView::SetItemImage(HTREEITEM hItem, int img)
+{
+	CTreeViewCtrl::SetItemImage(hItem, img, img);
+}
+
 void CTreeView::SetTestItemImage(unsigned id, int img)
 {
 	auto it = m_items.find(id);
 	if (it != m_items.end())
-		SetItemImage(it->second, img, img);
+		SetItemImage(it->second, img);
 }
 
 void CTreeView::BeginTestSuite(unsigned /*id*/)
@@ -269,12 +284,17 @@ void CTreeView::BeginTestSuite(unsigned /*id*/)
 
 void CTreeView::BeginTestCase(unsigned id)
 {
-	SetTestItemImage(id, m_iArrow);
+	auto it = m_items.find(id);
+	if (it != m_items.end())
+	{
+		m_hCurrentItem = it->second;
+		SetItemImage(m_hCurrentItem, m_iRun + m_runIndex);
+	}
 }
 
 void CTreeView::SetTestFail(HTREEITEM hItem)
 {
-	SetItemImage(hItem, m_iCross, m_iCross);
+	SetItemImage(hItem, m_iCross);
 
 	HTREEITEM hParent = GetParentItem(hItem);
 	if (hParent != nullptr)
@@ -283,7 +303,7 @@ void CTreeView::SetTestFail(HTREEITEM hItem)
 
 void CTreeView::SetTestOk(HTREEITEM hItem)
 {
-	SetItemImage(hItem, m_iTick, m_iTick);
+	SetItemImage(hItem, m_iTick);
 
 	HTREEITEM hParent = GetParentItem(hItem);
 	if (hParent == nullptr)
@@ -303,6 +323,8 @@ void CTreeView::SetTestOk(HTREEITEM hItem)
 
 void CTreeView::EndTestCase(unsigned id, bool succeeded)
 {
+	m_hCurrentItem = nullptr;
+
 	auto it = m_items.find(id);
 	if (it == m_items.end())
 		return;
@@ -315,6 +337,19 @@ void CTreeView::EndTestCase(unsigned id, bool succeeded)
 
 void CTreeView::EndTestSuite(unsigned /*id*/)
 {
+}
+
+void CTreeView::OnTestStart()
+{
+	SetTimer(1, 100);
+}
+
+void CTreeView::OnTestFinish()
+{
+	KillTimer(1);
+	if (m_hCurrentItem)
+		SetItemImage(m_hCurrentItem, m_iEmpty);
+	m_hCurrentItem = nullptr;
 }
 
 } // namespace gj

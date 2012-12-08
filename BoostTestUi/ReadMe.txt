@@ -22,6 +22,7 @@ Boost Test GUI ToDo done
 - Reload config when timestamp changes
 - Auto run new build
 - gtest runner
+- Auto repeat
 
 Boost Test GUI ToDo
 ===================
@@ -29,4 +30,3 @@ Boost Test GUI ToDo
 - other options?
 - nunit runner
 - check log highlights
-- Auto repeat

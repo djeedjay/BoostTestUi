@@ -46,12 +46,16 @@ public:
 	void EndTestCase(unsigned id, bool succeeded);
 	void EndTestSuite(unsigned id);
 
+	void OnTestStart();
+	void OnTestFinish();
+
 // Handler prototypes (uncomment arguments if needed):
 //	LRESULT MessageHandler(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 //	LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 //	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
 	LRESULT OnCreate(const CREATESTRUCT* pCreate);
+	void OnTimer(UINT_PTR /*nIDEvent*/);
 	void OnContextMenu(HWND hWnd, CPoint pt);
 	LRESULT OnSelChanged(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
 	LRESULT OnClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
@@ -64,6 +68,7 @@ private:
 	void CheckTreeItem(HTREEITEM hItem, bool check);
 	int GetTestItemImage(HTREEITEM hItem) const;
 	void SetTreeImages(HTREEITEM hItem, int image);
+	void SetItemImage(HTREEITEM hItem, int img);
 	void SetTestItemImage(unsigned id, int img);
 	void SetTestFail(HTREEITEM hItem);
 	void SetTestOk(HTREEITEM hItem);
@@ -74,6 +79,9 @@ private:
 	int m_iArrow;
 	int m_iTick;
 	int m_iCross;
+	int m_iRun;
+	int m_runIndex;
+	HTREEITEM m_hCurrentItem;
 	std::vector<HTREEITEM> m_parents;
 	std::map<unsigned, HTREEITEM> m_items;
 };

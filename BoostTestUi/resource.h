@@ -7,7 +7,7 @@
 #define IDR_UNIT_TEST_GUI_HPP           200
 #define IDR_GTEST_GUI_H                 201
 #define IDI_EMPTY                       202
-#define IDI_ARROW                       203
+#define IDI_RUN                         203
 #define IDI_TICK                        204
 #define IDI_CROSS                       205
 #define IDR_LOGLEVEL_MENU               206
@@ -22,9 +22,10 @@
 #define IDC_CONTINUE                    1007
 #define IDC_UNLIMITED                   1008
 #define IDC_RANDOMIZE                   1009
-#define IDPANE_TESTCASE_TOTAL           2000
-#define IDPANE_TESTCASE_RUN             2001
-#define IDPANE_TESTCASE_FAILED          2002
+#define IDPANE_TESTCASE_ITERATIONS      2000 
+#define IDPANE_TESTCASE_TOTAL           2001
+#define IDPANE_TESTCASE_RUN             2002
+#define IDPANE_TESTCASE_FAILED          2003
 #define ID_TEST_ABORT                   32773
 #define ID_LOG_SELECTALL                32776
 #define ID_LOG_CLEARSELECTION           32777

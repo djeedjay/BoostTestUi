@@ -21,6 +21,7 @@ public:
 	Process(const std::wstring& pathName, const std::vector<std::wstring>& args);
 	Process(const std::wstring& pathName, const std::wstring& args);
 
+	std::wstring GetName() const;
 	HANDLE GetStdIn() const;
 	HANDLE GetStdOut() const;
 	HANDLE GetProcessHandle() const;
@@ -28,9 +29,13 @@ public:
 	unsigned GetProcessId() const;
 	unsigned GetThreadId() const;
 
+	bool IsRunning() const;
+	void Wait() const;
+
 private:
 	void Run(const std::wstring& pathName, const std::wstring& args);
 
+	std::wstring m_name;
 	CHandle m_stdIn;
 	CHandle m_stdOut;
 	CHandle m_hProcess;

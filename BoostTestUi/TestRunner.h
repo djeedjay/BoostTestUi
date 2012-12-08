@@ -73,10 +73,12 @@ class TestObserver
 public:
 	virtual void test_message(Severity::type severity, const std::string& msg) = 0;
 
-	virtual void test_waiting(const std::string& processName, unsigned processId) = 0;
-	virtual void test_start(unsigned test_cases_amount) = 0;
+	virtual void test_waiting(const std::wstring& processName, unsigned processId) = 0;
+	virtual void test_start() = 0;
 	virtual void test_finish() = 0;
 	virtual void test_aborted() = 0;
+	virtual void test_iteration_start(unsigned test_cases_amount) = 0;
+	virtual void test_iteration_finish() = 0;
 	virtual void test_unit_start(const TestUnit& tu) = 0;
 	virtual void test_unit_finish(const TestUnit& tu, unsigned long elapsed) = 0;
 	virtual void test_unit_skipped(const TestUnit& tu) = 0;
@@ -119,7 +121,7 @@ struct ArgumentBuilder
 	virtual std::wstring GetListArg() = 0;
 	virtual void LoadTestUnits(TestUnitNode& node, std::istream& is, const std::string& testName) = 0;
 
-	virtual std::wstring BuildArgs(TestRunner& runner, int logLevel, unsigned options) = 0;
+	virtual std::wstring BuildArgs(TestRunner& runner, int logLevel, unsigned& options) = 0;
 	virtual void FilterMessage(const std::string& msg);
 
 	virtual ~ArgumentBuilder();

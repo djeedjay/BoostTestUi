@@ -117,7 +117,7 @@ void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const 
 	}
 }
 
-std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int /*logLevel*/, unsigned options)
+std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int /*logLevel*/, unsigned& options)
 {
 	std::wostringstream args;
 	args << L"--gtest_also_run_disabled_tests";
@@ -126,10 +126,11 @@ std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int /*logLevel*/, un
 		args << L" --gtest_shuffle";
 
 	if (options & ExeRunner::Repeat)
-		args << L" --gtest_repeat=-1";
+		args << L" --gtest_repeat=-1 --gtest_break_on_failure";
+	options &= ~ExeRunner::Repeat;
 
 	if (options & ExeRunner::WaitForDebugger)
-		args << L" --gui_wait --gtest_break_on_failure";
+		args << L" --gui_wait";
 
 	GetEnableArg getArg;
 	runner.TraverseTestTree(getArg);
@@ -177,29 +178,29 @@ void ArgumentBuilder::FilterMessage(const std::string& msg)
 	if (std::regex_search(msg, sm, reWaiting))
 		return m_pRunner->OnWaiting();
 	else if (std::regex_search(msg, sm, reStart))
-		m_pObserver->test_start(get_arg<unsigned>(sm[1]));
+		m_pObserver->test_iteration_start(get_arg<unsigned>(sm[1]));
 	else if (std::regex_search(msg, sm, reTest))
 	{
 		if (sm[2].matched)
-			m_pObserver->test_unit_finish(m_pRunner->GetTestUnit(GetId(sm[1])), get_arg<unsigned>(sm[3]));
+			m_pRunner->OnTestUnitFinish(GetId(sm[1]), get_arg<unsigned>(sm[3]));
 		else
-			m_pObserver->test_unit_start(m_pRunner->GetTestUnit(GetId(sm[1])));
+			m_pRunner->OnTestUnitStart(GetId(sm[1]));
 	}
 	else if (std::regex_search(msg, sm, reBegin))
-		m_pObserver->test_unit_start(m_pRunner->GetTestUnit(GetId(sm[1])));
+		m_pRunner->OnTestUnitStart(GetId(sm[1]));
 	else if (std::regex_search(msg, reError))
 	{
 		severity = Severity::Error;
-		m_pObserver->assertion_result(false);
+		m_pRunner->OnTestAssertion(false);
 	}
 	else if (std::regex_search(msg, sm, reEnd))
 	{
-		m_pObserver->test_unit_finish(m_pRunner->GetTestUnit(GetId(sm[2])), get_arg<unsigned>(sm[3]));
+		m_pRunner->OnTestUnitFinish(GetId(sm[2]), get_arg<unsigned>(sm[3]));
 		if (sm[1] == "  FAILED  ")
 			severity = Severity::Error;
 	}
 	else if (std::regex_search(msg, sm, reFinish))
-		m_pObserver->test_finish();
+		m_pObserver->test_iteration_finish();
 	else if (std::regex_search(msg, reAssertion))
 		severity =  Severity::Assertion;
 

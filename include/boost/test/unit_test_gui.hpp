@@ -23,7 +23,8 @@ namespace boost {
 namespace unit_test {
 namespace gui {
 
-class test_suite_access : public test_suite
+template <typename Suite>
+class basic_test_suite_access : public Suite
 {
 public:
 	const std::vector<test_unit_id>& members() const
@@ -32,8 +33,11 @@ public:
 	}
 
 private:
-	test_suite_access();
+	basic_test_suite_access();
 };
+
+typedef basic_test_suite_access<test_suite> test_suite_access;
+typedef basic_test_suite_access<master_test_suite_t> master_test_suite_access;
 
 class test_tree_reporter : public test_tree_visitor
 {

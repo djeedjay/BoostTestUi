@@ -43,6 +43,7 @@
 //
 // Don't forget gtest.h, which declares the testing framework.
 
+#include <windows.h>
 #include <limits.h>
 #include <gtest/gtest-gui.h>
 #include "sample1.h"
@@ -114,7 +115,7 @@ TEST(FactorialTest, Positive) {
   EXPECT_EQ(1, Factorial(1));
   EXPECT_EQ(2, Factorial(2));
   EXPECT_EQ(6, Factorial(3));
-  EXPECT_EQ(40320, Factorial(8+1));
+  EXPECT_EQ(40320, Factorial(8));
 }
 
 
@@ -143,7 +144,7 @@ TEST(IsPrimeTest, Positive) {
   EXPECT_TRUE(IsPrime(5));
   EXPECT_FALSE(IsPrime(6));
   EXPECT_TRUE(IsPrime(23));
-  assert(1 + 1 == 3);
+  Sleep(100);
 }
 
 // Step 3. Call RUN_ALL_TESTS() in main().

@@ -51,10 +51,12 @@ public:
 
 	virtual void test_message(Severity::type, const std::string& msg) override;
 
-	virtual void test_waiting(const std::string& processName, unsigned processId) override;
-	virtual void test_start(unsigned test_cases_amount) override;
+	virtual void test_waiting(const std::wstring& processName, unsigned processId) override;
+	virtual void test_start() override;
 	virtual void test_finish() override;
 	virtual void test_aborted() override;
+	virtual void test_iteration_start(unsigned test_cases_amount) override;
+	virtual void test_iteration_finish() override;
 	virtual void test_unit_start(const gj::TestUnit& tu) override;
 	virtual void test_unit_finish(const gj::TestUnit& tu, unsigned long elapsed) override;
 	virtual void test_unit_skipped(const gj::TestUnit& tu) override;
@@ -87,6 +89,7 @@ public:
 		UPDATE_ELEMENT(1, UPDUI_STATUSBAR)
 		UPDATE_ELEMENT(2, UPDUI_STATUSBAR)
 		UPDATE_ELEMENT(3, UPDUI_STATUSBAR)
+		UPDATE_ELEMENT(4, UPDUI_STATUSBAR)
 	END_UPDATE_UI_MAP()
 
 	enum { UM_DEQUEUE = WM_APP + 100 };
@@ -137,6 +140,7 @@ private:
 	void SaveSettings();
 	void ShowToolBar(bool visible);
 	void ShowStatusBar(bool visible);
+	bool IsRunnable() const;
 	void RunSingle(unsigned id);
 	void RunChecked();
 	void RunAll();
@@ -162,7 +166,9 @@ private:
 	bool m_randomize;
 	bool m_repeat;
 	bool m_debugger;
+	bool m_resetTimer;
 	gj::Timer m_timer;
+	int m_testIterationCount;
 	int m_testCaseCount;
 	int m_testsRunCount;
 	int m_failedTestCount;

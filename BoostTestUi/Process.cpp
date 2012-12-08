@@ -9,6 +9,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <boost/filesystem.hpp>
 #include "Utilities.h"
 #include "Process.h"
 
@@ -102,6 +103,8 @@ Process::Process(const std::wstring& pathName, const std::wstring& args)
 
 void Process::Run(const std::wstring& pathName, const std::wstring& args)
 {
+	m_name = boost::filesystem::wpath(pathName).filename();
+
 	std::wstring commandLine;
 	commandLine += L"\"";
 	commandLine += pathName;
@@ -175,6 +178,11 @@ void Process::Run(const std::wstring& pathName, const std::wstring& args)
 	m_threadId = processInformation.dwThreadId;
 }
 
+std::wstring Process::GetName() const
+{
+	return m_name;
+}
+
 HANDLE Process::GetStdIn() const
 {
 	return m_stdIn;
@@ -203,6 +211,21 @@ unsigned Process::GetProcessId() const
 unsigned Process::GetThreadId() const
 {
 	return m_threadId;
+}
+
+bool Process::IsRunning() const
+{
+	DWORD exitCode;
+	if (!GetExitCodeProcess(m_hProcess, &exitCode))
+		ThrowLastError("process exit");
+
+	return exitCode == STILL_ACTIVE;
+}
+
+void Process::Wait() const
+{
+	if (WaitForSingleObject(m_hProcess, INFINITE) != WAIT_OBJECT_0)
+		ThrowLastError("process exit");
 }
 
 } // namespace gj

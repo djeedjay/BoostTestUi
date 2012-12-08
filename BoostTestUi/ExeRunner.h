@@ -42,17 +42,29 @@ public:
 	virtual void Wait() override;
 
 	void OnWaiting();
+	void OnTestUnitStart(unsigned id);
+	void OnTestAssertion(bool result);
+	void OnTestExceptionCaught(const std::string& what);
+	void OnTestUnitFinish(unsigned id, unsigned elapsed);
+	void OnTestUnitSkipped(unsigned id);
+	void OnTestUnitAborted(unsigned id);
+
 	TestUnit& GetTestUnit(unsigned id);
 
 private:
+	TestUnit* GetTestUnitPtr(unsigned id);
 	TestUnitNode& RootTestUnitNode();
 	TestUnitNode& GetTestUnitNode(unsigned id);
 	void Load();
 	void HandleClientNotification(const std::string& line);
 	void RunTest();
+	void RunTestIteration();
+	void StartTestProcess();
+	void WaitForTestProcess();
 
 	std::wstring m_fileName;
-	std::string m_processName;
+	std::wstring m_testArgs;
+	bool m_repeat;
 	TestObserver* m_pObserver;
 	TestUnitNode m_tree;
 	std::unique_ptr<ArgumentBuilder> m_pArgBuilder;

@@ -23,7 +23,7 @@ void ExeRunner::Load()
 
 	hstream hs(proc.GetStdOut());
 	m_tree.children.clear();
-	m_pArgBuilder->LoadTestUnits(m_tree, hs, m_processName);
+	m_pArgBuilder->LoadTestUnits(m_tree, hs, Str(proc.GetName()));
 	if (m_tree.children.empty())
 		throw std::runtime_error("No test cases");
 }
@@ -40,7 +40,6 @@ std::unique_ptr<ArgumentBuilder> CreateArgumentBuilder(const std::wstring& fileN
 
 ExeRunner::ExeRunner(const std::wstring& fileName, TestObserver& observer) :
 	m_fileName(fileName),
-	m_processName(boost::filesystem::path(WideCharToMultiByte(fileName)).filename()),
 	m_pObserver(&observer),
 	m_tree(TestUnit(0, TestUnit::TestSuite, "root")),
 	m_pArgBuilder(CreateArgumentBuilder(fileName, *this, observer))
@@ -104,9 +103,28 @@ void ExeRunner::Run(int logLevel, unsigned options)
 	if (m_pThread)
 		return;
 
-	m_pProcess.reset(new Process(m_fileName, m_pArgBuilder->BuildArgs(*this, logLevel, options)));
-	m_pObserver->test_message(Severity::Info, stringbuilder() << "Process " << m_pProcess->GetProcessId() << ": " << m_processName << ", started");
+	m_testArgs = m_pArgBuilder->BuildArgs(*this, logLevel, options);
+	m_repeat = options & ExeRunner::Repeat;
+	StartTestProcess();
 	m_pThread.reset(new boost::thread([this]() { RunTest(); }));
+}
+
+void ExeRunner::StartTestProcess()
+{
+	m_pProcess.reset(new Process(m_fileName, m_testArgs));
+	m_pObserver->test_start();
+	m_pObserver->test_message(Severity::Info, stringbuilder() << "Process " << m_pProcess->GetProcessId() << ": " << Str(m_pProcess->GetName()) << ", started");
+}
+
+void ExeRunner::WaitForTestProcess()
+{
+	if (!m_pProcess)
+		return;
+
+	m_pProcess->Wait();
+	m_pObserver->test_message(Severity::Info, stringbuilder() << "Process " << m_pProcess->GetProcessId() << ": " << Str(m_pProcess->GetName()) << ", finished");
+	m_pObserver->test_finish();
+	m_pProcess.reset();
 }
 
 void ExeRunner::Continue()
@@ -123,6 +141,7 @@ void ExeRunner::Abort()
 	if (!m_pThread)
 		return;
 
+	m_repeat = false;
 	TerminateProcess(m_pProcess->GetProcessHandle(), static_cast<unsigned>(-1));
 }
 
@@ -131,16 +150,53 @@ void ExeRunner::Wait()
 	if (!m_pThread)
 		return;
 
-	unsigned id = m_pProcess->GetProcessId();
 	m_pThread->join();
+	WaitForTestProcess();
 	m_pProcess.reset();
 	m_pThread.reset();
-	m_pObserver->test_message(Severity::Info, stringbuilder() << "Process " << id << ": " << m_processName << ", finished");
 }
 
 void ExeRunner::OnWaiting()
 {
-	m_pObserver->test_waiting(m_processName, m_pProcess->GetProcessId());
+	m_pObserver->test_waiting(m_pProcess->GetName(), m_pProcess->GetProcessId());
+}
+
+void ExeRunner::OnTestUnitStart(unsigned id)
+{
+	if (auto p = GetTestUnitPtr(id))
+		m_pObserver->test_unit_start(*p);
+}
+
+void ExeRunner::OnTestAssertion(bool passed)
+{
+	if (!passed)
+		m_repeat = false;
+	m_pObserver->assertion_result(passed);
+}
+
+void ExeRunner::OnTestExceptionCaught(const std::string& what)
+{
+	m_repeat = false;
+	m_pObserver->exception_caught(what);
+}
+
+void ExeRunner::OnTestUnitFinish(unsigned id, unsigned elapsed)
+{
+	if (auto p = GetTestUnitPtr(id))
+		m_pObserver->test_unit_finish(*p, elapsed);
+}
+
+void ExeRunner::OnTestUnitSkipped(unsigned id)
+{
+	if (auto p = GetTestUnitPtr(id))
+		m_pObserver->test_unit_skipped(*p);
+}
+
+void ExeRunner::OnTestUnitAborted(unsigned id)
+{
+	m_repeat = false;
+	if (auto p = GetTestUnitPtr(id))
+		m_pObserver->test_unit_aborted(*p);
 }
 
 TestUnitNode* GetTestUnitNodePtr(TestUnitNode& node, unsigned id)
@@ -153,6 +209,13 @@ TestUnitNode* GetTestUnitNodePtr(TestUnitNode& node, unsigned id)
 		if (auto p = GetTestUnitNodePtr(*it, id))
 			return p;
 	}
+	return nullptr;
+}
+
+TestUnit* ExeRunner::GetTestUnitPtr(unsigned id)
+{
+	if (auto p = GetTestUnitNodePtr(m_tree, id))
+		return &p->data;
 	return nullptr;
 }
 
@@ -171,11 +234,14 @@ TestUnit& ExeRunner::GetTestUnit(unsigned id)
 void ExeRunner::RunTest()
 try
 {
-	hstream hs(m_pProcess->GetStdOut());
-	std::string line;
-	while (std::getline(hs, line))
+	for (;;)
 	{
-		m_pArgBuilder->FilterMessage(line);
+		RunTestIteration();
+		WaitForTestProcess();
+		if (!m_repeat)
+			break;
+
+		StartTestProcess();
 	}
 
 	m_pObserver->TestFinished();
@@ -184,6 +250,16 @@ catch (std::exception& e)
 {
 	m_pObserver->exception_caught(e.what());
 	m_pObserver->TestFinished();
+}
+
+void ExeRunner::RunTestIteration()
+{
+	hstream hs(m_pProcess->GetStdOut());
+	std::string line;
+	while (std::getline(hs, line))
+	{
+		m_pArgBuilder->FilterMessage(line);
+	}
 }
 
 } // namespace gj

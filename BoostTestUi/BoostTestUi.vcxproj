@@ -138,10 +138,8 @@
     <ClInclude Include="..\include\gtest\gtest-gui.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="BoostTest.h" />
-    <ClInclude Include="boost\test\unit_test_gui.hpp" />
     <ClInclude Include="ExeRunner.h" />
     <ClInclude Include="GoogleTest.h" />
-    <ClInclude Include="gtest\gtest-gui.h" />
     <ClInclude Include="hstream.h" />
     <ClInclude Include="GetUnitTestType.h" />
     <ClInclude Include="LogView.h" />
@@ -158,9 +156,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
-    <None Include="res\arrow.ico" />
     <None Include="res\BoostTestUi.ico" />
     <None Include="res\empty.ico" />
+    <None Include="res\run.bmp" />
     <None Include="res\tick.ico" />
     <None Include="res\cross.ico" />
     <None Include="res\toolbar.bmp" />

@@ -46,17 +46,52 @@
 
 namespace gj {
 
+std::wstring MultiByteToWideChar(const std::string& str);
+std::string WideCharToMultiByte(const std::wstring& str);
+
+class Str
+{
+public:
+	explicit Str(const std::string& s) :
+		m_str()
+	{
+	}
+
+	explicit Str(const std::wstring& s) :
+		m_str(WideCharToMultiByte(s))
+	{
+	}
+
+	operator std::string() const
+	{
+		return m_str;
+	}
+
+	operator const char*() const
+	{
+		return m_str.c_str();
+	}
+
+private:
+	std::string m_str;
+};
+
 class WStr
 {
 public:
 	explicit WStr(const std::string& s) :
-		m_str(s.begin(), s.end())
+		m_str(MultiByteToWideChar(s))
 	{
 	}
 
 	explicit WStr(const std::wstring& s) :
 		m_str(s)
 	{
+	}
+
+	operator std::wstring() const
+	{
+		return m_str;
 	}
 
 	operator const wchar_t*() const
@@ -179,9 +214,6 @@ typedef basic_stringbuilder<char> stringbuilder;
 typedef basic_stringbuilder<wchar_t> wstringbuilder;
 
 std::wstring GetExceptionMessage();
-
-std::wstring MultiByteToWideChar(const std::string& str);
-std::string WideCharToMultiByte(const std::wstring& str);
 
 } // namespace gj
 

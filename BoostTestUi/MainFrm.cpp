@@ -99,7 +99,7 @@ void CMainFrame::UpdateUI()
 {
 	bool isLoaded = m_pRunner.get() != nullptr;
 	bool isRunning = isLoaded && m_pRunner->IsRunning();
-	bool isRunnable = isLoaded && !isRunning;
+	bool isRunnable = IsRunnable();
 	UIEnable(ID_TREE_RUN, isRunnable);
 	UIEnable(ID_TREE_RUN_CHECKED, isRunnable);
 	UIEnable(ID_TREE_RUN_ALL, isRunnable);
@@ -142,8 +142,8 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
     UIAddStatusBar(m_hWndStatusBar);
 //	CreateSimpleStatusBar();
 
-	int paneIds[] = { ID_DEFAULT_PANE, IDPANE_TESTCASE_TOTAL, IDPANE_TESTCASE_RUN, IDPANE_TESTCASE_FAILED };
-    m_statusBar.SetPanes(paneIds, 4, false);
+	int paneIds[] = { ID_DEFAULT_PANE, IDPANE_TESTCASE_ITERATIONS, IDPANE_TESTCASE_TOTAL, IDPANE_TESTCASE_RUN, IDPANE_TESTCASE_FAILED };
+    m_statusBar.SetPanes(paneIds, 5, false);
 
 	// client rect for vertical splitter
 	WTL::CRect rcVert;
@@ -178,6 +178,7 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 	UISetCheck(ID_FILE_AUTO_RUN, m_autoRun);
 	UISetCheck(ID_LOG_AUTO_CLEAR, m_logAutoClear);
 	UISetCheck(ID_TEST_RANDOMIZE, m_randomize);
+	UISetCheck(ID_TEST_REPEAT, m_repeat);
 	UISetCheck(ID_TEST_DEBUGGER, m_debugger);
 	UpdateUI();
 
@@ -297,6 +298,18 @@ FILETIME GetLastWriteTime(HANDLE hFile, const std::wstring& fileName)
 	return ftWrite;
 }
 
+FILETIME GetLastWriteTime(const std::wstring& fileName)
+{
+	CHandle hFile(CreateFile(fileName.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr));
+	if (hFile == INVALID_HANDLE_VALUE)
+	{
+		hFile.Detach();
+		ThrowLastError(fileName);
+	}
+
+	return GetLastWriteTime(hFile, fileName);
+}
+
 bool operator==(const FILETIME& ft1, const FILETIME& ft2)
 {
 	return
@@ -320,9 +333,12 @@ void CMainFrame::OnTimer(UINT_PTR /*nIDEvent*/)
 		hFile.Detach();
 		return;
 	}
-	if (GetLastWriteTime(hFile, m_pathName) == m_fileTime)
+
+	FILETIME fileTime = GetLastWriteTime(hFile, m_pathName);
+	if (fileTime == m_fileTime)
 		return;
 
+	m_fileTime = fileTime;
 	Load(m_pathName);
 }
 
@@ -336,18 +352,6 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 		if (DragQueryFile(hDropInfo, 0, fileName.data(), fileName.size()))
 			Load(fileName.data());
 	}
-}
-
-FILETIME GetLastWriteTime(const std::wstring& fileName)
-{
-	CHandle hFile(CreateFile(fileName.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr));
-	if (hFile == INVALID_HANDLE_VALUE)
-	{
-		hFile.Detach();
-		ThrowLastError(fileName);
-	}
-
-	return GetLastWriteTime(hFile, fileName);
 }
 
 void CMainFrame::Load(const std::wstring& fileName, int mruId)
@@ -368,6 +372,7 @@ void CMainFrame::Load(const std::wstring& fileName, int mruId)
 //	else
 //		m_pRunner.reset(new DllRunner(fileName, *this));
 
+	m_testIterationCount = 0;
 	m_testCaseCount = 0;
 	m_testsRunCount = 0;
 	m_failedTestCount = 0;
@@ -381,7 +386,6 @@ void CMainFrame::Load(const std::wstring& fileName, int mruId)
 	SetWindowText(WStr(wstringbuilder() << fullPath.filename() << L" - Boost Test"));
 	m_pathName = fullPath.file_string();
 	m_logFileName = fullPath.replace_extension(L"txt").file_string();
-	m_fileTime = GetLastWriteTime(m_pathName);
 
 	guard.release();
 	if (mruId == 0)
@@ -520,19 +524,41 @@ void CMainFrame::SelectItem(unsigned id)
 	m_treeView.SelectTestItem(id);
 }
 
-void CMainFrame::test_waiting(const std::string& processName, unsigned processId)
+void CMainFrame::test_waiting(const std::wstring& processName, unsigned processId)
 {
 	EnQueue([this, processName, processId]()
 	{
 		this->MessageBox(
-			WStr(wstringbuilder() << L"Attach debugger to " << MultiByteToWideChar(processName) << ", pid: "<< processId),
+			WStr(wstringbuilder() << L"Attach debugger to " << processName << L", pid: "<< processId),
 			L"Boost Test",
 			MB_OK);
 		m_pRunner->Continue();
 	});
 }
 
-void CMainFrame::test_start(unsigned test_cases_amount)
+void CMainFrame::test_start()
+{
+	EnQueue([this]()
+	{
+		if (m_resetTimer)
+			m_timer.Reset();
+		m_treeView.OnTestStart();
+	});
+}
+
+void CMainFrame::test_finish()
+{
+	EnQueue([this]()
+	{
+		m_treeView.OnTestFinish();
+	});
+}
+
+void CMainFrame::test_aborted()
+{
+}
+
+void CMainFrame::test_iteration_start(unsigned test_cases_amount)
 {
 	EnQueue([this, test_cases_amount]()
 	{
@@ -540,15 +566,17 @@ void CMainFrame::test_start(unsigned test_cases_amount)
 		m_progressBar.SetRange(0, test_cases_amount);
 		m_progressBar.SetPos(0);
 		m_progressBar.SetBarColor(RGB(20, 180, 20));
+		m_treeView.ResetTreeImages();
 	});
 }
 
-void CMainFrame::test_finish()
+void CMainFrame::test_iteration_finish()
 {
-}
-
-void CMainFrame::test_aborted()
-{
+	EnQueue([this]()
+	{
+		++m_testIterationCount;
+		UpdateStatusBar();
+	});
 }
 
 void CMainFrame::test_unit_start(const TestUnit& tu)
@@ -605,9 +633,10 @@ void CMainFrame::UpdateStatusBar()
 	bool isLoaded = m_pRunner.get() != nullptr;
 	bool isRunning = isLoaded && m_pRunner->IsRunning();
 	UISetText(0, isRunning? L"Running...": L"Ready");
-	UISetText(1, isLoaded? WStr(wstringbuilder() << L"Test cases: " << m_testCaseCount): L"");
-	UISetText(2, isLoaded? WStr(wstringbuilder() << L"Tests run: " << m_testsRunCount): L"");
-	UISetText(3, isLoaded? WStr(wstringbuilder() << L"Failed tests: " << m_failedTestCount): L"");
+	UISetText(1, isLoaded? WStr(wstringbuilder() << L"Test iterations: " << m_testIterationCount): L"");
+	UISetText(2, isLoaded? WStr(wstringbuilder() << L"Test cases: " << m_testCaseCount): L"");
+	UISetText(3, isLoaded? WStr(wstringbuilder() << L"Tests run: " << m_testsRunCount): L"");
+	UISetText(4, isLoaded? WStr(wstringbuilder() << L"Failed tests: " << m_failedTestCount): L"");
 }
 
 void CMainFrame::assertion_result(bool passed)
@@ -886,6 +915,9 @@ private:
 
 void CMainFrame::RunSingle(unsigned id)
 {
+	if (!IsRunnable())
+		return;
+
 	SingleTestCaseSelector selector(id);
 	m_pRunner->TraverseTestTree(selector);
 	Run();
@@ -913,8 +945,16 @@ private:
 	const CTreeView* m_pTreeView;
 };
 
+bool CMainFrame::IsRunnable() const
+{
+	return m_pRunner && !m_pRunner->IsRunning();
+}
+
 void CMainFrame::RunChecked()
 {
+	if (!IsRunnable())
+		return;
+
 	CheckedTestCaseSelector selector(m_treeView);
 	m_pRunner->TraverseTestTree(selector);
 	Run();
@@ -935,6 +975,9 @@ struct TestCaseSelector : TestTreeVisitor
 
 void CMainFrame::RunAll()
 {
+	if (!IsRunnable())
+		return;
+
 	TestCaseSelector selector;
 	m_pRunner->TraverseTestTree(selector);
 	Run();
@@ -942,13 +985,14 @@ void CMainFrame::RunAll()
 
 void CMainFrame::Run()
 {
-	m_treeView.ResetTreeImages();
+	if (!IsRunnable())
+		return;
+
 	m_testsRunCount = 0;
 	m_failedTestCount = 0;
 	if (m_logAutoClear)
 		m_logView.Clear();
-	if (m_logView.Empty())
-		m_timer.Reset();
+	m_resetTimer = m_logView.Empty();
 	m_pRunner->Run(m_combo.GetCurSel(), GetOptions());
 	UpdateUI();
 }

@@ -10,11 +10,16 @@
 #include <boost/test/unit_test_gui.hpp>
 
 #ifndef BOOST_TEST_MODULE
+
 boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
 {
-	boost::unit_test::framework::master_test_suite().p_name.value = "Exe TestRunner Test";
+	using namespace boost::unit_test;
+
+	framework::master_test_suite().p_name.value = "Exe TestRunner Test";
+
 	return nullptr;
 }
+
 #endif
 
 #include <boost/thread.hpp>
@@ -110,6 +115,7 @@ BOOST_AUTO_TEST_CASE(TestWait6)
 
 BOOST_AUTO_TEST_CASE(TestWait7)
 {
+	BOOST_CHECK(false);
 	BOOST_MESSAGE("Waiting for Abort");
 	boost::this_thread::sleep(boost::posix_time::seconds(1));
 }
