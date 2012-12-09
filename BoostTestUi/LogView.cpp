@@ -22,8 +22,8 @@ BEGIN_MSG_MAP_TRY(CLogView)
 	MSG_WM_CREATE(OnCreate)
 	MSG_WM_CONTEXTMENU(OnContextMenu);
 	REFLECTED_NOTIFY_CODE_HANDLER(NM_CUSTOMDRAW, OnCustomDraw)
-	REFLECTED_NOTIFY_CODE_HANDLER(NM_CLICK, OnClick)
 	REFLECTED_NOTIFY_CODE_HANDLER(NM_DBLCLK, OnDblClick)
+	REFLECTED_NOTIFY_CODE_HANDLER(LVN_ITEMCHANGING, OnItemChanging)
 	REFLECTED_NOTIFY_CODE_HANDLER(LVN_GETINFOTIP, OnGetInfoTip)
 	DEFAULT_REFLECTION_HANDLER();
 END_MSG_MAP_CATCH(ExceptionHandler)
@@ -280,17 +280,6 @@ LRESULT CLogView::OnCustomDraw(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
 	return CDRF_DODEFAULT;
 }
 
-LRESULT CLogView::OnClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
-{
-	NMITEMACTIVATE* pItemActivate = reinterpret_cast<NMITEMACTIVATE*>(pnmh);
-
-	if (pItemActivate->iItem < 0  || static_cast<size_t>(pItemActivate->iItem) >= m_logLines.size())
-		return 0;
-
-	m_pMainFrame->SelectItem(m_logLines[pItemActivate->iItem].id);
-	return 0;
-}
-
 LRESULT CLogView::OnDblClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
 {
 	NMITEMACTIVATE* pItemActivate = reinterpret_cast<NMITEMACTIVATE*>(pnmh);
@@ -301,6 +290,20 @@ LRESULT CLogView::OnDblClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
 	std::smatch sm;
 	if (std::regex_match(line, sm, re1) || std::regex_search(line, sm, re2))
 		ShowSourceLine(sm[1], to_int(sm[2]));
+
+	return 0;
+}
+
+LRESULT CLogView::OnItemChanging(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
+{
+	NMLISTVIEW* pListView = reinterpret_cast<NMLISTVIEW*>(pnmh);
+
+	if ((pListView->uNewState & LVIS_FOCUSED) == 0 ||
+		pListView->iItem < 0  ||
+		static_cast<size_t>(pListView->iItem) >= m_logLines.size())
+		return 0;
+
+	m_pMainFrame->SelectItem(m_logLines[pListView->iItem].id);
 
 	return 0;
 }
