@@ -64,7 +64,7 @@ void CLogView::OnContextMenu(HWND /*hWnd*/, CPoint pt)
 	if (pt == CPoint(-1, -1))
 	{
 		RECT rect;
-		GetItemRect(GetNextItem(-1, LVNI_ALL | LVIS_FOCUSED), &rect, LVIR_LABEL);
+		GetItemRect(GetNextItem(-1, LVNI_ALL | LVNI_FOCUSED), &rect, LVIR_LABEL);
 		pt = CPoint(rect.left, rect.bottom - 1);
 	}
 	else
@@ -137,7 +137,8 @@ void CLogView::Add(unsigned id, double t, Severity::type severity, const std::st
 		--it;
 	}
 
-	bool selectLast = GetSelectionMark() == GetItemCount() - 1;
+	int focus = GetNextItem(0, LVNI_FOCUSED);
+	bool selectLast = focus < 0 || focus == GetItemCount() - 1;
 
 	int item = InsertItem(
 		std::numeric_limits<int>::max(),
@@ -149,7 +150,7 @@ void CLogView::Add(unsigned id, double t, Severity::type severity, const std::st
 	if (selectLast)
 	{
 		EnsureVisible(item, true);
-		SetSelectionMark(item);
+		SetItemState(item, LVIS_FOCUSED, LVIS_FOCUSED);
 	}
 }
 
@@ -200,6 +201,8 @@ void CLogView::BeginTestUnit(unsigned id)
 void CLogView::EndTestUnit(unsigned id)
 {
 	m_items[id].endLine = GetItemCount();
+	if (m_logHighLightEnd > GetItemCount())
+		SetHighLight(id);
 }
 
 void CLogView::SelectAll()
