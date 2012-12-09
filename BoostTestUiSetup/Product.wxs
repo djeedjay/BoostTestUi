@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="Boost Test UI 1.0" Language="1033" Version="1.0.0.0" Manufacturer="Boost" UpgradeCode="b25897f6-501e-491a-9a2f-2f815d19b007">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+    <Media Id='1' Cabinet='BoostTestUi.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
+    <Property Id='DiskPrompt' Value="Boost Test UI 1.0 Installation [1]" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="Boost" Name="Boost">
+          <Directory Id="INSTALLFOLDER" Name="BoostTestUi">
+            <Component Id="MainExecutable" Guid="81A400AD-0B40-44B5-B925-FF5C9A014455">
+              <File Id="BoostTestUiEXE" Name="BoostTestUi.exe" DiskId="1" Source="$(var.SolutionDir)/$(var.Configuration)/BoostTestUi.exe" KeyPath="yes">
+                <Shortcut Id="startmenuBoostTestUi" Directory="ProgramMenuDir" Name="BoostTestUi" WorkingDirectory="INSTALLDIR" Icon="BoostTestUi.exe" IconIndex="0" Advertise="yes" />
+                <Shortcut Id="desktopBoostTestUi" Directory="DesktopFolder" Name="BoostTestUi" WorkingDirectory="INSTALLDIR" Icon="BoostTestUi.exe" IconIndex="0" Advertise="yes" />
+              </File>
+            </Component>
+          </Directory>
+        </Directory>
+      </Directory>
+
+      <Directory Id="ProgramMenuFolder" Name="Programs">
+        <Directory Id="ProgramMenuDir" Name="Boost Test UI">
+          <Component Id="ProgramMenuDir" Guid="E58963B9-1682-47F8-8B01-F33FB3F78FBF">
+            <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
+            <RegistryValue Root='HKCU' Key='Software/[Manufacturer]/[ProductName]' Type='string' Value='' KeyPath='yes' />
+          </Component>
+        </Directory>
+      </Directory>
+
+      <Directory Id="DesktopFolder" Name="Desktop" />
+    </Directory>
+
+    <DirectoryRef Id="TARGETDIR">
+      <Merge Id="VCRedist1" SourceFile="$(env.CommonProgramFiles)/Merge Modules/Microsoft_VC100_ATL_x86.msm" DiskId="1" Language="0"/>
+      <Merge Id="VCRedist2" SourceFile="$(env.CommonProgramFiles)/Merge Modules/Microsoft_VC100_CRT_x86.msm" DiskId="1" Language="0"/>
+    </DirectoryRef>
+
+    <Feature Id="VCRedist" Title="Visual C++ 10.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+      <MergeRef Id="VCRedist1"/>
+      <MergeRef Id="VCRedist2"/>
+    </Feature>
+
+    <Feature Id='Complete' Level='1'>
+      <ComponentRef Id='MainExecutable' />
+      <ComponentRef Id='ProgramMenuDir' />
+    </Feature>
+
+    <Icon Id="BoostTestUi.exe" SourceFile="$(var.SolutionDir)/$(var.Configuration)/BoostTestUi.exe" />
+
+  </Product>
+</Wix>

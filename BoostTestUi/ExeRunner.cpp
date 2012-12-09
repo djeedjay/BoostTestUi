@@ -104,7 +104,7 @@ void ExeRunner::Run(int logLevel, unsigned options)
 		return;
 
 	m_testArgs = m_pArgBuilder->BuildArgs(*this, logLevel, options);
-	m_repeat = options & ExeRunner::Repeat;
+	m_repeat = (options & ExeRunner::Repeat) != 0;
 	StartTestProcess();
 	m_pThread.reset(new boost::thread([this]() { RunTest(); }));
 }
