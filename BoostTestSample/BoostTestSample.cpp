@@ -115,7 +115,6 @@ BOOST_AUTO_TEST_CASE(TestWait6)
 
 BOOST_AUTO_TEST_CASE(TestWait7)
 {
-	BOOST_CHECK(false);
 	BOOST_MESSAGE("Waiting for Abort");
 	boost::this_thread::sleep(boost::posix_time::seconds(1));
 }

@@ -118,11 +118,6 @@ BEGIN
         MENUITEM "Auto Clear Log",              ID_LOG_AUTO_CLEAR
         MENUITEM "&Copy\tCtrl+C",               ID_LOG_COPY
     END
-    POPUP "&View"
-    BEGIN
-        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
-        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
-    END
     POPUP "&Help"
     BEGIN
         MENUITEM "&About BoostTestUi...",       ID_APP_ABOUT
@@ -383,26 +378,6 @@ END
 IDI_EMPTY               ICON                    "res\\empty.ico"
 IDI_TICK                ICON                    "res\\tick.ico"
 IDI_CROSS               ICON                    "res\\cross.ico"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_AUTORUN DIALOGEX 0, 0, 118, 108
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Auto Run Options"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,7,87,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,61,87,50,14
-    EDITTEXT        IDC_COUNT,43,60,40,14,ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "",IDC_COUNT_SPIN,"msctls_updown32",UDS_AUTOBUDDY | UDS_ARROWKEYS,83,60,10,14
-    CONTROL         "Continue on error",IDC_CONTINUE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,36,73,10
-    CONTROL         "Unlimited",IDC_UNLIMITED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,47,45,10
-    LTEXT           "Runs:",IDC_STATIC,19,62,20,8
-    CONTROL         "Randomize",IDC_RANDOMIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,25,51,10
-END
 
 
 /////////////////////////////////////////////////////////////////////////////

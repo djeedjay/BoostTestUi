@@ -50,8 +50,6 @@ BEGIN_MSG_MAP_TRY(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_TEST_REPEAT, OnTestRepeat)
 	COMMAND_ID_HANDLER_EX(ID_TEST_DEBUGGER, OnTestDebugger)
 	COMMAND_ID_HANDLER_EX(ID_TEST_ABORT, OnTestAbort)
-	COMMAND_ID_HANDLER_EX(ID_VIEW_TOOLBAR, OnViewToolBar)
-	COMMAND_ID_HANDLER_EX(ID_VIEW_STATUS_BAR, OnViewStatusBar)
 	COMMAND_ID_HANDLER_EX(ID_APP_ABOUT, OnAppAbout)
 	COMMAND_ID_HANDLER_EX(ID_TREE_RUN, OnTreeRun)
 	COMMAND_ID_HANDLER_EX(ID_TREE_RUN_CHECKED, OnTreeRunChecked)
@@ -338,7 +336,6 @@ void CMainFrame::OnTimer(UINT_PTR /*nIDEvent*/)
 	if (fileTime == m_fileTime)
 		return;
 
-	m_fileTime = fileTime;
 	Load(m_pathName);
 }
 
@@ -356,6 +353,9 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 
 void CMainFrame::Load(const std::wstring& fileName, int mruId)
 {
+	// Store the time stamp of this file so that we don't retry Load()-ing it until it changes:
+	m_fileTime = GetLastWriteTime(fileName);
+
 	ScopedCursor cursor(::LoadCursor(nullptr, IDC_WAIT));
 	UISetText(0, WStr(wstringbuilder() << "Loading " << fileName));
 
@@ -711,35 +711,6 @@ void CMainFrame::OnTestAbort(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl
 	m_pRunner->Abort();
 }
 
-void CMainFrame::ShowToolBar(bool visible)
-{
-//	::ShowWindow(m_hWndToolBar, visible ? SW_SHOWNOACTIVATE : SW_HIDE);
-	UISetCheck(ID_VIEW_TOOLBAR, visible);
-	UpdateLayout();
-}
-
-void CMainFrame::OnViewToolBar(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
-{
-//	ShowToolBar(!::IsWindowVisible(m_hWndToolBar));
-	CReBarCtrl rebar = m_hWndToolBar;
-	int nBandIndex = rebar.IdToIndex(ATL_IDW_BAND_FIRST + 1);
-	rebar.ShowBand(nBandIndex, true);
-	UISetCheck(ID_VIEW_TOOLBAR, true);
-	UpdateLayout();
-}
-
-void CMainFrame::ShowStatusBar(bool visible)
-{
-	::ShowWindow(m_hWndStatusBar, visible? SW_SHOWNOACTIVATE: SW_HIDE);
-	UISetCheck(ID_VIEW_STATUS_BAR, visible);
-	UpdateLayout();
-}
-
-void CMainFrame::OnViewStatusBar(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
-{
-	ShowStatusBar(!::IsWindowVisible(m_hWndStatusBar));
-}
-
 void CMainFrame::OnAppAbout(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	CAboutDlg dlg;
@@ -814,12 +785,6 @@ bool CMainFrame::LoadSettings()
 
 	m_logView.LoadSettings(reg);
 
-	DWORD viewFlags;
-	if (reg.QueryDWORDValue(L"ViewFlags", viewFlags) == ERROR_SUCCESS)
-	{
-		ShowToolBar((viewFlags & 1) != 0);
-		ShowStatusBar((viewFlags & 2) != 0);
-	}
 	DWORD options;
 	if (reg.QueryDWORDValue(L"Options", options) == ERROR_SUCCESS)
 	{
@@ -855,12 +820,6 @@ void CMainFrame::SaveSettings()
 	reg.SetDWORDValue(L"height", placement.rcNormalPosition.bottom - placement.rcNormalPosition.top);
 	reg.SetDWORDValue(L"vSplit", m_vSplit.GetSplitterPos());
 	m_logView.SaveSettings(reg);
-	int viewFlags = 0;
-	if (::IsWindowVisible(m_hWndToolBar))
-		viewFlags |= 1;
-	if (::IsWindowVisible(m_hWndStatusBar))
-		viewFlags |= 2;
-	reg.SetDWORDValue(L"ViewFlags", viewFlags);
 	reg.SetDWORDValue(L"Options", GetOptions());
 	reg.SetDWORDValue(L"LogLevel", m_combo.GetCurSel());
 

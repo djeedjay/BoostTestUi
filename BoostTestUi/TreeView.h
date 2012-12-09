@@ -72,6 +72,8 @@ private:
 	void SetTestItemImage(unsigned id, int img);
 	void SetTestFail(HTREEITEM hItem);
 	void SetTestOk(HTREEITEM hItem);
+	void UpdateIndicator();
+	void RemoveIndicator();
 
 	CMainFrame* m_pMainFrame;
 	CImageList m_treeImg;

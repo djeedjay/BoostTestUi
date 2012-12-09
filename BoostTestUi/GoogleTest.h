@@ -33,6 +33,7 @@ private:
 
 	ExeRunner* m_pRunner;
 	TestObserver* m_pObserver;
+	unsigned m_rootId;
 	std::map<std::string, unsigned> m_ids;
 };
 

@@ -23,8 +23,7 @@ namespace boost {
 namespace unit_test {
 namespace gui {
 
-template <typename Suite>
-class basic_test_suite_access : public Suite
+class test_suite_access : public test_suite
 {
 public:
 	const std::vector<test_unit_id>& members() const
@@ -33,11 +32,8 @@ public:
 	}
 
 private:
-	basic_test_suite_access();
+	test_suite_access();
 };
-
-typedef basic_test_suite_access<test_suite> test_suite_access;
-typedef basic_test_suite_access<master_test_suite_t> master_test_suite_access;
 
 class test_tree_reporter : public test_tree_visitor
 {
@@ -261,6 +257,8 @@ void test_name::test_method()                                             \
 #define BOOST_AUTO_TEST_CASE_ENABLE(test_name, enable)                    \
 BOOST_FIXTURE_TEST_CASE_ENABLE(test_name, BOOST_AUTO_TEST_CASE_FIXTURE, enable)
 
+#ifndef BOOST_TEST_NO_GUI_INIT
+
 boost::unit_test::test_suite* init_unit_test_suite2(int argc, char* argv[]);
 
 boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
@@ -274,6 +272,8 @@ boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
 extern "C" __declspec(dllexport) inline void unit_test_type_boost()
 {
 }
+
+#endif
 
 #define init_unit_test_suite init_unit_test_suite2
 

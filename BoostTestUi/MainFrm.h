@@ -118,8 +118,6 @@ public:
 	void OnTestRepeat(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestDebugger(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestAbort(UINT uNotifyCode, int nID, CWindow wndCtl);
-	void OnViewToolBar(UINT uNotifyCode, int nID, CWindow wndCtl);
-	void OnViewStatusBar(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnAppAbout(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTreeRun(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTreeRunChecked(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -138,8 +136,6 @@ private:
 	unsigned GetOptions() const;
 	bool LoadSettings();
 	void SaveSettings();
-	void ShowToolBar(bool visible);
-	void ShowStatusBar(bool visible);
 	bool IsRunnable() const;
 	void RunSingle(unsigned id);
 	void RunChecked();

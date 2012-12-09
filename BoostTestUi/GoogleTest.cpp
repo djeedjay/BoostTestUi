@@ -96,7 +96,8 @@ void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const 
 {
 	static const std::regex re("(\\w+)(\\.)?");
 
-	tree.children.push_back(TestSuite(0, testName));
+	m_rootId = GetId(testName);
+	tree.children.push_back(TestSuite(m_rootId, testName));
 	TestUnitNode& node = tree.children.back();
 	std::string line;
 	while (std::getline(is, line))
@@ -178,7 +179,10 @@ void ArgumentBuilder::FilterMessage(const std::string& msg)
 	if (std::regex_search(msg, sm, reWaiting))
 		return m_pRunner->OnWaiting();
 	else if (std::regex_search(msg, sm, reStart))
+	{
 		m_pObserver->test_iteration_start(get_arg<unsigned>(sm[1]));
+		m_pRunner->OnTestUnitStart(m_rootId);
+	}
 	else if (std::regex_search(msg, sm, reTest))
 	{
 		if (sm[2].matched)
@@ -200,7 +204,10 @@ void ArgumentBuilder::FilterMessage(const std::string& msg)
 			severity = Severity::Error;
 	}
 	else if (std::regex_search(msg, sm, reFinish))
+	{
+		m_pRunner->OnTestUnitFinish(m_rootId, 0);
 		m_pObserver->test_iteration_finish();
+	}
 	else if (std::regex_search(msg, reAssertion))
 		severity =  Severity::Assertion;
 
