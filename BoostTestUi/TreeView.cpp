@@ -21,7 +21,7 @@ BEGIN_MSG_MAP_TRY(CTreeView)
 	REFLECTED_NOTIFY_CODE_HANDLER(NM_CLICK, OnClick)
 	REFLECTED_NOTIFY_CODE_HANDLER(NM_RCLICK, OnRClick)
 	DEFAULT_REFLECTION_HANDLER();
-	CHAIN_MSG_MAP(COffscreenDraw<CTreeView>)
+	CHAIN_MSG_MAP(COffscreenPaint<CTreeView>)
 END_MSG_MAP_CATCH(ExceptionHandler)
 
 CTreeView::CTreeView(CMainFrame& mainFrame) :
@@ -167,9 +167,11 @@ LRESULT CTreeView::OnRClick(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& bHandled)
 	return 0;
 }
 
-void CTreeView::DoPaint(CDCHandle dc)
+void CTreeView::DoPaint(CDCHandle hdc, const RECT& rcClip)
 {
-	DefWindowProc(WM_PAINT, reinterpret_cast<WPARAM>(dc.m_hDC), 0);
+	hdc.FillSolidRect(&rcClip, GetSysColor(COLOR_WINDOW));
+
+	DefWindowProc(WM_PAINT, reinterpret_cast<WPARAM>(hdc.m_hDC), 0);
 }
 
 void CTreeView::CheckSubTreeItems(HTREEITEM hItem, bool check)

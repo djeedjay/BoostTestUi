@@ -10,7 +10,7 @@
 #include <vector>
 #include <map>
 #include "Severity.h"
-#include "OffscreenDraw.h"
+#include "OffscreenPaint.h"
 
 namespace gj {
 
@@ -20,7 +20,7 @@ class CMainFrame;
 
 class CLogView :
 	public CWindowImpl<CLogView, CListViewCtrl, CListViewTraits>,
-	public COffscreenDrawRect<CLogView>
+	public COffscreenPaint<CLogView>
 {
 public:
 	explicit CLogView(CMainFrame& mainFrame);

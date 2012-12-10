@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "OffscreenDraw.h"
+#include "OffscreenPaint.h"
 
 namespace gj {
 
@@ -17,7 +17,7 @@ typedef CWinTraitsOR<TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT | TVS_SHOWS
 
 class CTreeView :
 	public CWindowImpl<CTreeView, CTreeViewCtrl, CTreeViewTraits>,
-	public COffscreenDraw<CTreeView>
+	public COffscreenPaint<CTreeView>
 {
 public:
 	DECLARE_WND_SUPERCLASS(nullptr, CTreeViewCtrl::GetWndClassName())
@@ -64,7 +64,7 @@ public:
 	LRESULT OnSelChanged(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
 	LRESULT OnClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
 	LRESULT OnRClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
-	void DoPaint(CDCHandle dc);
+	void DoPaint(CDCHandle hdc, const RECT& rcClip);
 
 private:
 	void CheckSubTreeItems(HTREEITEM hItem, bool check);

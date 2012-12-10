@@ -19,6 +19,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseOfAtl>Static</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -102,6 +103,11 @@
       <DebugInformationFormat>
       </DebugInformationFormat>
       <WholeProgramOptimization>true</WholeProgramOptimization>
+      <Optimization>MinSpace</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <StringPooling>true</StringPooling>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -112,6 +118,8 @@
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -144,7 +152,7 @@
     <ClInclude Include="GetUnitTestType.h" />
     <ClInclude Include="LogView.h" />
     <ClInclude Include="MainFrm.h" />
-    <ClInclude Include="OffscreenDraw.h" />
+    <ClInclude Include="OffscreenPaint.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Severity.h" />
