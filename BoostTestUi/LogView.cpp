@@ -25,7 +25,8 @@ BEGIN_MSG_MAP_TRY(CLogView)
 	REFLECTED_NOTIFY_CODE_HANDLER(NM_DBLCLK, OnDblClick)
 	REFLECTED_NOTIFY_CODE_HANDLER(LVN_ITEMCHANGING, OnItemChanging)
 	REFLECTED_NOTIFY_CODE_HANDLER(LVN_GETINFOTIP, OnGetInfoTip)
-	DEFAULT_REFLECTION_HANDLER();
+	DEFAULT_REFLECTION_HANDLER()
+	CHAIN_MSG_MAP(COffscreenDrawRect<CLogView>)
 END_MSG_MAP_CATCH(ExceptionHandler)
 
 CLogView::CLogView(CMainFrame& mainFrame) :
@@ -50,7 +51,7 @@ LRESULT CLogView::OnCreate(const CREATESTRUCT* /*pCreate*/)
 {
 	DefWindowProc();
 
-	SetExtendedListViewStyle(LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER | LVS_EX_INFOTIP);
+	SetExtendedListViewStyle(LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	int timeWidth = 90;
 	InsertColumn(0, L"Time", LVCFMT_LEFT, timeWidth, 0);
@@ -316,6 +317,13 @@ LRESULT CLogView::OnGetInfoTip(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
 	NMLVGETINFOTIP* pGetInfoTip = reinterpret_cast<NMLVGETINFOTIP*>(pnmh);
 
 	return 0;
+}
+
+void CLogView::DoPaint(CDCHandle dc, const RECT& rcClip)
+{
+	dc.FillSolidRect(&rcClip, GetSysColor(COLOR_WINDOW));
+ 
+	DefWindowProc(WM_PAINT, reinterpret_cast<WPARAM>(dc.m_hDC), 0);
 }
 
 } // namespace gj

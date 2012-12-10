@@ -10,6 +10,7 @@
 #include <vector>
 #include <map>
 #include "Severity.h"
+#include "OffscreenDraw.h"
 
 namespace gj {
 
@@ -17,7 +18,9 @@ typedef CWinTraitsOR<LVS_REPORT | LVS_NOSORTHEADER | LVS_SHOWSELALWAYS> CListVie
 
 class CMainFrame;
 
-class CLogView : public CWindowImpl<CLogView, CListViewCtrl, CListViewTraits>
+class CLogView :
+	public CWindowImpl<CLogView, CListViewCtrl, CListViewTraits>,
+	public COffscreenDrawRect<CLogView>
 {
 public:
 	explicit CLogView(CMainFrame& mainFrame);
@@ -55,6 +58,7 @@ public:
 	LRESULT OnDblClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
 	LRESULT OnItemChanging(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
 	LRESULT OnGetInfoTip(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
+	void DoPaint(CDCHandle dc, const RECT& rcClip);
 
 private:
 	struct LogLine

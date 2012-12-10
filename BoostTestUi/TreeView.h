@@ -7,13 +7,17 @@
 
 #pragma once
 
+#include "OffscreenDraw.h"
+
 namespace gj {
 
 class CMainFrame;
 
 typedef CWinTraitsOR<TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT | TVS_SHOWSELALWAYS> CTreeViewTraits;
 
-class CTreeView : public CWindowImpl<CTreeView, CTreeViewCtrl, CTreeViewTraits>
+class CTreeView :
+	public CWindowImpl<CTreeView, CTreeViewCtrl, CTreeViewTraits>,
+	public COffscreenDraw<CTreeView>
 {
 public:
 	DECLARE_WND_SUPERCLASS(nullptr, CTreeViewCtrl::GetWndClassName())
@@ -60,6 +64,7 @@ public:
 	LRESULT OnSelChanged(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
 	LRESULT OnClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
 	LRESULT OnRClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
+	void DoPaint(CDCHandle dc);
 
 private:
 	void CheckSubTreeItems(HTREEITEM hItem, bool check);

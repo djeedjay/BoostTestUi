@@ -21,6 +21,7 @@ BEGIN_MSG_MAP_TRY(CTreeView)
 	REFLECTED_NOTIFY_CODE_HANDLER(NM_CLICK, OnClick)
 	REFLECTED_NOTIFY_CODE_HANDLER(NM_RCLICK, OnRClick)
 	DEFAULT_REFLECTION_HANDLER();
+	CHAIN_MSG_MAP(COffscreenDraw<CTreeView>)
 END_MSG_MAP_CATCH(ExceptionHandler)
 
 CTreeView::CTreeView(CMainFrame& mainFrame) :
@@ -164,6 +165,11 @@ LRESULT CTreeView::OnRClick(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& bHandled)
 	SendMessage(WM_CONTEXTMENU, (WPARAM)m_hWnd, GetMessagePos());
 	bHandled = TRUE;
 	return 0;
+}
+
+void CTreeView::DoPaint(CDCHandle dc)
+{
+	DefWindowProc(WM_PAINT, reinterpret_cast<WPARAM>(dc.m_hDC), 0);
 }
 
 void CTreeView::CheckSubTreeItems(HTREEITEM hItem, bool check)
