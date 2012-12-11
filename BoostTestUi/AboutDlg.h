@@ -12,6 +12,8 @@
 
 #include "Resource.h"
 
+namespace gj {
+
 class CAboutDlg : public CDialogImpl<CAboutDlg>
 {
 public:
@@ -34,5 +36,7 @@ public:
 private:
 	CHyperLink m_link;
 };
+
+} // namespace gj
 
 #endif // BOOST_TESTUI_ABOUTDLG_H

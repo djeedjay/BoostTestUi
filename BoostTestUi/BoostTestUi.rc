@@ -145,11 +145,12 @@ CAPTION "About Boost Test UI"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,130,108,50,14
-    CTEXT           "Boost Test UI V1.0",IDC_STATIC,54,22,118,8
+    CTEXT           "Boost Test UI V1.0",IDC_VERSION,54,22,118,8
     ICON            IDR_MAINFRAME,IDC_STATIC,21,26,20,20
     GROUPBOX        "",IDC_STATIC,7,7,173,91
     CTEXT           "http://www.boost.org/libs/test",IDC_BOOST_URL,16,82,156,8
-    CTEXT           "© Gert-Jan de Vos 2012",IDC_STATIC,54,35,118,8
+    CTEXT           "© Gert-Jan de Vos 2012",IDC_STATIC,54,48,118,8
+    CTEXT           "Dec 13 2012",IDC_DATE,54,35,118,8
 END
 
 
@@ -200,8 +201,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 0,1,0,0
+ PRODUCTVERSION 0,1,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -216,13 +217,13 @@ BEGIN
     BEGIN
         BLOCK "040904B0"
         BEGIN
-            VALUE "FileDescription", "BoostTestUi Module"
-            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "FileDescription", "BoostTestUi"
+            VALUE "FileVersion", "0,1,0,0"
             VALUE "InternalName", "BoostTestUi"
-            VALUE "LegalCopyright", "Copyright 2010"
+            VALUE "LegalCopyright", "Copyright 2012"
             VALUE "OriginalFilename", "BoostTestUi.exe"
-            VALUE "ProductName", "BoostTestUi Module"
-            VALUE "ProductVersion", "1, 0, 0, 1"
+            VALUE "ProductName", "BoostTestUi"
+            VALUE "ProductVersion", "0,1,0,0"
         END
     END
     BLOCK "VarFileInfo"
@@ -378,26 +379,6 @@ END
 IDI_EMPTY               ICON                    "res\\empty.ico"
 IDI_TICK                ICON                    "res\\tick.ico"
 IDI_CROSS               ICON                    "res\\cross.ico"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_AUTORUN, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 111
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 101
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
 
 /////////////////////////////////////////////////////////////////////////////
 //

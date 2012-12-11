@@ -22,7 +22,9 @@
 #define IDC_CONTINUE                    1007
 #define IDC_UNLIMITED                   1008
 #define IDC_RANDOMIZE                   1009
-#define IDPANE_TESTCASE_ITERATIONS      2000 
+#define IDC_DATE                        1010
+#define IDC_VERSION                     1011
+#define IDPANE_TESTCASE_ITERATIONS      2000
 #define IDPANE_TESTCASE_TOTAL           2001
 #define IDPANE_TESTCASE_RUN             2002
 #define IDPANE_TESTCASE_FAILED          2003
@@ -59,7 +61,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        209
 #define _APS_NEXT_COMMAND_VALUE         32810
-#define _APS_NEXT_CONTROL_VALUE         1010
+#define _APS_NEXT_CONTROL_VALUE         1012
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

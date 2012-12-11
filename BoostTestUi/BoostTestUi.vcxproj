@@ -79,6 +79,12 @@
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Command>$(ComSpec) /c UpdateBuildNr.cmd</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Update version.h</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -121,6 +127,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
+    <PostBuildEvent>
+      <Command>$(ComSpec) /c UpdateBuildNr.cmd version.h</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Update version.h</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDlg.cpp" />
@@ -146,8 +158,10 @@
     <ClInclude Include="..\include\gtest\gtest-gui.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="BoostTest.h" />
+    <ClInclude Include="boost\test\unit_test_gui.hpp" />
     <ClInclude Include="ExeRunner.h" />
     <ClInclude Include="GoogleTest.h" />
+    <ClInclude Include="gtest\gtest-gui.h" />
     <ClInclude Include="hstream.h" />
     <ClInclude Include="GetUnitTestType.h" />
     <ClInclude Include="LogView.h" />
@@ -162,6 +176,7 @@
     <ClInclude Include="TestRunner.h" />
     <ClInclude Include="TreeView.h" />
     <ClInclude Include="Utilities.h" />
+    <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
