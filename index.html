@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>BoostTestUi by djeedjay</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>BoostTestUi</h1>
+        <p>GUI runner for boost.test</p>
+
+        <p class="view"><a href="https://github.com/djeedjay/BoostTestUi">View the Project on GitHub <small>djeedjay/BoostTestUi</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/djeedjay/BoostTestUi/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/djeedjay/BoostTestUi/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/djeedjay/BoostTestUi">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>BoostTestUi</h1>
+
+<p>BoostTestUi provides a Windows gui runner for boost.test and google test
+based unit test executables.</p>
+
+<h2>How to build</h2>
+
+<p>This is a Visual Studio 2010 project with the following dependencies:</p>
+
+<ul>
+<li>boost 1.43 or later</li>
+<li>WTL 8.0 or later</li>
+<li>gtest 1.6.0 or later (only required for the GTestSample sample unit test)</li>
+</ul><p>These libraries must be installed in Libraries. All projects should now build.</p>
+
+<h2>Boost.test support</h2>
+
+<p>In your unit test, replace #include &lt;boost/test/unit_test.hpp&gt; with
+&lt;boost/test/unit_test_gui.hpp&gt;:</p>
+
+<pre><code>#define BOOST_TEST_MODULE Exe TestRunner Test
+#include &lt;boost/test/unit_test_gui.hpp&gt;
+
+BOOST_AUTO_TEST_CASE(MyTest) { ... }
+</code></pre>
+
+<p>You can also provide your own init_unit_test_suite() initialization function
+by omitting BOOST_TEST_MODULE, as usual.</p>
+
+<h2>Google test support</h2>
+
+<p>In your unit test, replace #include &lt;gtest/gtest.h&gt; with &lt;gtest/gtest-gui.h&gt;:</p>
+
+<pre><code>#include &lt;gtest/gtest-gui.h&gt;
+
+TEST(MyTest, MyTestCase) { ... }
+</code></pre>
+
+<p>Then add InitGoogleTestGui() to your main function body like this:</p>
+
+<pre><code>int main(int argc, char* argv[])
+{
+    testing::InitGoogleTest(&amp;argc, argv);
+    testing::InitGoogleTestGui(&amp;argc, argv);
+    return RUN_ALL_TESTS();
+}
+</code></pre>
+
+<h2>BoostTestUi</h2>
+
+<p>Run BoostTestUi.exe and open a unit test executable that was build with
+the gui header included. The appropriate header can be generated from the
+File -&gt; Create Header menu. Store it preferably in a sub folder named
+"boost/test" or "gtest" in one of your include directories. Now select
+Run from the toolbar or the test tree context menu to run the tests.</p>
+
+<h2>Author</h2>
+
+<p>Gert-Jan de Vos
+mailto:<a href="mailto:boosttestui@on.nl">boosttestui@on.nl</a></p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/djeedjay">djeedjay</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
