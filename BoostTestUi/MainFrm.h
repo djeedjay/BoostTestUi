@@ -31,7 +31,7 @@ class CMainFrame :
 	public CUpdateUI<CMainFrame>,
 	public CMessageFilter,
 	public CIdleHandler,
-	public gj::TestObserver
+	public TestObserver
 {
 public:
 	explicit CMainFrame(const std::wstring& fileName);
@@ -40,8 +40,8 @@ public:
 
 	void SetLogHighLight(unsigned id);
 
-	void AddTestCase(const gj::TestCase& tc);
-	void EnterTestSuite(const gj::TestSuite& ts);
+	void AddTestCase(const TestCase& tc);
+	void EnterTestSuite(const TestSuite& ts);
 	void LeaveTestSuite();
 
 	void AddLogMessage(double t, Severity::type severity, const std::string& msg);
@@ -57,14 +57,17 @@ public:
 	virtual void test_aborted() override;
 	virtual void test_iteration_start(unsigned test_cases_amount) override;
 	virtual void test_iteration_finish() override;
-	virtual void test_unit_start(const gj::TestUnit& tu) override;
-	virtual void test_unit_finish(const gj::TestUnit& tu, unsigned long elapsed) override;
-	virtual void test_unit_skipped(const gj::TestUnit& tu) override;
-	virtual void test_unit_aborted(const gj::TestUnit& tu) override;
+	virtual void test_suite_start(unsigned id) override;
+	virtual void test_case_start(unsigned id) override;
+	virtual void test_case_finish(unsigned id, unsigned long elapsed) override;
+	virtual void test_suite_finish(unsigned id, unsigned long elapsed) override;
+	virtual void test_unit_skipped(unsigned id) override;
+	virtual void test_unit_aborted(unsigned id) override;
 
 	virtual void assertion_result(bool passed) override;
 	virtual void exception_caught(const std::string& what) override;
 
+	virtual void TestStarted() override;
 	virtual void TestFinished() override;
 
 	BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
@@ -155,7 +158,7 @@ private:
 	CProgressBarCtrl m_progressBar;
 	CLogView m_logView;
 	CRecentDocumentList m_mru;
-	std::unique_ptr<gj::TestRunner> m_pRunner;
+	std::unique_ptr<TestRunner> m_pRunner;
 	unsigned m_currentId;
 	bool m_autoRun;
 	bool m_logAutoClear;
@@ -163,7 +166,7 @@ private:
 	bool m_repeat;
 	bool m_debugger;
 	bool m_resetTimer;
-	gj::Timer m_timer;
+	Timer m_timer;
 	int m_testIterationCount;
 	int m_testCaseCount;
 	int m_testsRunCount;

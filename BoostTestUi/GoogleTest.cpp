@@ -181,17 +181,17 @@ void ArgumentBuilder::FilterMessage(const std::string& msg)
 	else if (std::regex_search(msg, sm, reStart))
 	{
 		m_pObserver->test_iteration_start(get_arg<unsigned>(sm[1]));
-		m_pRunner->OnTestUnitStart(m_rootId);
+		m_pRunner->OnTestSuiteStart(m_rootId);
 	}
 	else if (std::regex_search(msg, sm, reTest))
 	{
 		if (sm[2].matched)
-			m_pRunner->OnTestUnitFinish(GetId(sm[1]), get_arg<unsigned>(sm[3]));
+			m_pRunner->OnTestSuiteFinish(GetId(sm[1]), get_arg<unsigned>(sm[3]));
 		else
-			m_pRunner->OnTestUnitStart(GetId(sm[1]));
+			m_pRunner->OnTestSuiteStart(GetId(sm[1]));
 	}
 	else if (std::regex_search(msg, sm, reBegin))
-		m_pRunner->OnTestUnitStart(GetId(sm[1]));
+		m_pRunner->OnTestCaseStart(GetId(sm[1]));
 	else if (std::regex_search(msg, reError))
 	{
 		severity = Severity::Error;
@@ -199,13 +199,13 @@ void ArgumentBuilder::FilterMessage(const std::string& msg)
 	}
 	else if (std::regex_search(msg, sm, reEnd))
 	{
-		m_pRunner->OnTestUnitFinish(GetId(sm[2]), get_arg<unsigned>(sm[3]));
+		m_pRunner->OnTestCaseFinish(GetId(sm[2]), get_arg<unsigned>(sm[3]));
 		if (sm[1] == "  FAILED  ")
 			severity = Severity::Error;
 	}
 	else if (std::regex_search(msg, sm, reFinish))
 	{
-		m_pRunner->OnTestUnitFinish(m_rootId, 0);
+		m_pRunner->OnTestSuiteFinish(m_rootId, 0);
 		m_pObserver->test_iteration_finish();
 	}
 	else if (std::regex_search(msg, reAssertion))

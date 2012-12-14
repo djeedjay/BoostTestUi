@@ -79,14 +79,17 @@ public:
 	virtual void test_aborted() = 0;
 	virtual void test_iteration_start(unsigned test_cases_amount) = 0;
 	virtual void test_iteration_finish() = 0;
-	virtual void test_unit_start(const TestUnit& tu) = 0;
-	virtual void test_unit_finish(const TestUnit& tu, unsigned long elapsed) = 0;
-	virtual void test_unit_skipped(const TestUnit& tu) = 0;
-	virtual void test_unit_aborted(const TestUnit& tu) = 0;
+	virtual void test_suite_start(unsigned id) = 0;
+	virtual void test_case_start(unsigned id) = 0;
+	virtual void test_case_finish(unsigned id, unsigned long elapsed) = 0;
+	virtual void test_suite_finish(unsigned id, unsigned long elapsed) = 0;
+	virtual void test_unit_skipped(unsigned id) = 0;
+	virtual void test_unit_aborted(unsigned id) = 0;
 
 	virtual void assertion_result(bool passed) = 0;
 	virtual void exception_caught(const std::string& what) = 0;
 
+	virtual void TestStarted() = 0;
 	virtual void TestFinished() = 0;
 
 protected:

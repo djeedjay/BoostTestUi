@@ -161,10 +161,14 @@ void ExeRunner::OnWaiting()
 	m_pObserver->test_waiting(m_pProcess->GetName(), m_pProcess->GetProcessId());
 }
 
-void ExeRunner::OnTestUnitStart(unsigned id)
+void ExeRunner::OnTestSuiteStart(unsigned id)
 {
-	if (auto p = GetTestUnitPtr(id))
-		m_pObserver->test_unit_start(*p);
+	m_pObserver->test_suite_start(id);
+}
+
+void ExeRunner::OnTestCaseStart(unsigned id)
+{
+	m_pObserver->test_case_start(id);
 }
 
 void ExeRunner::OnTestAssertion(bool passed)
@@ -180,23 +184,25 @@ void ExeRunner::OnTestExceptionCaught(const std::string& what)
 	m_pObserver->exception_caught(what);
 }
 
-void ExeRunner::OnTestUnitFinish(unsigned id, unsigned elapsed)
+void ExeRunner::OnTestCaseFinish(unsigned id, unsigned elapsed)
 {
-	if (auto p = GetTestUnitPtr(id))
-		m_pObserver->test_unit_finish(*p, elapsed);
+	m_pObserver->test_case_finish(id, elapsed);
+}
+
+void ExeRunner::OnTestSuiteFinish(unsigned id, unsigned elapsed)
+{
+	m_pObserver->test_suite_finish(id, elapsed);
 }
 
 void ExeRunner::OnTestUnitSkipped(unsigned id)
 {
-	if (auto p = GetTestUnitPtr(id))
-		m_pObserver->test_unit_skipped(*p);
+	m_pObserver->test_unit_skipped(id);
 }
 
 void ExeRunner::OnTestUnitAborted(unsigned id)
 {
 	m_repeat = false;
-	if (auto p = GetTestUnitPtr(id))
-		m_pObserver->test_unit_aborted(*p);
+	m_pObserver->test_unit_aborted(id);
 }
 
 TestUnitNode* GetTestUnitNodePtr(TestUnitNode& node, unsigned id)
@@ -234,6 +240,9 @@ TestUnit& ExeRunner::GetTestUnit(unsigned id)
 void ExeRunner::RunTest()
 try
 {
+	m_pObserver->TestStarted();
+	auto guard = make_guard([this]() { m_pObserver->TestFinished(); });
+
 	for (;;)
 	{
 		RunTestIteration();
@@ -243,13 +252,10 @@ try
 
 		StartTestProcess();
 	}
-
-	m_pObserver->TestFinished();
 }
 catch (std::exception& e)
 {
 	m_pObserver->exception_caught(e.what());
-	m_pObserver->TestFinished();
 }
 
 void ExeRunner::RunTestIteration()

@@ -80,7 +80,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>$(ComSpec) /c UpdateBuildNr.cmd</Command>
+      <Command>$(ComSpec) /c UpdateBuildNr.cmd version.h</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Update version.h</Message>

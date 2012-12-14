@@ -264,12 +264,26 @@ void ArgumentBuilder::HandleClientNotification(const std::string& line)
 	else if (command == "aborted")
 		m_pObserver->test_aborted();
 	else if (command == "unit_start")
-		m_pRunner->OnTestUnitStart(get_arg<unsigned>(ss));
+	{
+		if (auto p = m_pRunner->GetTestUnitPtr(get_arg<unsigned>(ss)))
+		{
+			if (p->type == TestUnit::TestCase)
+				m_pRunner->OnTestCaseStart(p->id);
+			else
+				m_pRunner->OnTestSuiteStart(p->id);
+		}
+	}
 	else if (command == "unit_finish")
 	{
 		unsigned id = get_arg<unsigned>(ss);
 		unsigned elapsed = get_arg<unsigned>(ss);
-		m_pRunner->OnTestUnitFinish(id, elapsed);
+		if (auto p = m_pRunner->GetTestUnitPtr(id))
+		{
+			if (p->type == TestUnit::TestCase)
+				m_pRunner->OnTestCaseFinish(p->id, elapsed);
+			else
+				m_pRunner->OnTestSuiteFinish(p->id, elapsed);
+		}
 	}
 	else if (command == "unit_skipped")
 		m_pRunner->OnTestUnitSkipped(get_arg<unsigned>(ss));

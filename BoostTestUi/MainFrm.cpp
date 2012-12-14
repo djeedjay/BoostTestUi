@@ -506,7 +506,8 @@ void CMainFrame::OnLogCopy(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/
 
 void CMainFrame::test_message(Severity::type severity, const std::string& msg)
 {
-	double t = m_timer.Get();
+	double t = m_resetTimer? (m_timer.Reset(), 0): m_timer.Get();
+	m_resetTimer = false;
 	std::string text = msg;
 	EnQueue([this, t, severity, text]()
 	{
@@ -538,20 +539,10 @@ void CMainFrame::test_waiting(const std::wstring& processName, unsigned processI
 
 void CMainFrame::test_start()
 {
-	EnQueue([this]()
-	{
-		if (m_resetTimer)
-			m_timer.Reset();
-		m_treeView.OnTestStart();
-	});
 }
 
 void CMainFrame::test_finish()
 {
-	EnQueue([this]()
-	{
-		m_treeView.OnTestFinish();
-	});
 }
 
 void CMainFrame::test_aborted()
@@ -579,31 +570,33 @@ void CMainFrame::test_iteration_finish()
 	});
 }
 
-void CMainFrame::test_unit_start(const TestUnit& tu)
+void CMainFrame::test_suite_start(unsigned id)
 {
-	EnQueue([this, tu]()
+	EnQueue([this, id]()
 	{
-		m_currentId = tu.id;
-		m_testCaseFailed = false;
-		if (tu.type == TestUnit::TestCase)
-			m_treeView.BeginTestCase(tu.id);
-		else
-			m_treeView.BeginTestSuite(tu.id);
-		m_logView.BeginTestUnit(tu.id);
+		m_currentId = id;
+		m_treeView.BeginTestSuite(id);
+		m_logView.BeginTestUnit(id);
 	});
 }
 
-void CMainFrame::test_unit_finish(const TestUnit& tu, unsigned long /*elapsed*/)
+void CMainFrame::test_case_start(unsigned id)
 {
-	EnQueue([this, tu]()
+	EnQueue([this, id]()
 	{
-		if (tu.type == TestUnit::TestCase)
-			m_treeView.EndTestCase(tu.id, !m_testCaseFailed);
-		else
-			m_treeView.EndTestSuite(tu.id);
-		m_logView.EndTestUnit(tu.id);
-		if (tu.type != TestUnit::TestCase)
-			return;
+		m_currentId = id;
+		m_testCaseFailed = false;
+		m_treeView.BeginTestCase(id);
+		m_logView.BeginTestUnit(id);
+	});
+}
+
+void CMainFrame::test_case_finish(unsigned id, unsigned long /*elapsed*/)
+{
+	EnQueue([this, id]()
+	{
+		m_treeView.EndTestCase(id, !m_testCaseFailed);
+		m_logView.EndTestUnit(id);
 
 		if (m_testCaseFailed)
 			++m_failedTestCount;
@@ -614,17 +607,26 @@ void CMainFrame::test_unit_finish(const TestUnit& tu, unsigned long /*elapsed*/)
 	});
 }
 
-void CMainFrame::test_unit_skipped(const TestUnit& tu)
+void CMainFrame::test_suite_finish(unsigned id, unsigned long /*elapsed*/)
 {
-	EnQueue([this, tu]()
+	EnQueue([this, id]()
+	{
+		m_treeView.EndTestSuite(id);
+		m_logView.EndTestUnit(id);
+	});
+}
+
+void CMainFrame::test_unit_skipped(unsigned id)
+{
+	EnQueue([this, id]()
 	{
 		CountTestCases ctc;
-		m_pRunner->TraverseTestTree(tu.id, ctc);
+		m_pRunner->TraverseTestTree(id, ctc);
 		m_progressBar.OffsetPos(ctc.count());
 	});
 }
 
-void CMainFrame::test_unit_aborted(const TestUnit& /*tu*/)
+void CMainFrame::test_unit_aborted(unsigned /*id*/)
 {
 }
 
@@ -663,11 +665,21 @@ void CMainFrame::exception_caught(const std::string& /*what*/)
 	});
 }
 
+void CMainFrame::TestStarted()
+{
+	EnQueue([this]()
+	{
+		m_treeView.OnTestStart();
+		UpdateUI();
+	});
+}
+
 void CMainFrame::TestFinished()
 {
 	EnQueue([this]()
 	{
 		m_pRunner->Wait();
+		m_treeView.OnTestFinish();
 		UpdateUI();
 	});
 }
@@ -947,6 +959,7 @@ void CMainFrame::Run()
 	if (!IsRunnable())
 		return;
 
+	m_testIterationCount = 0;
 	m_testsRunCount = 0;
 	m_failedTestCount = 0;
 	if (m_logAutoClear)

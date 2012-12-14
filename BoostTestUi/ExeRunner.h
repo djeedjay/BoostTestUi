@@ -42,17 +42,19 @@ public:
 	virtual void Wait() override;
 
 	void OnWaiting();
-	void OnTestUnitStart(unsigned id);
+	void OnTestSuiteStart(unsigned id);
+	void OnTestCaseStart(unsigned id);
 	void OnTestAssertion(bool result);
 	void OnTestExceptionCaught(const std::string& what);
-	void OnTestUnitFinish(unsigned id, unsigned elapsed);
+	void OnTestCaseFinish(unsigned id, unsigned elapsed);
+	void OnTestSuiteFinish(unsigned id, unsigned elapsed);
 	void OnTestUnitSkipped(unsigned id);
 	void OnTestUnitAborted(unsigned id);
 
 	TestUnit& GetTestUnit(unsigned id);
+	TestUnit* GetTestUnitPtr(unsigned id);
 
 private:
-	TestUnit* GetTestUnitPtr(unsigned id);
 	TestUnitNode& RootTestUnitNode();
 	TestUnitNode& GetTestUnitNode(unsigned id);
 	void Load();
