@@ -15,8 +15,9 @@ namespace gj {
 LRESULT CGoogleHelpDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
 	CenterWindow(GetParent());
+	DlgResize_Init();
 
-	m_link.SubclassWindow(GetDlgItem(IDC_BOOSTTEST_URL));
+	m_link.SubclassWindow(GetDlgItem(IDC_URL));
 
 	CRichEditCtrl sample(GetDlgItem(IDC_SAMPLE));
 	SetRichEditData(sample, SF_RTF, MAKEINTRESOURCE(IDR_GOOGLETESTSAMPLE_RTF));

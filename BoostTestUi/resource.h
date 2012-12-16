@@ -30,9 +30,10 @@
 #define IDC_RANDOMIZE                   1009
 #define IDC_DATE                        1010
 #define IDC_VERSION                     1011
+#define IDC_DESCRIPTION                 1012
 #define IDC_SAMPLE                      1013
-#define IDC_BOOSTTEST_URL               1014
-#define IDC_GOOGLETEST_URL              1015
+#define IDC_SEEALSO                     1014
+#define IDC_URL                         1015
 #define IDPANE_TESTCASE_ITERATIONS      2000
 #define IDPANE_TESTCASE_TOTAL           2001
 #define IDPANE_TESTCASE_RUN             2002

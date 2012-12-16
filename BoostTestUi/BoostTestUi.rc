@@ -156,28 +156,28 @@ BEGIN
     CTEXT           "Dec 13 2012",IDC_DATE,54,35,118,8
 END
 
-IDD_BOOSTHELP DIALOGEX 0, 0, 243, 221
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_BOOSTHELP DIALOGEX 0, 0, 244, 222
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "HowTo Create a Boost Unit Test"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,186,201,50,14
-    LTEXT           "Select File -> Create Header -> Boost Test...\r\nto create the unit_test_gui.hpp file somewhere in your include path.\r\n\r\nCopy the code template below into a Win32 Console Application project. Then extend the assertions, test cases and suites.",IDC_STATIC,7,12,229,40
-    CONTROL         "",IDC_SAMPLE,"RichEdit20W",WS_BORDER | WS_TABSTOP | 0x884,7,59,229,118
-    LTEXT           "See also",IDC_STATIC,7,185,28,8
-    LTEXT           "http://www.boost.org/libs/test",IDC_BOOSTTEST_URL,37,185,97,8
+    DEFPUSHBUTTON   "OK",IDOK,187,202,50,14
+    CONTROL         "",IDC_SAMPLE,"RichEdit20W",ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_BORDER | WS_TABSTOP,7,59,230,118
+    LTEXT           "Select File -> Create Header -> Boost Test...\r\nto create the unit_test_gui.hpp file somewhere in your include path.\r\n\r\nCopy the code template below into a Win32 Console Application project. Then extend the assertions, test cases and suites.",IDC_DESCRIPTION,7,12,230,40
+    LTEXT           "See also",IDC_SEEALSO,7,185,28,8
+    LTEXT           "http://www.boost.org/libs/test",IDC_URL,37,185,97,8
 END
 
 IDD_GOOGLEHELP DIALOGEX 0, 0, 243, 242
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "HowTo Create a Google Unit Test"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,186,223,50,14
-    LTEXT           "Select File -> Create Header -> Google Test...\r\nto create the gtest-gui.h file somewhere in your include path.\r\n\r\nCopy the code template below into a Win32 Console Application project. Then extend the assertions, tests and test cases.",IDC_STATIC,7,12,229,40
-    CONTROL         "",IDC_SAMPLE,"RichEdit20W",ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_BORDER | WS_TABSTOP,7,59,229,144
-    LTEXT           "See also",IDC_STATIC,7,207,28,8
-    LTEXT           "http://code.google.com/p/googletest/",IDC_BOOSTTEST_URL,37,207,123,8
+    CONTROL         "",IDC_SAMPLE,"RichEdit20W",WS_BORDER | WS_TABSTOP | 0x884,7,59,229,144
+    LTEXT           "Select File -> Create Header -> Google Test...\r\nto create the gtest-gui.h file somewhere in your include path.\r\n\r\nCopy the code template below into a Win32 Console Application project. Then extend the assertions, tests and test cases.",IDC_DESCRIPTION,7,12,229,40
+    LTEXT           "See also",IDC_SEEALSO,7,207,28,8
+    LTEXT           "http://code.google.com/p/googletest/",IDC_URL,37,207,123,8
 END
 
 
@@ -200,9 +200,9 @@ BEGIN
     IDD_BOOSTHELP, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 236
+        RIGHTMARGIN, 237
         TOPMARGIN, 7
-        BOTTOMMARGIN, 215
+        BOTTOMMARGIN, 216
     END
 
     IDD_GOOGLEHELP, DIALOG
@@ -317,8 +317,9 @@ END
 
 STRINGTABLE
 BEGIN
-	ID_HELP_BOOST           "Display how to build a boost unit test\nBoost Unit Test"
-	ID_HELP_GOOGLE          "Display how to build a google unit test\nGoogle Unit Test"
+    ID_TEST_REPEAT          "Repeat the selected test cases until a failure occurs\nRepeat"
+    ID_HELP_BOOST           "Display how to build a boost unit test\nBoost Unit Test"
+    ID_HELP_GOOGLE          "Display how to build a google unit test\nGoogle Unit Test"
 END
 
 STRINGTABLE
@@ -364,11 +365,6 @@ END
 STRINGTABLE
 BEGIN
     ATL_IDS_MRU_FILE        "Load this unit test"
-END
-
-STRINGTABLE
-BEGIN
-    ID_TEST_REPEAT          "Repeat the selected test cases until a failure occurs\nRepeat"
 END
 
 #endif    // English (United States) resources

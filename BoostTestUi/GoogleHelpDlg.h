@@ -14,7 +14,9 @@
 
 namespace gj {
 
-class CGoogleHelpDlg : public CDialogImpl<CGoogleHelpDlg>
+class CGoogleHelpDlg :
+	public CDialogImpl<CGoogleHelpDlg>,
+	public CDialogResize<CGoogleHelpDlg>
 {
 public:
 	enum { IDD = IDD_GOOGLEHELP };
@@ -23,7 +25,16 @@ public:
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
 		COMMAND_ID_HANDLER(IDOK, OnCloseCmd)
 		COMMAND_ID_HANDLER(IDCANCEL, OnCloseCmd)
+		CHAIN_MSG_MAP(CDialogResize<CGoogleHelpDlg>)
 	END_MSG_MAP()
+
+	BEGIN_DLGRESIZE_MAP(CGoogleHelpDlg)
+		DLGRESIZE_CONTROL(IDC_DESCRIPTION, DLSZ_SIZE_X)
+		DLGRESIZE_CONTROL(IDC_SAMPLE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		DLGRESIZE_CONTROL(IDC_SEEALSO, DLSZ_MOVE_Y)
+		DLGRESIZE_CONTROL(IDC_URL, DLSZ_MOVE_Y)
+		DLGRESIZE_CONTROL(IDOK, DLSZ_MOVE_X | DLSZ_MOVE_Y)
+	END_DLGRESIZE_MAP()
 
 // Handler prototypes (uncomment arguments if needed):
 //	LRESULT MessageHandler(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
