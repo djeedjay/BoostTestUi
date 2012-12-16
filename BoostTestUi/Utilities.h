@@ -215,6 +215,9 @@ typedef basic_stringbuilder<wchar_t> wstringbuilder;
 
 std::wstring GetExceptionMessage();
 
+DWORD SetRichEditData(CRichEditCtrl& ctrl, DWORD format, const BYTE* pData, size_t len);
+DWORD SetRichEditData(CRichEditCtrl& ctrl, DWORD format, LPWSTR resourcedId);
+
 } // namespace gj
 
 #endif // BOOST_TESTUI_UTILITIES_H

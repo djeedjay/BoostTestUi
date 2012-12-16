@@ -121,6 +121,8 @@ public:
 	void OnTestRepeat(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestDebugger(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestAbort(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnHelpBoost(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnHelpGoogle(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnAppAbout(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTreeRun(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTreeRunChecked(UINT uNotifyCode, int nID, CWindow wndCtl);

@@ -2,17 +2,23 @@
 // Microsoft Visual C++ generated include file.
 // Used by BoostTestUi.rc
 //
+#define IDD_GTESTHELP                   9
 #define IDD_ABOUTBOX                    100
+#define IDD_ABOUTBOX1                   101
+#define IDD_BOOSTHELP                   101
+#define IDD_GOOGLEHELP                  102
 #define IDR_MAINFRAME                   128
 #define IDR_UNIT_TEST_GUI_HPP           200
 #define IDR_GTEST_GUI_H                 201
-#define IDI_EMPTY                       202
-#define IDI_RUN                         203
-#define IDI_TICK                        204
-#define IDI_CROSS                       205
-#define IDR_LOGLEVEL_MENU               206
-#define IDR_TREE_CONTEXTMENU            207
-#define IDD_AUTORUN                     208
+#define IDR_BOOSTTESTSAMPLE_RTF         202
+#define IDR_GOOGLETESTSAMPLE_RTF        203
+#define IDI_EMPTY                       204
+#define IDI_RUN                         205
+#define IDI_TICK                        206
+#define IDI_CROSS                       207
+#define IDR_LOGLEVEL_MENU               208
+#define IDR_TREE_CONTEXTMENU            209
+#define IDD_AUTORUN                     210
 #define IDC_TREEVIEW                    1000
 #define IDC_PROGRESSBAR                 1001
 #define IDC_LOGVIEW                     1002
@@ -24,6 +30,9 @@
 #define IDC_RANDOMIZE                   1009
 #define IDC_DATE                        1010
 #define IDC_VERSION                     1011
+#define IDC_SAMPLE                      1013
+#define IDC_BOOSTTEST_URL               1014
+#define IDC_GOOGLETEST_URL              1015
 #define IDPANE_TESTCASE_ITERATIONS      2000
 #define IDPANE_TESTCASE_TOTAL           2001
 #define IDPANE_TESTCASE_RUN             2002
@@ -53,15 +62,16 @@
 #define IDR_LIST_CONTEXTMENU            32801
 #define ID_TREE_WAITFORDEBUGGER         32802
 #define ID_TEST_REPEAT                  32804
-#define ID_TEST_REPEAT32809             32809
+#define ID_HELP_BOOST                   32805
+#define ID_HELP_GOOGLE                  32806
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        209
-#define _APS_NEXT_COMMAND_VALUE         32810
-#define _APS_NEXT_CONTROL_VALUE         1012
+#define _APS_NEXT_RESOURCE_VALUE        211
+#define _APS_NEXT_COMMAND_VALUE         32807
+#define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -136,9 +136,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDlg.cpp" />
+    <ClCompile Include="BoostHelpDlg.cpp" />
     <ClCompile Include="BoostTest.cpp" />
     <ClCompile Include="BoostTestUi.cpp" />
     <ClCompile Include="ExeRunner.cpp" />
+    <ClCompile Include="GoogleHelpDlg.cpp" />
     <ClCompile Include="GoogleTest.cpp" />
     <ClCompile Include="GetUnitTestType.cpp" />
     <ClCompile Include="LogView.cpp" />
@@ -157,9 +159,11 @@
     <ClInclude Include="..\include\boost\test\unit_test_gui.hpp" />
     <ClInclude Include="..\include\gtest\gtest-gui.h" />
     <ClInclude Include="AboutDlg.h" />
+    <ClInclude Include="BoostHelpDlg.h" />
     <ClInclude Include="BoostTest.h" />
     <ClInclude Include="boost\test\unit_test_gui.hpp" />
     <ClInclude Include="ExeRunner.h" />
+    <ClInclude Include="GoogleHelpDlg.h" />
     <ClInclude Include="GoogleTest.h" />
     <ClInclude Include="gtest\gtest-gui.h" />
     <ClInclude Include="hstream.h" />
@@ -179,6 +183,8 @@
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="BoostTestSample.rtf" />
+    <None Include="GoogleTestSample.rtf" />
     <None Include="ReadMe.txt" />
     <None Include="res\BoostTestUi.ico" />
     <None Include="res\empty.ico" />

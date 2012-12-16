@@ -1,0 +1,17 @@
+{\rtf\ansi{\fonttbl{\f0 Consolas;}}
+{\colortbl;\red0\green0\blue255;\red163\green21\blue21;}
+\f0\fs19\cf1 #include\cf0  \cf2 <gtest/gtest-gui.h>\cf0\par
+\par
+TEST(TestCase, Test)\par
+\{\par
+\tab EXPECT_EQ(1 + 1, 2);\par
+\}\par
+\par
+\cf1 int\cf0  main(\cf1 int\cf0  argc, \cf1 char\cf0 * argv[])\par
+\{\par
+\tab testing::InitGoogleTest(&argc, argv);\par
+\tab testing::InitGoogleTestGui(&argc, argv);\par
+\par
+\tab \cf1 return\cf0  RUN_ALL_TESTS();\par
+\}\par
+\par}

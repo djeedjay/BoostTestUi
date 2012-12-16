@@ -14,6 +14,8 @@
 #include <fstream>
 #include <array>
 #include <boost/filesystem.hpp>
+#include "BoostHelpDlg.h"
+#include "GoogleHelpDlg.h"
 #include "AboutDlg.h"
 #include "ExeRunner.h"
 #include "MainFrm.h"
@@ -50,6 +52,8 @@ BEGIN_MSG_MAP_TRY(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_TEST_REPEAT, OnTestRepeat)
 	COMMAND_ID_HANDLER_EX(ID_TEST_DEBUGGER, OnTestDebugger)
 	COMMAND_ID_HANDLER_EX(ID_TEST_ABORT, OnTestAbort)
+	COMMAND_ID_HANDLER_EX(ID_HELP_BOOST, OnHelpBoost)
+	COMMAND_ID_HANDLER_EX(ID_HELP_GOOGLE, OnHelpGoogle)
 	COMMAND_ID_HANDLER_EX(ID_APP_ABOUT, OnAppAbout)
 	COMMAND_ID_HANDLER_EX(ID_TREE_RUN, OnTreeRun)
 	COMMAND_ID_HANDLER_EX(ID_TREE_RUN_CHECKED, OnTreeRunChecked)
@@ -722,6 +726,21 @@ void CMainFrame::OnTestAbort(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl
 {
 	m_pRunner->Abort();
 }
+
+void CMainFrame::OnHelpBoost(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
+{
+	HINSTANCE h = ::LoadLibrary(CRichEditCtrl::GetLibraryName());
+	CBoostHelpDlg dlg;
+	dlg.DoModal();
+}
+
+void CMainFrame::OnHelpGoogle(UINT uNotifyCode, int nID, CWindow wndCtl)
+{
+	HINSTANCE h = ::LoadLibrary(CRichEditCtrl::GetLibraryName());
+	CGoogleHelpDlg dlg;
+	dlg.DoModal();
+}
+
 
 void CMainFrame::OnAppAbout(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {

@@ -120,6 +120,9 @@ BEGIN
     END
     POPUP "&Help"
     BEGIN
+        MENUITEM "Using Boost Test...",         ID_HELP_BOOST
+        MENUITEM "Using Google Test...",        ID_HELP_GOOGLE
+        MENUITEM SEPARATOR
         MENUITEM "&About BoostTestUi...",       ID_APP_ABOUT
     END
 END
@@ -153,6 +156,30 @@ BEGIN
     CTEXT           "Dec 13 2012",IDC_DATE,54,35,118,8
 END
 
+IDD_BOOSTHELP DIALOGEX 0, 0, 243, 221
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "HowTo Create a Boost Unit Test"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,186,201,50,14
+    LTEXT           "Select File -> Create Header -> Boost Test...\r\nto create the unit_test_gui.hpp file somewhere in your include path.\r\n\r\nCopy the code template below into a Win32 Console Application project. Then extend the assertions, test cases and suites.",IDC_STATIC,7,12,229,40
+    CONTROL         "",IDC_SAMPLE,"RichEdit20W",WS_BORDER | WS_TABSTOP | 0x884,7,59,229,118
+    LTEXT           "See also",IDC_STATIC,7,185,28,8
+    LTEXT           "http://www.boost.org/libs/test",IDC_BOOSTTEST_URL,37,185,97,8
+END
+
+IDD_GOOGLEHELP DIALOGEX 0, 0, 243, 242
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "HowTo Create a Google Unit Test"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,186,223,50,14
+    LTEXT           "Select File -> Create Header -> Google Test...\r\nto create the gtest-gui.h file somewhere in your include path.\r\n\r\nCopy the code template below into a Win32 Console Application project. Then extend the assertions, tests and test cases.",IDC_STATIC,7,12,229,40
+    CONTROL         "",IDC_SAMPLE,"RichEdit20W",ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_BORDER | WS_TABSTOP,7,59,229,144
+    LTEXT           "See also",IDC_STATIC,7,207,28,8
+    LTEXT           "http://code.google.com/p/googletest/",IDC_BOOSTTEST_URL,37,207,123,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -168,6 +195,19 @@ BEGIN
         RIGHTMARGIN, 180
         TOPMARGIN, 7
         BOTTOMMARGIN, 98
+    END
+
+    IDD_BOOSTHELP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 236
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 215
+    END
+
+    IDD_GOOGLEHELP, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 221
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -273,6 +313,12 @@ BEGIN
     ID_LOG_SELECTALL        "Select all log lines\nSelect All"
     ID_LOG_COPY             "Copy selected log lines to the clipboard\nCopy"
     ID_LOG_CLEAR            "Clear log display\nClear Log"
+END
+
+STRINGTABLE
+BEGIN
+	ID_HELP_BOOST           "Display how to build a boost unit test\nBoost Unit Test"
+	ID_HELP_GOOGLE          "Display how to build a google unit test\nGoogle Unit Test"
 END
 
 STRINGTABLE
@@ -387,6 +433,8 @@ IDI_CROSS               ICON                    "res\\cross.ico"
 
 IDR_UNIT_TEST_GUI_HPP   RCDATA                  "boost/test/unit_test_gui.hpp"
 IDR_GTEST_GUI_H         RCDATA                  "gtest/gtest-gui.h"
+IDR_BOOSTTESTSAMPLE_RTF RCDATA                  "BoostTestSample.rtf"
+IDR_GOOGLETESTSAMPLE_RTF RCDATA                  "GoogleTestSample.rtf"
 
 /////////////////////////////////////////////////////////////////////////////
 //
