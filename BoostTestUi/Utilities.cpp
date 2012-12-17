@@ -49,14 +49,25 @@ std::string WideCharToMultiByte(const std::wstring& str)
 	return WideCharToMultiByte(str.c_str(), str.size());
 }
 
+void ThrowWin32Error(DWORD error, const std::string& what)
+{
+	throw boost::system::system_error(error, boost::system::get_system_category(), what);
+}
+
 void ThrowLastError(const std::string& what)
 {
-	throw boost::system::system_error(GetLastError(), boost::system::get_system_category(), what);
+	ThrowWin32Error(GetLastError(), what);
 }
 
 void ThrowLastError(const std::wstring& what)
 {
 	ThrowLastError(WideCharToMultiByte(what));
+}
+
+void CheckHr(HRESULT hr)
+{
+	if (FAILED(hr))
+		ThrowWin32Error(hr);
 }
 
 Timer::Timer()

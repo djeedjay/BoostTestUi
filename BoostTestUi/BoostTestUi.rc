@@ -410,6 +410,14 @@ BEGIN
     END
 END
 
+IDR_SAMPLE_CONTEXTMENU MENU
+BEGIN
+    POPUP "Sample"
+    BEGIN
+        MENUITEM "&Copy\tCtrl+C",               ID_SAMPLE_COPY
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

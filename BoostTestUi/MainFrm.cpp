@@ -727,16 +727,23 @@ void CMainFrame::OnTestAbort(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl
 	m_pRunner->Abort();
 }
 
+void LoadRichEditLibrary()
+{
+	static HINSTANCE h = ::LoadLibrary(CRichEditCtrl::GetLibraryName());
+	if (!h)
+		ThrowLastError(CRichEditCtrl::GetLibraryName());
+}
+
 void CMainFrame::OnHelpBoost(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
-	HINSTANCE h = ::LoadLibrary(CRichEditCtrl::GetLibraryName());
+	LoadRichEditLibrary();
 	CBoostHelpDlg dlg;
 	dlg.DoModal();
 }
 
 void CMainFrame::OnHelpGoogle(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	HINSTANCE h = ::LoadLibrary(CRichEditCtrl::GetLibraryName());
+	LoadRichEditLibrary();
 	CGoogleHelpDlg dlg;
 	dlg.DoModal();
 }

@@ -22,9 +22,11 @@ public:
 	enum { IDD = IDD_GOOGLEHELP };
 
 	BEGIN_MSG_MAP(CGoogleHelpDlg)
-		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
-		COMMAND_ID_HANDLER(IDOK, OnCloseCmd)
-		COMMAND_ID_HANDLER(IDCANCEL, OnCloseCmd)
+		MSG_WM_INITDIALOG(OnInitDialog)
+		MSG_WM_CONTEXTMENU(OnContextMenu);
+		COMMAND_ID_HANDLER_EX(ID_SAMPLE_COPY, OnCopy)
+		COMMAND_ID_HANDLER_EX(IDOK, OnCloseCmd)
+		COMMAND_ID_HANDLER_EX(IDCANCEL, OnCloseCmd)
 		CHAIN_MSG_MAP(CDialogResize<CGoogleHelpDlg>)
 	END_MSG_MAP()
 
@@ -41,13 +43,14 @@ public:
 //	LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 //	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
-	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
-	LRESULT OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
-	DWORD OnStreamInCallback(BYTE* pbBuff, long cb, long* pcb);
+	BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
+	void OnContextMenu(CWindow wnd, CPoint point);
+	void OnCopy(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/);
+	void OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/);
 
 private:
+	CRichEditCtrl m_sample;
 	CHyperLink m_link;
-	long m_streamIndex;
 };
 
 } // namespace gj

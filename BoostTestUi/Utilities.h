@@ -134,8 +134,10 @@ private:
 	HCURSOR m_cursor;
 };
 
+void ThrowWin32Error(DWORD error, const std::string& what = "");
 void ThrowLastError(const std::string& what);
 void ThrowLastError(const std::wstring& what);
+void CheckHr(HRESULT hr);
 
 template <typename F>
 class scope_guard : boost::noncopyable

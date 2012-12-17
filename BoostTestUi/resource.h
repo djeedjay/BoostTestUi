@@ -2,9 +2,7 @@
 // Microsoft Visual C++ generated include file.
 // Used by BoostTestUi.rc
 //
-#define IDD_GTESTHELP                   9
 #define IDD_ABOUTBOX                    100
-#define IDD_ABOUTBOX1                   101
 #define IDD_BOOSTHELP                   101
 #define IDD_GOOGLEHELP                  102
 #define IDR_MAINFRAME                   128
@@ -61,17 +59,19 @@
 #define ID_TREE_UNCHECK_ALL             32799
 #define ID_TREE_CHECK_FAILED            32800
 #define IDR_LIST_CONTEXTMENU            32801
-#define ID_TREE_WAITFORDEBUGGER         32802
-#define ID_TEST_REPEAT                  32804
-#define ID_HELP_BOOST                   32805
-#define ID_HELP_GOOGLE                  32806
+#define IDR_SAMPLE_CONTEXTMENU          32802
+#define ID_SAMPLE_COPY                  32803
+#define ID_TREE_WAITFORDEBUGGER         32804
+#define ID_TEST_REPEAT                  32805
+#define ID_HELP_BOOST                   32806
+#define ID_HELP_GOOGLE                  32807
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        211
-#define _APS_NEXT_COMMAND_VALUE         32807
+#define _APS_NEXT_COMMAND_VALUE         32808
 #define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

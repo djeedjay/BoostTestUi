@@ -12,22 +12,52 @@
 
 namespace gj {
 
-LRESULT CGoogleHelpDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+BOOL CGoogleHelpDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 {
 	CenterWindow(GetParent());
 	DlgResize_Init();
 
-	m_link.SubclassWindow(GetDlgItem(IDC_URL));
+	m_sample = GetDlgItem(IDC_SAMPLE);
+	SetRichEditData(m_sample, SF_RTF, MAKEINTRESOURCE(IDR_GOOGLETESTSAMPLE_RTF));
 
-	CRichEditCtrl sample(GetDlgItem(IDC_SAMPLE));
-	SetRichEditData(sample, SF_RTF, MAKEINTRESOURCE(IDR_GOOGLETESTSAMPLE_RTF));
+	m_link.SubclassWindow(GetDlgItem(IDC_URL));
 	return TRUE;
 }
 
-LRESULT CGoogleHelpDlg::OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+void CGoogleHelpDlg::OnContextMenu(CWindow wnd, CPoint pt)
+{
+	if (pt == CPoint(-1, -1))
+	{
+		long begin, end;
+		m_sample.GetSel(begin, end);
+		pt = m_sample.PosFromChar(begin);
+	}
+	else
+	{
+		m_sample.ScreenToClient(&pt);
+	}
+
+	CRect rect;
+	m_sample.GetClientRect(&rect);
+	if (!rect.PtInRect(pt))
+		return;
+
+	m_sample.SetSel(0, -1);
+	CMenu menuContext;
+	menuContext.LoadMenu(IDR_SAMPLE_CONTEXTMENU);
+	CMenuHandle menuPopup(menuContext.GetSubMenu(0));
+	m_sample.ClientToScreen(&pt);
+	menuPopup.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, *this);
+}
+
+void CGoogleHelpDlg::OnCopy(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)
+{
+	m_sample.Copy();
+}
+
+void CGoogleHelpDlg::OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)
 {
 	EndDialog(wID);
-	return 0;
 }
 
 } // namespace gj
