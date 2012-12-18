@@ -38,7 +38,7 @@ CLogView::CLogView(CMainFrame& mainFrame) :
 
 void CLogView::ExceptionHandler()
 {
-	MessageBox(WStr(GetExceptionMessage()), L"Boost Test", MB_ICONERROR | MB_OK);
+	MessageBox(WStr(GetExceptionMessage()), L"Boost Test Runner", MB_ICONERROR | MB_OK);
 }
 
 BOOL CLogView::PreTranslateMessage(MSG* pMsg)

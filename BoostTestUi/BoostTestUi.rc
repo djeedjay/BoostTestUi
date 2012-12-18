@@ -123,7 +123,7 @@ BEGIN
         MENUITEM "Using Boost Test...",         ID_HELP_BOOST
         MENUITEM "Using Google Test...",        ID_HELP_GOOGLE
         MENUITEM SEPARATOR
-        MENUITEM "&About BoostTestUi...",       ID_APP_ABOUT
+        MENUITEM "&About Boost Test Runner...",       ID_APP_ABOUT
     END
 END
 
@@ -144,21 +144,21 @@ IDR_MAINFRAME           ICON                    "res\\BoostTestUi.ico"
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 187, 127
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "About Boost Test UI"
+CAPTION "About Boost Test Runner"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,130,108,50,14
-    CTEXT           "Boost Test UI V1.0",IDC_VERSION,54,22,118,8
+    CTEXT           "Boost Test Runner V1.0",IDC_VERSION,54,22,118,8
     ICON            IDR_MAINFRAME,IDC_STATIC,21,26,20,20
     GROUPBOX        "",IDC_STATIC,7,7,173,91
     CTEXT           "http://www.boost.org/libs/test",IDC_BOOST_URL,16,82,156,8
     CTEXT           "© Gert-Jan de Vos 2012",IDC_STATIC,54,48,118,8
-    CTEXT           "Dec 13 2012",IDC_DATE,54,35,118,8
+    CTEXT           "Dec 18 2012",IDC_DATE,54,35,118,8
 END
 
 IDD_BOOSTHELP DIALOGEX 0, 0, 244, 222
 STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "HowTo Create a Boost Unit Test"
+CAPTION "How To Create a Boost Unit Test"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,187,202,50,14
@@ -170,7 +170,7 @@ END
 
 IDD_GOOGLEHELP DIALOGEX 0, 0, 243, 242
 STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "HowTo Create a Google Unit Test"
+CAPTION "How To Create a Google Unit Test"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,186,223,50,14
@@ -262,7 +262,7 @@ BEGIN
             VALUE "InternalName", "BoostTestUi"
             VALUE "LegalCopyright", "Copyright 2012"
             VALUE "OriginalFilename", "BoostTestUi.exe"
-            VALUE "ProductName", "BoostTestUi"
+            VALUE "ProductName", "Boost Test Runner"
             VALUE "ProductVersion", "0,1,0,0"
         END
     END
@@ -280,7 +280,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDR_MAINFRAME           "BoostTestUi"
+    IDR_MAINFRAME           "Boost Test Runner"
 END
 
 STRINGTABLE
@@ -325,7 +325,7 @@ END
 STRINGTABLE
 BEGIN
     ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
-    ID_APP_EXIT             "Quit Boost Test UI\nExit"
+    ID_APP_EXIT             "Quit Boost Test Runner\nExit"
 END
 
 STRINGTABLE

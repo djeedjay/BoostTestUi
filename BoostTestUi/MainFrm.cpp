@@ -81,7 +81,7 @@ CMainFrame::CMainFrame(const std::wstring& fileName) :
 
 void CMainFrame::ExceptionHandler()
 {
-	MessageBox(WStr(GetExceptionMessage()), L"Boost Test", MB_ICONERROR | MB_OK);
+	MessageBox(WStr(GetExceptionMessage()), L"Boost Test Runner", MB_ICONERROR | MB_OK);
 	UpdateUI();
 }
 
@@ -206,31 +206,27 @@ void CMainFrame::OnFileExit(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*
 class GetTestUnits : public TestTreeVisitor
 {
 public:
-	explicit GetTestUnits(CMainFrame& app, bool skipRoot = false) : m_pApp(&app), m_level(skipRoot? -1: 0)
+	explicit GetTestUnits(CMainFrame& app) : m_pApp(&app)
 	{
 	}
 
     virtual void VisitTestCase(TestCase& tc) override
 	{
-		if (m_level > 0)
-			m_pApp->AddTestCase(tc);
+		m_pApp->AddTestCase(tc);
 	}
 
 	virtual void EnterTestSuite(TestSuite& ts) override
 	{
-		if (++m_level > 0)
-			m_pApp->EnterTestSuite(ts);
+		m_pApp->EnterTestSuite(ts);
 	}
 
 	virtual void LeaveTestSuite() override
 	{
-		if (m_level-- > 0)
-			m_pApp->LeaveTestSuite();
+		m_pApp->LeaveTestSuite();
 	}
 
 private:
 	CMainFrame* m_pApp;
-	int m_level;
 };
 
 class CountTestCases : public TestTreeVisitor
@@ -382,12 +378,12 @@ void CMainFrame::Load(const std::wstring& fileName, int mruId)
 	m_failedTestCount = 0;
 	m_treeView.Clear();
 	m_logView.Clear();
-	GetTestUnits getUnits(*this, false);
+	GetTestUnits getUnits(*this);
 	m_pRunner->TraverseTestTree(getUnits);
 	m_progressBar.SetPos(0);
 	UpdateUI();
 
-	SetWindowText(WStr(wstringbuilder() << fullPath.filename() << L" - Boost Test"));
+	SetWindowText(WStr(wstringbuilder() << fullPath.filename() << L" - Boost Test Runner"));
 	m_pathName = fullPath.file_string();
 	m_logFileName = fullPath.replace_extension(L"txt").file_string();
 
@@ -423,8 +419,7 @@ void CMainFrame::CreateHpp(int resourceId, const std::wstring& fileName)
 
 void CMainFrame::OnFileOpen(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
-//	CFileDialog dlg(TRUE, L".exe", L"", OFN_FILEMUSTEXIST | OFN_HIDEREADONLY, L"Boost Unit Test (*.exe)\0*.exe\0Boost Unit Test Library (*.dll)\0*.dll\0\0", 0, L"Load Unit Test");
-	CFileDialog dlg(TRUE, L".exe", L"", OFN_FILEMUSTEXIST | OFN_HIDEREADONLY, L"Boost Unit Test (*.exe)\0*.exe\0\0", 0);
+	CFileDialog dlg(TRUE, L".exe", L"", OFN_FILEMUSTEXIST | OFN_HIDEREADONLY, L"Unit Test Executable (*.exe)\0*.exe\0\0", 0);
 	dlg.m_ofn.nFilterIndex = 0;
 	dlg.m_ofn.lpstrTitle = L"Load Unit Test";
 	if (dlg.DoModal() != IDOK)
@@ -476,7 +471,7 @@ void CMainFrame::OnFileCreateBoostHpp(UINT /*uNotifyCode*/, int /*nID*/, CWindow
 
 void CMainFrame::OnFileCreateGoogleHpp(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
-	CFileDialog dlg(FALSE, L".h", L"gtest-gui.h", OFN_OVERWRITEPROMPT, L"C++ Header Files (*.h)\0*.hpp\0All Files\0*.*\0\0", 0);
+	CFileDialog dlg(FALSE, L".h", L"gtest-gui.h", OFN_OVERWRITEPROMPT, L"C++ Header Files (*.h)\0*.h\0All Files\0*.*\0\0", 0);
 	dlg.m_ofn.nFilterIndex = 0;
 	dlg.m_ofn.lpstrTitle = L"Create gtest-gui.h";
 	if (dlg.DoModal() != IDOK)
@@ -535,7 +530,7 @@ void CMainFrame::test_waiting(const std::wstring& processName, unsigned processI
 	{
 		this->MessageBox(
 			WStr(wstringbuilder() << L"Attach debugger to " << processName << L", pid: "<< processId),
-			L"Boost Test",
+			L"Boost Test Runner",
 			MB_OK);
 		m_pRunner->Continue();
 	});

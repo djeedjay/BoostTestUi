@@ -33,7 +33,7 @@ CTreeView::CTreeView(CMainFrame& mainFrame) :
 
 void CTreeView::ExceptionHandler()
 {
-	MessageBox(WStr(GetExceptionMessage()), L"Boost Test", MB_ICONERROR | MB_OK);
+	MessageBox(WStr(GetExceptionMessage()), L"Boost Test Runner", MB_ICONERROR | MB_OK);
 }
 
 BOOL CTreeView::PreTranslateMessage(MSG* pMsg)
