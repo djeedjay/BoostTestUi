@@ -25,6 +25,7 @@ public:
 	virtual std::wstring GetListArg() override;
 	virtual void LoadTestUnits(TestUnitNode& node, std::istream& is, const std::string& testName) override;
 
+	virtual unsigned GetEnabledOptions(unsigned options) const override;
 	virtual std::wstring BuildArgs(TestRunner& runner, int logLevel, unsigned& options) override;
 	virtual void FilterMessage(const std::string& msg) override;
 

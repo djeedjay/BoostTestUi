@@ -13,6 +13,14 @@
 
 namespace gj {
 
+std::wstring LoadString(int id)
+{
+	CString cs;
+	if (!cs.LoadString(id))
+		ThrowLastError("LoadString");
+	return static_cast<const wchar_t*>(cs);
+}
+
 std::wstring MultiByteToWideChar(const char* str, int len)
 {
 	int buf_size = len + 2;

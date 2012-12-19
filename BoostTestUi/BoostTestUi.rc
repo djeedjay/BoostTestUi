@@ -281,6 +281,7 @@ END
 STRINGTABLE
 BEGIN
     IDR_MAINFRAME           "Boost Test Runner"
+    IDR_APPNAME             "Boost Test Runner"
 END
 
 STRINGTABLE

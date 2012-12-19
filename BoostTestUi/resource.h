@@ -6,6 +6,7 @@
 #define IDD_BOOSTHELP                   101
 #define IDD_GOOGLEHELP                  102
 #define IDR_MAINFRAME                   128
+#define IDR_APPNAME                     129
 #define IDR_UNIT_TEST_GUI_HPP           200
 #define IDR_GTEST_GUI_H                 201
 #define IDR_BOOSTTESTSAMPLE_RTF         202

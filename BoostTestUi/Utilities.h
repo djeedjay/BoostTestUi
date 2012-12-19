@@ -46,6 +46,8 @@
 
 namespace gj {
 
+std::wstring LoadString(int id);
+
 std::wstring MultiByteToWideChar(const std::string& str);
 std::string WideCharToMultiByte(const std::wstring& str);
 

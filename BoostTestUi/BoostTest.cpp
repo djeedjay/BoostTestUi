@@ -225,6 +225,11 @@ void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const 
 	BoostTest::LoadTestUnits(tree, is);
 }
 
+unsigned ArgumentBuilder::GetEnabledOptions(unsigned options) const
+{
+	return ExeRunner::Randomize | ExeRunner::WaitForDebugger;
+}
+
 std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsigned& options)
 {
 	std::wostringstream args;

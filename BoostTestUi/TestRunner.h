@@ -110,6 +110,7 @@ struct TestRunner
 
 	virtual void EnableTestUnit(unsigned id, bool enable) = 0;
 
+	virtual unsigned GetEnabledOptions(unsigned options) = 0;
 	virtual bool IsRunning() const = 0;
 	virtual void Run(int logLevel, unsigned options) = 0;
 	virtual void Continue() = 0;
@@ -124,6 +125,7 @@ struct ArgumentBuilder
 	virtual std::wstring GetListArg() = 0;
 	virtual void LoadTestUnits(TestUnitNode& node, std::istream& is, const std::string& testName) = 0;
 
+	virtual unsigned GetEnabledOptions(unsigned options) const = 0;
 	virtual std::wstring BuildArgs(TestRunner& runner, int logLevel, unsigned& options) = 0;
 	virtual void FilterMessage(const std::string& msg);
 

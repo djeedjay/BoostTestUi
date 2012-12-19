@@ -35,6 +35,7 @@ public:
 
 	virtual void EnableTestUnit(unsigned id, bool enable) override;
 
+	virtual unsigned GetEnabledOptions(unsigned options);
 	virtual bool IsRunning() const override;
 	virtual void Run(int logLevel, unsigned options) override;
 	virtual void Continue() override;

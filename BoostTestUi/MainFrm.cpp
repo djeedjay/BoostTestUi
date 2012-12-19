@@ -14,6 +14,7 @@
 #include <fstream>
 #include <array>
 #include <boost/filesystem.hpp>
+#include "Utilities.h"
 #include "BoostHelpDlg.h"
 #include "GoogleHelpDlg.h"
 #include "AboutDlg.h"
@@ -81,7 +82,7 @@ CMainFrame::CMainFrame(const std::wstring& fileName) :
 
 void CMainFrame::ExceptionHandler()
 {
-	MessageBox(WStr(GetExceptionMessage()), L"Boost Test Runner", MB_ICONERROR | MB_OK);
+	MessageBox(WStr(GetExceptionMessage()), LoadString(IDR_APPNAME).c_str(), MB_ICONERROR | MB_OK);
 	UpdateUI();
 }
 
@@ -102,11 +103,18 @@ void CMainFrame::UpdateUI()
 	bool isLoaded = m_pRunner.get() != nullptr;
 	bool isRunning = isLoaded && m_pRunner->IsRunning();
 	bool isRunnable = IsRunnable();
+	unsigned enabled = isLoaded? m_pRunner->GetEnabledOptions(GetOptions()): 0;
+	UIEnable(ID_TEST_DEBUGGER, (enabled & TestRunner::WaitForDebugger) != 0);
 	UIEnable(ID_TREE_RUN, isRunnable);
 	UIEnable(ID_TREE_RUN_CHECKED, isRunnable);
 	UIEnable(ID_TREE_RUN_ALL, isRunnable);
 	UIEnable(ID_TEST_ABORT, isRunning);
 	UIEnable(ID_LOGLEVEL, !isRunning);
+	UISetCheck(ID_FILE_AUTO_RUN, m_autoRun);
+	UISetCheck(ID_LOG_AUTO_CLEAR, m_logAutoClear);
+	UISetCheck(ID_TEST_RANDOMIZE, m_randomize);
+	UISetCheck(ID_TEST_REPEAT, m_repeat);
+	UISetCheck(ID_TEST_DEBUGGER, m_debugger);
 	UpdateStatusBar();
 }
 
@@ -177,11 +185,6 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 	m_mru.SetMenuHandle(m_CmdBar.GetMenu().GetSubMenu(0).GetSubMenu(7));
 
 	LoadSettings();
-	UISetCheck(ID_FILE_AUTO_RUN, m_autoRun);
-	UISetCheck(ID_LOG_AUTO_CLEAR, m_logAutoClear);
-	UISetCheck(ID_TEST_RANDOMIZE, m_randomize);
-	UISetCheck(ID_TEST_REPEAT, m_repeat);
-	UISetCheck(ID_TEST_DEBUGGER, m_debugger);
 	UpdateUI();
 
 	// register object for message filtering and idle updates
@@ -454,7 +457,7 @@ void CMainFrame::OnFileSaveAs(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCt
 void CMainFrame::OnFileAutoRun(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_autoRun = !m_autoRun;
-	UISetCheck(ID_FILE_AUTO_RUN, m_autoRun);
+	UpdateUI();
 }
 
 void CMainFrame::OnFileCreateBoostHpp(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
@@ -484,7 +487,7 @@ void CMainFrame::OnFileCreateGoogleHpp(UINT /*uNotifyCode*/, int /*nID*/, CWindo
 void CMainFrame::OnLogAutoClear(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_logAutoClear = !m_logAutoClear;
-	UISetCheck(ID_LOG_AUTO_CLEAR, m_logAutoClear);
+	UpdateUI();
 }
 
 void CMainFrame::OnLogSelectAll(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
@@ -530,7 +533,7 @@ void CMainFrame::test_waiting(const std::wstring& processName, unsigned processI
 	{
 		this->MessageBox(
 			WStr(wstringbuilder() << L"Attach debugger to " << processName << L", pid: "<< processId),
-			L"Boost Test Runner",
+			LoadString(IDR_APPNAME).c_str(),
 			MB_OK);
 		m_pRunner->Continue();
 	});
@@ -686,19 +689,19 @@ void CMainFrame::TestFinished()
 void CMainFrame::OnTestRandomize(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_randomize = !m_randomize;
-	UISetCheck(ID_TEST_RANDOMIZE, m_randomize);
+	UpdateUI();
 }
 
 void CMainFrame::OnTestRepeat(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_repeat = !m_repeat;
-	UISetCheck(ID_TEST_REPEAT, m_repeat);
+	UpdateUI();
 }
 
 void CMainFrame::OnTestDebugger(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_debugger = !m_debugger;
-	UISetCheck(ID_TEST_DEBUGGER, m_debugger);
+	UpdateUI();
 }
 
 unsigned CMainFrame::GetOptions() const
