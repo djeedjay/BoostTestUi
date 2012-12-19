@@ -24,30 +24,32 @@ BOOL CBoostHelpDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 	return TRUE;
 }
 
-void CBoostHelpDlg::OnContextMenu(CWindow wnd, CPoint pt)
+void SampleContextMenu(CWindow wnd, CRichEditCtrl& ctrl, CPoint pt)
 {
+	CHARRANGE selRange;
+	ctrl.GetSel(selRange);
 	if (pt == CPoint(-1, -1))
-	{
-		long begin, end;
-		m_sample.GetSel(begin, end);
-		pt = m_sample.PosFromChar(begin);
-	}
+		pt = ctrl.PosFromChar(selRange.cpMin);
 	else
-	{
-		m_sample.ScreenToClient(&pt);
-	}
+		ctrl.ScreenToClient(&pt);
 
 	CRect rect;
-	m_sample.GetClientRect(&rect);
+	ctrl.GetClientRect(&rect);
 	if (!rect.PtInRect(pt))
 		return;
 
-	m_sample.SetSel(0, -1);
+	if (selRange.cpMin == selRange.cpMax)
+		ctrl.SetSel(0, -1);
 	CMenu menuContext;
 	menuContext.LoadMenu(IDR_SAMPLE_CONTEXTMENU);
 	CMenuHandle menuPopup(menuContext.GetSubMenu(0));
-	m_sample.ClientToScreen(&pt);
-	menuPopup.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, *this);
+	ctrl.ClientToScreen(&pt);
+	menuPopup.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, wnd);
+}
+
+void CBoostHelpDlg::OnContextMenu(CWindow wnd, CPoint pt)
+{
+	SampleContextMenu(wnd, m_sample, pt);
 }
 
 void CBoostHelpDlg::OnCopy(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)

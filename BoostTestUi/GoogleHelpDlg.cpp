@@ -24,30 +24,11 @@ BOOL CGoogleHelpDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 	return TRUE;
 }
 
+void SampleContextMenu(CWindow wnd, CRichEditCtrl& ctrl, CPoint pt);
+
 void CGoogleHelpDlg::OnContextMenu(CWindow wnd, CPoint pt)
 {
-	if (pt == CPoint(-1, -1))
-	{
-		long begin, end;
-		m_sample.GetSel(begin, end);
-		pt = m_sample.PosFromChar(begin);
-	}
-	else
-	{
-		m_sample.ScreenToClient(&pt);
-	}
-
-	CRect rect;
-	m_sample.GetClientRect(&rect);
-	if (!rect.PtInRect(pt))
-		return;
-
-	m_sample.SetSel(0, -1);
-	CMenu menuContext;
-	menuContext.LoadMenu(IDR_SAMPLE_CONTEXTMENU);
-	CMenuHandle menuPopup(menuContext.GetSubMenu(0));
-	m_sample.ClientToScreen(&pt);
-	menuPopup.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, *this);
+	SampleContextMenu(wnd, m_sample, pt);
 }
 
 void CGoogleHelpDlg::OnCopy(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)
