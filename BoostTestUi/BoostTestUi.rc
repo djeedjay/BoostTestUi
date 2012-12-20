@@ -56,6 +56,7 @@ BEGIN
     SEPARATOR
     BUTTON      ID_LOG_CLEAR
     BUTTON      ID_LOG_AUTO_CLEAR
+    BUTTON      ID_LOG_TIME
     BUTTON      ID_LOG_COPY
     SEPARATOR
     BUTTON      ID_TEST_RANDOMIZE
@@ -116,6 +117,7 @@ BEGIN
         MENUITEM "Select &All\tCtrl+A",         ID_LOG_SELECTALL
         MENUITEM "Clear Log\tCtrl+X",           ID_LOG_CLEAR
         MENUITEM "Auto Clear Log",              ID_LOG_AUTO_CLEAR
+        MENUITEM "Clock Time\tCtrl+T",          ID_LOG_TIME
         MENUITEM "&Copy\tCtrl+C",               ID_LOG_COPY
     END
     POPUP "&Help"
@@ -123,7 +125,7 @@ BEGIN
         MENUITEM "Using Boost Test...",         ID_HELP_BOOST
         MENUITEM "Using Google Test...",        ID_HELP_GOOGLE
         MENUITEM SEPARATOR
-        MENUITEM "&About Boost Test Runner...",       ID_APP_ABOUT
+        MENUITEM "&About Boost Test Runner...", ID_APP_ABOUT
     END
 END
 
@@ -162,7 +164,7 @@ CAPTION "How To Create a Boost Unit Test"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,187,202,50,14
-    CONTROL         "",IDC_SAMPLE,"RichEdit20W",ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_BORDER | WS_TABSTOP,7,59,230,118
+    CONTROL         "",IDC_SAMPLE,"RichEdit20W",WS_BORDER | WS_TABSTOP | 0x884,7,59,230,118
     LTEXT           "Select File -> Create Header -> Boost Test...\r\nto create the unit_test_gui.hpp file somewhere in your include path.\r\n\r\nCopy the code template below into a Win32 Console Application project. Then extend the assertions, test cases and suites.",IDC_DESCRIPTION,7,12,230,40
     LTEXT           "See also",IDC_SEEALSO,7,185,28,8
     LTEXT           "http://www.boost.org/libs/test",IDC_URL,37,185,97,8
@@ -229,9 +231,10 @@ BEGIN
     VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
     VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
     VK_PAUSE,       ID_TEST_ABORT,          VIRTKEY, CONTROL, NOINVERT
+    VK_F6,          ID_TREE_RUN_ALL,        VIRTKEY, NOINVERT
     "R",            ID_TREE_RUN_CHECKED,    VIRTKEY, CONTROL, NOINVERT
     VK_F5,          ID_TREE_RUN_CHECKED,    VIRTKEY, NOINVERT
-    VK_F6,          ID_TREE_RUN_ALL,        VIRTKEY, NOINVERT
+    "T",            ID_LOG_TIME,            VIRTKEY, CONTROL, NOINVERT
 END
 
 
@@ -321,6 +324,7 @@ BEGIN
     ID_TEST_REPEAT          "Repeat the selected test cases until a failure occurs\nRepeat"
     ID_HELP_BOOST           "Display how to build a boost unit test\nBoost Unit Test"
     ID_HELP_GOOGLE          "Display how to build a google unit test\nGoogle Unit Test"
+    ID_LOG_TIME             "Show clock time\nClock Time"
 END
 
 STRINGTABLE

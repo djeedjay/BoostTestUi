@@ -44,7 +44,7 @@ public:
 	void EnterTestSuite(const TestSuite& ts);
 	void LeaveTestSuite();
 
-	void AddLogMessage(double t, Severity::type severity, const std::string& msg);
+	void AddLogMessage(const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg);
 	void SelectItem(unsigned id);
 
 	void EnQueue(const std::function<void ()>& fn);
@@ -78,6 +78,7 @@ public:
 	BEGIN_UPDATE_UI_MAP(CMainFrame)
 	    UPDATE_ELEMENT(ID_FILE_AUTO_RUN, UPDUI_MENUPOPUP)
 	    UPDATE_ELEMENT(ID_LOG_AUTO_CLEAR, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
+	    UPDATE_ELEMENT(ID_LOG_TIME, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
 	    UPDATE_ELEMENT(ID_TEST_RANDOMIZE, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
 	    UPDATE_ELEMENT(ID_TEST_REPEAT, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
 	    UPDATE_ELEMENT(ID_TEST_DEBUGGER, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
@@ -116,6 +117,7 @@ public:
 	void OnLogAutoClear(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnLogSelectAll(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnLogClear(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnLogTime(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnLogCopy(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestRandomize(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestRepeat(UINT uNotifyCode, int nID, CWindow wndCtl);

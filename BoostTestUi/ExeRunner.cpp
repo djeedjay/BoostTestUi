@@ -96,7 +96,7 @@ void ExeRunner::EnableTestUnit(unsigned id, bool enable)
 unsigned ExeRunner::GetEnabledOptions(unsigned options)
 {
 	unsigned enabled = m_pArgBuilder->GetEnabledOptions(options);
-	if ((options & ~enabled & ExeRunner::Repeat) != 0 && (options & ExeRunner::WaitForDebugger))
+	if ((options & ~enabled & ExeRunner::Repeat) != 0)
 		enabled = (enabled & ~ExeRunner::WaitForDebugger) | ExeRunner::Repeat;
 	return enabled;
 }

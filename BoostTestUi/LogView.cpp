@@ -25,12 +25,14 @@ BEGIN_MSG_MAP_TRY(CLogView)
 	REFLECTED_NOTIFY_CODE_HANDLER(NM_DBLCLK, OnDblClick)
 	REFLECTED_NOTIFY_CODE_HANDLER(LVN_ITEMCHANGING, OnItemChanging)
 	REFLECTED_NOTIFY_CODE_HANDLER(LVN_GETINFOTIP, OnGetInfoTip)
+	REFLECTED_NOTIFY_CODE_HANDLER(LVN_GETDISPINFO, OnGetDispInfo)
 	DEFAULT_REFLECTION_HANDLER()
 	CHAIN_MSG_MAP(COffscreenPaint<CLogView>)
 END_MSG_MAP_CATCH(ExceptionHandler)
 
 CLogView::CLogView(CMainFrame& mainFrame) :
 	m_pMainFrame(&mainFrame),
+	m_clockTime(false),
 	m_logHighLightBegin(0),
 	m_logHighLightEnd(0)
 {
@@ -128,7 +130,7 @@ void CLogView::SetHighLight(int begin, int end)
 	EnsureVisible(begin, true);
 }
 
-void CLogView::Add(unsigned id, double t, Severity::type severity, const std::string& msg)
+void CLogView::Add(unsigned id, const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg)
 {
 	auto it = msg.end();
 	while (it > msg.begin())
@@ -141,18 +143,26 @@ void CLogView::Add(unsigned id, double t, Severity::type severity, const std::st
 	int focus = GetNextItem(0, LVNI_FOCUSED);
 	bool selectLast = focus < 0 || focus == GetItemCount() - 1;
 
-	int item = InsertItem(
-		std::numeric_limits<int>::max(),
-		WStr(wstringbuilder() << std::fixed << std::setprecision(6) << t));
-
-	SetItemText(item, 1, std::wstring(msg.begin(), it).c_str());
-	m_logLines.push_back(LogLine(id, severity));
+	int item = m_logLines.size();
+	m_logLines.push_back(LogLine(id, localTime, t, severity, std::string(msg.begin(), it)));
+	SetItemCount(m_logLines.size());
 
 	if (selectLast)
 	{
 		EnsureVisible(item, true);
 		SetItemState(item, LVIS_FOCUSED, LVIS_FOCUSED);
 	}
+}
+
+bool CLogView::GetClockTime() const
+{
+	return m_clockTime;
+}
+
+void CLogView::SetClockTime(bool clockTime)
+{
+	m_clockTime = clockTime;
+	Invalidate(false);
 }
 
 void CLogView::Save(const std::wstring& fileName)
@@ -315,6 +325,46 @@ LRESULT CLogView::OnItemChanging(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*
 LRESULT CLogView::OnGetInfoTip(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
 {
 	NMLVGETINFOTIP* pGetInfoTip = reinterpret_cast<NMLVGETINFOTIP*>(pnmh);
+
+	return 0;
+}
+
+void CopyItemText(const std::string& s, wchar_t* buf, size_t maxLen)
+{
+	for (auto it = s.begin(); maxLen > 1 && it != s.end(); ++it, ++buf, --maxLen)
+		*buf = *it;
+	*buf = '\0';
+}
+
+std::string CLogView::GetTimeText(double t)
+{
+	return stringbuilder() << std::fixed << std::setprecision(6) << t;
+}
+
+std::string CLogView::GetTimeText(const SYSTEMTIME& t)
+{
+	char buf[32];
+	sprintf(buf, "%d:%02d:%02d.%03d", t.wHour, t.wMinute, t.wSecond, t.wMilliseconds);
+	return buf;
+}
+
+std::string CLogView::GetTimeText(const LogLine& log) const
+{
+	return m_clockTime? GetTimeText(log.localTime): GetTimeText(log.time);
+}
+
+LRESULT CLogView::OnGetDispInfo(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
+{
+	NMLVDISPINFO* pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pnmh);
+	LVITEM& item = pDispInfo->item;
+	if ((item.mask & LVIF_TEXT) == 0 || item.iItem >= m_logLines.size())
+		return 0;
+
+	switch (item.iSubItem)
+	{
+	case 0: CopyItemText(GetTimeText(m_logLines[item.iItem]), item.pszText, item.cchTextMax); break;
+	case 1: CopyItemText(m_logLines[item.iItem].message, item.pszText, item.cchTextMax); break;
+	}
 
 	return 0;
 }

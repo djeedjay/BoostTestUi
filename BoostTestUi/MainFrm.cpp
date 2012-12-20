@@ -28,7 +28,8 @@ struct Options
 	enum type
 	{
 		LogAutoClear = 1 << 16,
-		AutoRun = 1 << 17
+		AutoRun = 1 << 17,
+		ClockTime = 1 << 18,
 	};
 };
 
@@ -48,6 +49,7 @@ BEGIN_MSG_MAP_TRY(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_LOG_AUTO_CLEAR, OnLogAutoClear)
 	COMMAND_ID_HANDLER_EX(ID_LOG_SELECTALL, OnLogSelectAll)
 	COMMAND_ID_HANDLER_EX(ID_LOG_CLEAR, OnLogClear)
+	COMMAND_ID_HANDLER_EX(ID_LOG_TIME, OnLogTime)
 	COMMAND_ID_HANDLER_EX(ID_LOG_COPY, OnLogCopy)
 	COMMAND_ID_HANDLER_EX(ID_TEST_RANDOMIZE, OnTestRandomize)
 	COMMAND_ID_HANDLER_EX(ID_TEST_REPEAT, OnTestRepeat)
@@ -112,6 +114,7 @@ void CMainFrame::UpdateUI()
 	UIEnable(ID_LOGLEVEL, !isRunning);
 	UISetCheck(ID_FILE_AUTO_RUN, m_autoRun);
 	UISetCheck(ID_LOG_AUTO_CLEAR, m_logAutoClear);
+	UISetCheck(ID_LOG_TIME, m_logView.GetClockTime());
 	UISetCheck(ID_TEST_RANDOMIZE, m_randomize);
 	UISetCheck(ID_TEST_REPEAT, m_repeat);
 	UISetCheck(ID_TEST_DEBUGGER, m_debugger);
@@ -500,6 +503,12 @@ void CMainFrame::OnLogClear(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*
 	m_logView.Clear();
 }
 
+void CMainFrame::OnLogTime(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
+{
+	m_logView.SetClockTime(!m_logView.GetClockTime());
+	UpdateUI();
+}
+
 void CMainFrame::OnLogCopy(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	ScopedCursor cursor(::LoadCursor(nullptr, IDC_WAIT));
@@ -508,18 +517,20 @@ void CMainFrame::OnLogCopy(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/
 
 void CMainFrame::test_message(Severity::type severity, const std::string& msg)
 {
+	SYSTEMTIME localTime;
+	GetLocalTime(&localTime);
 	double t = m_resetTimer? (m_timer.Reset(), 0): m_timer.Get();
 	m_resetTimer = false;
 	std::string text = msg;
-	EnQueue([this, t, severity, text]()
+	EnQueue([this, localTime, t, severity, text]()
 	{
-		AddLogMessage(t, severity, text);
+		AddLogMessage(localTime, t, severity, text);
 	});
 }
 
-void CMainFrame::AddLogMessage(double t, Severity::type severity, const std::string& msg)
+void CMainFrame::AddLogMessage(const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg)
 {
-	m_logView.Add(m_currentId, t, severity, msg);
+	m_logView.Add(m_currentId, localTime, t, severity, msg);
 }
 
 void CMainFrame::SelectItem(unsigned id)
@@ -707,6 +718,8 @@ void CMainFrame::OnTestDebugger(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wnd
 unsigned CMainFrame::GetOptions() const
 {
 	unsigned options = 0;
+	if (m_logView.GetClockTime())
+		options |= Options::ClockTime;
 	if (m_autoRun)
 		options |= Options::AutoRun;
 	if (m_logAutoClear)
@@ -826,6 +839,7 @@ bool CMainFrame::LoadSettings()
 	{
 		m_autoRun = (options & Options::AutoRun) != 0;
 		m_logAutoClear = (options & Options::LogAutoClear) != 0;
+		m_logView.SetClockTime((options & Options::ClockTime) != 0);
 		m_randomize = (options & TestRunner::Randomize) != 0;
 		m_repeat = (options & TestRunner::Repeat) != 0;
 		m_debugger = (options & TestRunner::WaitForDebugger) != 0;

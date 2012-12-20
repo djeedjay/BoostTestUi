@@ -14,7 +14,7 @@
 
 namespace gj {
 
-typedef CWinTraitsOR<LVS_REPORT | LVS_NOSORTHEADER | LVS_SHOWSELALWAYS> CListViewTraits;
+typedef CWinTraitsOR<LVS_REPORT | LVS_OWNERDATA | LVS_NOSORTHEADER | LVS_SHOWSELALWAYS> CListViewTraits;
 
 class CMainFrame;
 
@@ -29,7 +29,9 @@ public:
 	void Copy();
 	bool Empty() const;
 	void Clear();
-	void Add(unsigned id, double t, Severity::type severity, const std::string& msg);
+	void Add(unsigned id, const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg);
+	bool GetClockTime() const;
+	void SetClockTime(bool clockTime);
 	void SetHighLight(unsigned id);
 	void SetHighLight(int begin, int end);
 	void Save(const std::wstring& fileName);
@@ -58,18 +60,22 @@ public:
 	LRESULT OnDblClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
 	LRESULT OnItemChanging(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
 	LRESULT OnGetInfoTip(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
+	LRESULT OnGetDispInfo(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
 	void DoPaint(CDCHandle dc, const RECT& rcClip);
 
 private:
 	struct LogLine
 	{
-		LogLine(unsigned id, Severity::type severity = Severity::Info) :
-			id(id), severity(severity)
+		LogLine(unsigned id, const SYSTEMTIME& localTime, double time, Severity::type severity, const std::string& message) :
+			id(id), localTime(localTime), time(time), severity(severity), message(message)
 		{
 		}
 
 		unsigned id;
+		SYSTEMTIME localTime;
+		double time;
 		Severity::type severity;
+		std::string message;
 	};
 
 	struct TestItem
@@ -79,10 +85,14 @@ private:
 	};
 
 	void InvalidateLines(int begin, int end);
+	static std::string GetTimeText(double t);
+	static std::string GetTimeText(const SYSTEMTIME& t);
+	std::string GetTimeText(const LogLine& log) const;
 
 	CMainFrame* m_pMainFrame;
 	std::vector<LogLine> m_logLines;
 	std::map<unsigned, TestItem> m_items;
+	bool m_clockTime;
 	int m_logHighLightBegin;
 	int m_logHighLightEnd;
 };
