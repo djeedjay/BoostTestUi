@@ -28,9 +28,9 @@ namespace gui {
 
 #if BOOST_VERSION <= 105200
 
-const auto TUT_ANY = tut_any;
-const auto TUT_CASE = tut_case;
-const auto TUT_SUITE = tut_suite;
+const test_unit_type TUT_ANY = tut_any;
+const test_unit_type TUT_CASE = tut_case;
+const test_unit_type TUT_SUITE = tut_suite;
 
 #endif
 
