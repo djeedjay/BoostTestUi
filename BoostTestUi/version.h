@@ -1,1 +1,1 @@
-#define VERSION 0,1,0,88 
+#define VERSION 0,1,0,96 

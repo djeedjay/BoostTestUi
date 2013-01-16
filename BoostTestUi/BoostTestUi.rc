@@ -361,10 +361,10 @@ END
 
 STRINGTABLE
 BEGIN
-    IDPANE_TESTCASE_ITERATIONS "Test iterations: ####"
-    IDPANE_TESTCASE_TOTAL   "Test cases: ####"
-    IDPANE_TESTCASE_RUN     "Tests run: ####"
-    IDPANE_TESTCASE_FAILED  "Failed tests: ####"
+	IDPANE_TESTCASE_ITERATIONS "Test iterations: #####"
+	IDPANE_TESTCASE_TOTAL   "Test cases: #####"
+	IDPANE_TESTCASE_RUN     "Tests run: #####"
+	IDPANE_TESTCASE_FAILED  "Failed tests: #####"
 END
 
 STRINGTABLE

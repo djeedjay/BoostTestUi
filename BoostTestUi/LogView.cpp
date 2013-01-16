@@ -357,7 +357,7 @@ LRESULT CLogView::OnGetDispInfo(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/
 {
 	NMLVDISPINFO* pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pnmh);
 	LVITEM& item = pDispInfo->item;
-	if ((item.mask & LVIF_TEXT) == 0 || item.iItem >= m_logLines.size())
+	if ((item.mask & LVIF_TEXT) == 0 || item.iItem >= static_cast<int>(m_logLines.size()))
 		return 0;
 
 	switch (item.iSubItem)

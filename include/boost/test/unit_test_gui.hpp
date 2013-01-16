@@ -13,6 +13,9 @@
 #include <iostream>
 #include <iomanip>
 #include <boost/test/unit_test.hpp>
+#if BOOST_VERSION > 105200
+#	include <boost/test/tree/visitor.hpp>
+#endif
 #include <boost/test/execution_monitor.hpp>
 #include <boost/test/utils/runtime/cla/named_parameter.hpp>
 #include <boost/test/utils/runtime/cla/parser.hpp>
@@ -22,6 +25,14 @@
 namespace boost {
 namespace unit_test {
 namespace gui {
+
+#if BOOST_VERSION <= 105200
+
+const auto TUT_ANY = tut_any;
+const auto TUT_CASE = tut_case;
+const auto TUT_SUITE = tut_suite;
+
+#endif
 
 class test_suite_access : public test_suite
 {
@@ -125,7 +136,7 @@ private:
 	void enable(test_unit_id id)
 	{
 		bool enable = m_it != m_arg.end() && (*m_it++ == '1');
-		framework::get(id, tut_any).p_enabled.set(enable);
+		framework::get(id, TUT_ANY).p_enabled.set(enable);
 	}
 
 	virtual void visit(test_case const& tc)
@@ -213,7 +224,7 @@ public:
 
 	static void traverse_test_tree(test_unit_id id, test_tree_visitor& v)
 	{
-		if (ut_detail::test_id_2_unit_type(id) == tut_case)
+		if (ut_detail::test_id_2_unit_type(id) == TUT_CASE)
 			traverse_test_tree(framework::get<test_case>(id), v);
 		else
 			traverse_test_tree(framework::get<test_suite>(id), v);

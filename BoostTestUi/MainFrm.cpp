@@ -374,7 +374,7 @@ void CMainFrame::Load(const std::wstring& fileName, int mruId)
 	namespace fs = boost::filesystem;
 	fs::wpath fullPath = fs::system_complete(fs::wpath(fileName));
 //	if (fullPath.extension() == L".exe")
-		m_pRunner.reset(new ExeRunner(fullPath.file_string(), *this));
+		m_pRunner.reset(new ExeRunner(fullPath.wstring(), *this));
 //	else
 //		m_pRunner.reset(new DllRunner(fileName, *this));
 
@@ -389,9 +389,9 @@ void CMainFrame::Load(const std::wstring& fileName, int mruId)
 	m_progressBar.SetPos(0);
 	UpdateUI();
 
-	SetWindowText(WStr(wstringbuilder() << fullPath.filename() << L" - Boost Test Runner"));
-	m_pathName = fullPath.file_string();
-	m_logFileName = fullPath.replace_extension(L"txt").file_string();
+	SetWindowText(WStr(wstringbuilder() << fullPath.filename().wstring() << L" - Boost Test Runner"));
+	m_pathName = fullPath.wstring();
+	m_logFileName = fullPath.replace_extension(L"txt").wstring();
 
 	guard.release();
 	if (mruId == 0)
