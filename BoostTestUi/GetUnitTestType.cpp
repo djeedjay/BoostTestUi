@@ -38,9 +38,18 @@ static const std::string unit_test_type_("unit_test_type_");
 template <typename ImageNtHeaders>
 std::string GetNUnitTestType(const void* base, const ImageNtHeaders* pNTHeader)
 {
-	if (pNTHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR].VirtualAddress != 0)
-		return "nunit";
-	return "";
+	DWORD cliHeaderRVA = pNTHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR].VirtualAddress;
+	if (cliHeaderRVA == 0)
+		return "";
+
+	const IMAGE_SECTION_HEADER* header = GetEnclosingSectionHeader(cliHeaderRVA, pNTHeader);
+	if (!header)
+		return "";
+
+	int delta = static_cast<int>(header->VirtualAddress - header->PointerToRawData);
+	const IMAGE_COR20_HEADER* pCliHeader = GetPtr<IMAGE_COR20_HEADER>(base, cliHeaderRVA - delta);
+
+	return (pCliHeader->Flags & COMIMAGE_FLAGS_32BITREQUIRED)? "nunit-x86": "nunit";
 }
 
 template <typename ImageNtHeaders>

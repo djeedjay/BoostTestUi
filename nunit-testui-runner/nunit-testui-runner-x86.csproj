@@ -4,12 +4,12 @@
     <ProjectType>Local</ProjectType>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{53BF8787-CB9C-4BB8-AFB4-605DD3A5CA0E}</ProjectGuid>
+    <ProjectGuid>{0024A427-A7E1-4D67-A4ED-481AE4A30BAF}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
-    <AssemblyName>nunit-testui-runner</AssemblyName>
+    <AssemblyName>nunit-testui-runner-x86</AssemblyName>
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
     <DefaultTargetSchema>IE50</DefaultTargetSchema>
@@ -96,7 +96,7 @@
     <CodeAnalysisFailOnMissingRules>true</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
+    <OutputPath>..\Release\</OutputPath>
     <DefineConstants>TRACE;CLR_2_0,NET_2_0,CS_3_0</DefineConstants>
     <BaseAddress>285212672</BaseAddress>
     <Optimize>true</Optimize>

@@ -164,7 +164,7 @@ namespace NUnit.ConsoleRunner
 
 			if (options.gui_run)
 			{
-				testRunner.Run(new GuiEventCollector(), testFilter, true, LoggingThreshold.All);
+				testRunner.Run(new GuiEventCollector(), testFilter);
 				return true;
 			}
 

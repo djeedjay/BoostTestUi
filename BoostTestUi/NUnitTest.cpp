@@ -9,7 +9,6 @@
 #include <sstream>
 #include <regex>
 #include <boost/filesystem.hpp>
-#include "dbgstream.h"
 #include "Utilities.h"
 #include "ExeRunner.h"
 #include "NUnitTest.h"
@@ -129,7 +128,8 @@ private:
 };
 
 
-ArgumentBuilder::ArgumentBuilder(const std::wstring& fileName, ExeRunner& runner, TestObserver& observer) :
+ArgumentBuilder::ArgumentBuilder(const std::wstring& exeName, const std::wstring& fileName, ExeRunner& runner, TestObserver& observer) :
+	m_exeName(exeName),
 	m_fileName(fileName),
 	m_pRunner(&runner),
 	m_pObserver(&observer)
@@ -169,7 +169,7 @@ std::wstring ArgumentBuilder::GetExePathName()
 		GetTestUiPath(),
 		GetNUnitPath()
 	};
-	fs::wpath runner(L"nunit-testui-runner.exe");
+	fs::wpath runner(m_exeName);
 	for (auto it = std::begin(paths); it != std::end(paths); ++it)
 	{
 		fs::wpath exePath(*it / runner);
@@ -177,7 +177,7 @@ std::wstring ArgumentBuilder::GetExePathName()
 			return exePath.wstring();
 	}
 
-	throw std::runtime_error("Please install nunit-testui-runner.exe");
+	throw std::runtime_error(stringbuilder() << "Please install " << runner.string());
 }
 
 std::wstring ArgumentBuilder::GetListArg()
