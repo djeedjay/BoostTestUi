@@ -164,7 +164,11 @@ namespace NUnit.ConsoleRunner
 
 			if (options.gui_run)
 			{
+#if NUNIT_2_5
 				testRunner.Run(new GuiEventCollector(), testFilter);
+#elif NUNIT_2_6
+				testRunner.Run(new GuiEventCollector(), testFilter, false, LoggingThreshold.All);
+#endif
 				return true;
 			}
 

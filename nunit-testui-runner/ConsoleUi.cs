@@ -121,7 +121,11 @@ namespace NUnit.ConsoleRunner
 
 				try
 				{
-					result = testRunner.Run( collector, testFilter);
+#if NUNIT_2_5
+					testRunner.Run(collector, testFilter);
+#elif NUNIT_2_6
+					testRunner.Run(collector, testFilter, false, LoggingThreshold.Off);
+#endif
 				}
 				finally
 				{
