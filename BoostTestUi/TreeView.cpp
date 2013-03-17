@@ -287,7 +287,9 @@ void CTreeView::Check(unsigned id, bool check)
 void CTreeView::SelectTestItem(unsigned id)
 {
 	auto it = m_items.find(id);
-	if (it != m_items.end())
+	if (it == m_items.end())
+		SelectItem(nullptr);
+	else
 		SelectItem(it->second);
 }
 

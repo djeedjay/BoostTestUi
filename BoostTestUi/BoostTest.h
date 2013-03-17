@@ -20,8 +20,9 @@ namespace BoostTest {
 class ArgumentBuilder : public gj::ArgumentBuilder
 {
 public:
-	ArgumentBuilder(ExeRunner& runner, TestObserver& observer);
+	ArgumentBuilder(const std::wstring& fileName, ExeRunner& runner, TestObserver& observer);
 
+	virtual std::wstring GetExePathName() override;
 	virtual std::wstring GetListArg() override;
 	virtual void LoadTestUnits(TestUnitNode& node, std::istream& is, const std::string& testName) override;
 
@@ -31,6 +32,8 @@ public:
 
 private:
 	void HandleClientNotification(const std::string& line);
+
+	std::wstring m_fileName;
 	ExeRunner* m_pRunner;
 	TestObserver* m_pObserver;
 };

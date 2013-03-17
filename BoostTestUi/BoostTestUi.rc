@@ -308,7 +308,12 @@ BEGIN
     ID_FILE_CREATE_GOOGLE_HPP 
                             "Create gtest-gui.h for building google unit tests\nCreate gtest-gui.hpp"
     ID_LOGLEVEL             "Select test log detail\nLog Level"
+    ID_TREE_RUN             "Run the selected unit test and all checked child tests\nRun Selected"
     ID_TREE_RUN_CHECKED     "Run the checked unit tests\nRun Checked"
+    ID_TREE_RUN_ALL         "Run all unit tests\nRun All"
+    ID_TREE_CHECK_ALL       "Check all tests\nCheck All"
+    ID_TREE_UNCHECK_ALL     "Uncheck all tests\nUncheck All"
+    ID_TREE_CHECK_FAILED    "Check only failed tests\nCheck Failed"
 END
 
 STRINGTABLE
@@ -445,26 +450,5 @@ IDR_GTEST_GUI_H         RCDATA                  "gtest/gtest-gui.h"
 IDR_BOOSTTESTSAMPLE_RTF RCDATA                  "BoostTestSample.rtf"
 IDR_GOOGLETESTSAMPLE_RTF RCDATA                  "GoogleTestSample.rtf"
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE
-BEGIN
-    ID_TREE_RUN             "Run\nRun the selected test"
-    ID_TREE_RUN_CHECKED     "Run Checked\nRun all tests with a check mark"
-    ID_TREE_RUN_ALL         "Run All\n Run all tests"
-    ID_TREE_CHECK_ALL       "Check All\nCheck all tests"
-    ID_TREE_UNCHECK_ALL     "Uncheck All\nUncheck all tests"
-END
-
-STRINGTABLE
-BEGIN
-    ID_TREE_CHECK_FAILED    "Check Failed\nCheck only failed tests"
-END
-
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
-
-

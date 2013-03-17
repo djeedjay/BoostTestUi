@@ -46,6 +46,8 @@
 
 namespace gj {
 
+std::string chomp(std::string s);
+std::wstring chomp(std::wstring s);
 std::wstring LoadString(int id);
 
 std::wstring MultiByteToWideChar(const std::string& str);

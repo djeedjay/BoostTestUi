@@ -76,10 +76,16 @@ private:
 	std::string m_arg;
 };
 
-ArgumentBuilder::ArgumentBuilder(ExeRunner& runner, TestObserver& observer) :
+ArgumentBuilder::ArgumentBuilder(const std::wstring& fileName, ExeRunner& runner, TestObserver& observer) :
+	m_fileName(fileName),
 	m_pRunner(&runner),
 	m_pObserver(&observer)
 {
+}
+
+std::wstring ArgumentBuilder::GetExePathName()
+{
+	return m_fileName;
 }
 
 std::wstring ArgumentBuilder::GetListArg()

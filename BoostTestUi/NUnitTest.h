@@ -5,42 +5,40 @@
 
 //  See http://www.boost.org/libs/test for the boost test library home page.
 
-#ifndef BOOST_TESTUI_GOOGLETEST_H
-#define BOOST_TESTUI_GOOGLETEST_H
+#ifndef BOOST_TESTUI_NUNITTEST_H
+#define BOOST_TESTUI_NUNITTEST_H
 
 #pragma once
 
 #pragma warning(disable: 4481) // nonstandard extension used: override specifier 'override'
 
-#include "TestRunner.h"
+#include "ExeRunner.h"
 
 namespace gj {
-namespace GoogleTest {
+namespace NUnitTest {
 
 class ArgumentBuilder : public gj::ArgumentBuilder
 {
 public:
-	explicit ArgumentBuilder(const std::wstring& fileName, ExeRunner& runner, TestObserver& observer);
+	ArgumentBuilder(const std::wstring& fileName, ExeRunner& runner, TestObserver& observer);
 
 	virtual std::wstring GetExePathName() override;
 	virtual std::wstring GetListArg() override;
-	virtual void LoadTestUnits(TestUnitNode& tree, std::istream& is, const std::string& testName) override;
+	virtual void LoadTestUnits(TestUnitNode& node, std::istream& is, const std::string& testName) override;
 
-	unsigned GetEnabledOptions(unsigned options) const override;
+	virtual unsigned GetEnabledOptions(unsigned options) const override;
 	virtual std::wstring BuildArgs(TestRunner& runner, int logLevel, unsigned& options) override;
 	virtual void FilterMessage(const std::string& msg) override;
 
 private:
-	unsigned GetId(const std::string& name);
+	void HandleClientNotification(const std::string& line);
 
 	std::wstring m_fileName;
 	ExeRunner* m_pRunner;
 	TestObserver* m_pObserver;
-	unsigned m_rootId;
-	std::map<std::string, unsigned> m_ids;
 };
 
-} // namespace GoogleTest
+} // namespace NUnitTest
 } // namespace gj
 
-#endif // BOOST_TESTUI_GOOGLETEST_H
+#endif // BOOST_TESTUI_NUNITTEST_H

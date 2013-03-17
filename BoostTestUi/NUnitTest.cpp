@@ -8,12 +8,14 @@
 #include "stdafx.h"
 #include <sstream>
 #include <regex>
-#include "ExeRunner.h"
+#include <boost/filesystem.hpp>
+#include "dbgstream.h"
 #include "Utilities.h"
-#include "BoostTest.h"
+#include "ExeRunner.h"
+#include "NUnitTest.h"
 
 namespace gj {
-namespace BoostTest {
+namespace NUnitTest {
 
 const wchar_t* GetLogLevelArg(int logLevel)
 {
@@ -62,18 +64,18 @@ public:
 
 	bool AllCases() const
 	{
-		return m_suites[1].all;
+		return m_suites[0].all;
 	}
 
-	std::string GetArg() const
+	std::wstring GetArg() const
 	{
-		std::string arg;
-		const Suite& suite = m_suites[1];
+		std::wstring arg;
+		const Suite& suite = m_suites[0];
 		for (auto it = suite.cases.begin(); it != suite.cases.end(); ++it)
 		{
 			if (!arg.empty())
-				arg += ',';
-			arg += *it;
+				arg += L',';
+			arg += MultiByteToWideChar(*it);
 		}
 		return arg;
 	}
@@ -93,7 +95,7 @@ public:
 
 	virtual void LeaveTestSuite() override
 	{
-		if (m_suites.size() <= 2)
+		if (m_suites.size() <= 1)
 			return; // Skip top level
 
 		auto it = m_suites.rbegin();
@@ -108,7 +110,7 @@ public:
 		{
 			parent.all = false;
 			for (auto it = suite.cases.begin(); it != suite.cases.end(); ++it)
-				parent.cases.push_back(suite.name + '/' + *it);
+				parent.cases.push_back(suite.name + '.' + *it);
 		}
 		m_suites.pop_back();
 	}
@@ -134,24 +136,58 @@ ArgumentBuilder::ArgumentBuilder(const std::wstring& fileName, ExeRunner& runner
 {
 }
 
+namespace fs = boost::filesystem;
+
+fs::wpath GetParentPath(const std::wstring& fileName)
+{
+	return fs::wpath(fileName).parent_path();
+}
+
+fs::wpath GetTestUiPath()
+{
+	std::array<wchar_t, MAX_PATH> buf;
+	DWORD size = GetModuleFileNameW(nullptr, buf.data(), buf.size());
+	return GetParentPath(buf.data());
+}
+
+fs::wpath GetNUnitPath()
+{
+	CRegKey key;
+	std::array<wchar_t, MAX_PATH> buf;
+	ULONG length;
+	if (key.Open(HKEY_CURRENT_USER, L"Software\\Classes\\NUnitTestProject\\DefaultIcon", KEY_READ) == ERROR_SUCCESS &&
+		key.QueryStringValue(L"", buf.data(), &length) == ERROR_SUCCESS)
+		return GetParentPath(buf.data());
+	return fs::wpath();
+}
+
 std::wstring ArgumentBuilder::GetExePathName()
 {
-	return m_fileName;
+	fs::wpath paths[] =
+	{
+		GetParentPath(m_fileName),
+		GetTestUiPath(),
+		GetNUnitPath()
+	};
+	fs::wpath runner(L"nunit-testui-runner.exe");
+	for (auto it = std::begin(paths); it != std::end(paths); ++it)
+	{
+		fs::wpath exePath(*it / runner);
+		if (fs::exists(exePath))
+			return exePath.wstring();
+	}
+
+	throw std::runtime_error("Please install nunit-testui-runner.exe");
 }
 
 std::wstring ArgumentBuilder::GetListArg()
 {
-	return L"--gui_list";
+	return L"/nologo /process:Single /nothread /noshadow /gui_list " + m_fileName;
 }
 
 std::string normalize_type(const std::string& s)
 {
-	static const std::regex re1("(class|struct|union|enum) ");
-	auto s1 = std::regex_replace(s, re1, std::string());
-
-	// reduce std::basic_stream, std::basic_istream, std::basic_ostream, std::basic_stringstream to their common typedefs:
-	static const std::regex re2("std::basic_(string|if?stream|of?stream|([io]?stringstream))<(char|(w)char_t),std::char_traits<\\3>,std::allocator<\\3> >");
-	return std::regex_replace(s1, re2, std::string("std::$4$1"));
+	return s;
 }
 
 template <typename T>
@@ -182,6 +218,7 @@ std::string LoadTestUnits(TestUnitNode& node, std::istream& is, int indent = 0)
 	while (is)
 	{
 		line = chomp(line);
+
 		int lineIndent = static_cast<int>(line.find_first_not_of(' '));
 		if (lineIndent < 0)
 		{
@@ -220,36 +257,29 @@ std::string LoadTestUnits(TestUnitNode& node, std::istream& is, int indent = 0)
 
 void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const std::string&)
 {
-	BoostTest::LoadTestUnits(tree, is);
+	std::string line;
+	std::getline(is, line);
+	std::getline(is, line);
+	NUnitTest::LoadTestUnits(tree, is);
 }
 
 unsigned ArgumentBuilder::GetEnabledOptions(unsigned options) const
 {
-	return ExeRunner::Randomize | ExeRunner::WaitForDebugger;
+	return ExeRunner::WaitForDebugger;
 }
 
 std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsigned& options)
 {
 	std::wostringstream args;
-	args << L"--log_level=" << GetLogLevelArg(logLevel);
-
-	if (options & ExeRunner::Randomize)
-		args << L" --random=1";
-
-	if (options & ExeRunner::Repeat)
-		options &= ~ExeRunner::WaitForDebugger;
+	args << L"/nologo /process:Single /nothread /noshadow /noxml /labels /trace:verbose /gui_run";
 	if (options & ExeRunner::WaitForDebugger)
-		args << L" --gui_wait";
+		args << L" /gui_wait";
 
-/* Cannot enable disabled test cases:
-	GetEnableArg2 getArg2;
-	runner.TraverseTestTree(getArg2);
-	if (!getArg2.AllCases())
-		m_pObserver->test_message(Severity::Info, getArg2.GetArg());
-*/
-	GetEnableArg getArg;
+	GetEnableArg2 getArg;
 	runner.TraverseTestTree(getArg);
-	args << L" --gui_run=" << getArg.GetArg();
+	if (!getArg.AllCases())
+		args << L" /run:" << getArg.GetArg();
+	args << L" " << m_fileName;
 	return args.str();
 }
 
@@ -260,43 +290,40 @@ void ArgumentBuilder::HandleClientNotification(const std::string& line)
 	std::string command;
 	ss >> c >> command;
 
-	if (command == "start")
+	if (command == "RunStarted")
 		m_pObserver->test_iteration_start(get_arg<unsigned>(ss));
-	else if (command == "finish")
+	else if (command == "RunFinished")
 		m_pObserver->test_iteration_finish();
 	else if (command == "aborted")
 		m_pObserver->test_aborted();
-	else if (command == "unit_start")
+	else if (command == "TestStarted")
 	{
 		if (auto p = m_pRunner->GetTestUnitPtr(get_arg<unsigned>(ss)))
-		{
-			if (p->type == TestUnit::TestCase)
-				m_pRunner->OnTestCaseStart(p->id);
-			else
-				m_pRunner->OnTestSuiteStart(p->id);
-		}
+			m_pRunner->OnTestCaseStart(p->id);
 	}
-	else if (command == "unit_finish")
+	else if (command == "SuiteStarted")
+	{
+		if (auto p = m_pRunner->GetTestUnitPtr(get_arg<unsigned>(ss)))
+			m_pRunner->OnTestSuiteStart(p->id);
+	}
+	else if (command == "TestFinished")
+	{
+		unsigned id = get_arg<unsigned>(ss);
+		unsigned elapsed = get_arg<unsigned>(ss);
+		bool succeeded = get_arg<bool>(ss);
+		if (auto p = m_pRunner->GetTestUnitPtr(id))
+			m_pRunner->OnTestCaseFinish(p->id, elapsed, succeeded);
+	}
+	else if (command == "SuiteFinished")
 	{
 		unsigned id = get_arg<unsigned>(ss);
 		unsigned elapsed = get_arg<unsigned>(ss);
 		if (auto p = m_pRunner->GetTestUnitPtr(id))
-		{
-			if (p->type == TestUnit::TestCase)
-				m_pRunner->OnTestCaseFinish(p->id, elapsed);
-			else
-				m_pRunner->OnTestSuiteFinish(p->id, elapsed);
-		}
+			m_pRunner->OnTestSuiteFinish(p->id, elapsed);
 	}
-	else if (command == "unit_skipped")
-		m_pRunner->OnTestUnitSkipped(get_arg<unsigned>(ss));
-	else if (command == "unit_aborted")
-		m_pRunner->OnTestUnitAborted(get_arg<unsigned>(ss));
-	else if (command == "assertion")
-		m_pRunner->OnTestAssertion(get_arg<bool>(ss));
-	else if (command == "exception")
+	else if (command == "Exception")
 		m_pRunner->OnTestExceptionCaught(get_arg<std::string>(ss));
-	else if (command == "waiting")
+	else if (command == "Waiting")
 		m_pRunner->OnWaiting();
 	else
 		m_pObserver->test_message(Severity::Info, line);
@@ -309,17 +336,17 @@ void ArgumentBuilder::FilterMessage(const std::string& msg)
 
 	Severity::type severity = Severity::Info;
 
-	static const std::regex reError("\\): (fatal )?error ");
+	static const std::regex reError(": Error$");
 	std::smatch sm;
 	if (std::regex_search(msg, sm, reError))
-		severity = sm[1].matched? Severity::Fatal: Severity::Error;
+		severity = Severity::Error;
 
-	static const std::regex reAssertion("Assertion failed:");
-	if (std::regex_search(msg, reAssertion))
-		severity =  Severity::Assertion;
+	static const std::regex reFailure(": Failure$");
+	if (std::regex_search(msg, sm, reFailure))
+		severity = Severity::Fatal;
 
 	m_pObserver->test_message(severity, msg);
 }
 
-} // namespace BoostTest
+} // namespace NUnitTest
 } // namespace gj

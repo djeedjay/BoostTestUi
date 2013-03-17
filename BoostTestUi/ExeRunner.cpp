@@ -13,13 +13,14 @@
 #include "GetUnitTestType.h"
 #include "BoostTest.h"
 #include "GoogleTest.h"
+#include "NUnitTest.h"
 #include "ExeRunner.h"
 
 namespace gj {
 
 void ExeRunner::Load()
 {
-	Process proc(m_fileName, m_pArgBuilder->GetListArg());
+	Process proc(m_pArgBuilder->GetExePathName(), m_pArgBuilder->GetListArg());
 
 	hstream hs(proc.GetStdOut());
 	m_tree.children.clear();
@@ -32,14 +33,16 @@ std::unique_ptr<ArgumentBuilder> CreateArgumentBuilder(const std::wstring& fileN
 {
 	std::string type = GetUnitTestType(WideCharToMultiByte(fileName));
 	if (type == "boost")
-		return std::unique_ptr<ArgumentBuilder>(new BoostTest::ArgumentBuilder(runner, observer));
+		return std::unique_ptr<ArgumentBuilder>(new BoostTest::ArgumentBuilder(fileName, runner, observer));
 	if (type == "google")
-		return std::unique_ptr<ArgumentBuilder>(new GoogleTest::ArgumentBuilder(runner, observer));
-	throw std::runtime_error("This is not a boost.test executable");
+		return std::unique_ptr<ArgumentBuilder>(new GoogleTest::ArgumentBuilder(fileName, runner, observer));
+	if (type == "nunit")
+		return std::unique_ptr<ArgumentBuilder>(new NUnitTest::ArgumentBuilder(fileName, runner, observer));
+
+	throw std::runtime_error("This is not a supported unit test executable");
 }
 
 ExeRunner::ExeRunner(const std::wstring& fileName, TestObserver& observer) :
-	m_fileName(fileName),
 	m_pObserver(&observer),
 	m_tree(TestUnit(0, TestUnit::TestSuite, "root")),
 	m_pArgBuilder(CreateArgumentBuilder(fileName, *this, observer))
@@ -119,7 +122,7 @@ void ExeRunner::Run(int logLevel, unsigned options)
 
 void ExeRunner::StartTestProcess()
 {
-	m_pProcess.reset(new Process(m_fileName, m_testArgs));
+	m_pProcess.reset(new Process(m_pArgBuilder->GetExePathName(), m_testArgs));
 	m_pObserver->test_start();
 	m_pObserver->test_message(Severity::Info, stringbuilder() << "Process " << m_pProcess->GetProcessId() << ": " << Str(m_pProcess->GetName()) << ", started");
 }
@@ -197,6 +200,11 @@ void ExeRunner::OnTestCaseFinish(unsigned id, unsigned elapsed)
 	m_pObserver->test_case_finish(id, elapsed);
 }
 
+void ExeRunner::OnTestCaseFinish(unsigned id, unsigned elapsed, bool succeeded)
+{
+	m_pObserver->test_case_finish(id, elapsed, succeeded);
+}
+
 void ExeRunner::OnTestSuiteFinish(unsigned id, unsigned elapsed)
 {
 	m_pObserver->test_suite_finish(id, elapsed);
@@ -272,7 +280,7 @@ void ExeRunner::RunTestIteration()
 	std::string line;
 	while (std::getline(hs, line))
 	{
-		m_pArgBuilder->FilterMessage(line);
+		m_pArgBuilder->FilterMessage(chomp(line));
 	}
 }
 

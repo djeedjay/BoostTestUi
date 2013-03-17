@@ -23,6 +23,9 @@
 
 namespace gj {
 
+const COLORREF FailColor = RGB(255, 64, 64);
+const COLORREF SuccessColor = RGB(20, 180, 20);
+
 struct Options
 {
 	enum type
@@ -74,7 +77,7 @@ CMainFrame::CMainFrame(const std::wstring& fileName) :
 	m_pathName(fileName),
 	m_treeView(*this),
 	m_logView(*this),
-	m_autoRun(true),
+	m_autoRun(false),
 	m_logAutoClear(false),
 	m_randomize(false),
 	m_repeat(false),
@@ -106,6 +109,10 @@ void CMainFrame::UpdateUI()
 	bool isRunning = isLoaded && m_pRunner->IsRunning();
 	bool isRunnable = IsRunnable();
 	unsigned enabled = isLoaded? m_pRunner->GetEnabledOptions(GetOptions()): 0;
+	UIEnable(ID_FILE_SAVE, isLoaded);
+	UIEnable(ID_FILE_SAVE_AS, isLoaded);
+	UIEnable(ID_TEST_RANDOMIZE, (enabled & TestRunner::Randomize) != 0);
+	UIEnable(ID_TEST_REPEAT, isLoaded && !isRunning);
 	UIEnable(ID_TEST_DEBUGGER, (enabled & TestRunner::WaitForDebugger) != 0);
 	UIEnable(ID_TREE_RUN, isRunnable);
 	UIEnable(ID_TREE_RUN_CHECKED, isRunnable);
@@ -425,8 +432,12 @@ void CMainFrame::CreateHpp(int resourceId, const std::wstring& fileName)
 
 void CMainFrame::OnFileOpen(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
-	CFileDialog dlg(TRUE, L".exe", L"", OFN_FILEMUSTEXIST | OFN_HIDEREADONLY, L"Unit Test Executable (*.exe)\0*.exe\0\0", 0);
-	dlg.m_ofn.nFilterIndex = 0;
+	CFileDialog dlg(TRUE, L"*.exe;*.dll", L"", OFN_FILEMUSTEXIST | OFN_HIDEREADONLY,
+		L"Unit Test Executable (*.exe)\0*.exe\0"
+		L"NUnit Test Assembly (*.dll)\0*.dll\0"
+		L"All Unit Test Files (*.exe; *.dll)\0*.exe;*.dll\0"
+		L"\0", 0);
+	dlg.m_ofn.nFilterIndex = 3;
 	dlg.m_ofn.lpstrTitle = L"Load Unit Test";
 	if (dlg.DoModal() != IDOK)
 		return;
@@ -569,7 +580,7 @@ void CMainFrame::test_iteration_start(unsigned test_cases_amount)
 		m_currentId = m_pRunner->RootTestSuite().id;
 		m_progressBar.SetRange(0, test_cases_amount);
 		m_progressBar.SetPos(0);
-		m_progressBar.SetBarColor(RGB(20, 180, 20));
+		m_progressBar.SetBarColor(SuccessColor);
 		m_treeView.ResetTreeImages();
 	});
 }
@@ -604,20 +615,36 @@ void CMainFrame::test_case_start(unsigned id)
 	});
 }
 
-void CMainFrame::test_case_finish(unsigned id, unsigned long /*elapsed*/)
+void CMainFrame::test_case_finish(unsigned id, unsigned long elapsed)
 {
-	EnQueue([this, id]()
+	EnQueue([this, id, elapsed]()
 	{
-		m_treeView.EndTestCase(id, !m_testCaseFailed);
-		m_logView.EndTestUnit(id);
-
-		if (m_testCaseFailed)
-			++m_failedTestCount;
-
-		++m_testsRunCount;
-		UpdateStatusBar();
-		m_progressBar.OffsetPos(1);
+		EndTestCase(id, elapsed, !m_testCaseFailed);
 	});
+}
+
+void CMainFrame::test_case_finish(unsigned id, unsigned long elapsed, bool succeeded)
+{
+	EnQueue([this, id, elapsed, succeeded]()
+	{
+		EndTestCase(id, elapsed, succeeded);
+	});
+}
+
+void CMainFrame::EndTestCase(unsigned id, unsigned long /*elapsed*/, bool succeeded)
+{
+	m_treeView.EndTestCase(id, succeeded);
+	m_logView.EndTestUnit(id);
+
+	if (!succeeded)
+	{
+		m_progressBar.SetBarColor(FailColor);
+		++m_failedTestCount;
+	}
+
+	++m_testsRunCount;
+	UpdateStatusBar();
+	m_progressBar.OffsetPos(1);
 }
 
 void CMainFrame::test_suite_finish(unsigned id, unsigned long /*elapsed*/)
@@ -660,10 +687,10 @@ void CMainFrame::assertion_result(bool passed)
 		return;
 
 	unsigned id = m_currentId;
-	EnQueue([this, id]()
+	EnQueue([this]()
 	{
 		m_testCaseFailed = true;
-		m_progressBar.SetBarColor(RGB(255, 64, 64));
+		m_progressBar.SetBarColor(FailColor);
 	});
 }
 
@@ -673,7 +700,7 @@ void CMainFrame::exception_caught(const std::string& /*what*/)
 	EnQueue([this, id]()
 	{
 		m_testCaseFailed = true;
-		m_progressBar.SetBarColor(RGB(255, 64, 64));
+		m_progressBar.SetBarColor(FailColor);
 		UpdateStatusBar();
 	});
 }
@@ -879,7 +906,8 @@ void CMainFrame::SaveSettings()
 class SingleTestCaseSelector : public TestTreeVisitor
 {
 public:
-	explicit SingleTestCaseSelector(unsigned id) :
+	SingleTestCaseSelector(const CTreeView& treeView, unsigned id) :
+		m_pTreeView(&treeView),
 		m_id(id),
 		m_enable(false)
 	{
@@ -889,7 +917,7 @@ public:
 	{
 		if (tc.id == m_id)
 			EnableSuites();
-		tc.enabled = m_enable || tc.id == m_id;
+		tc.enabled = IsEnabled(tc.id);
 	}
 
 	virtual void EnterTestSuite(TestSuite& ts) override
@@ -899,7 +927,7 @@ public:
 			EnableSuites();
 			m_enable = true;
 		}
-		ts.enabled = m_enable;
+		ts.enabled = IsEnabled(ts.id);
 		m_suites.push_back(&ts);
 	}
 
@@ -911,12 +939,18 @@ public:
 	}
 
 private:
+	bool IsEnabled(unsigned id) const
+	{
+		return m_enable && m_pTreeView->IsChecked(id) || id == m_id;
+	}
+
 	void EnableSuites()
 	{
 		for (auto it = m_suites.begin(); it != m_suites.end(); ++it)
 			(*it)->enabled = true;
 	}
 
+	const CTreeView* m_pTreeView;
 	unsigned m_id;
 	bool m_enable;
 	std::vector<TestSuite*> m_suites;
@@ -927,7 +961,7 @@ void CMainFrame::RunSingle(unsigned id)
 	if (!IsRunnable())
 		return;
 
-	SingleTestCaseSelector selector(id);
+	SingleTestCaseSelector selector(m_treeView, id);
 	m_pRunner->TraverseTestTree(selector);
 	Run();
 }

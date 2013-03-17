@@ -60,6 +60,7 @@ public:
 	virtual void test_suite_start(unsigned id) override;
 	virtual void test_case_start(unsigned id) override;
 	virtual void test_case_finish(unsigned id, unsigned long elapsed) override;
+	virtual void test_case_finish(unsigned id, unsigned long /*elapsed*/, bool succeeded) override;
 	virtual void test_suite_finish(unsigned id, unsigned long elapsed) override;
 	virtual void test_unit_skipped(unsigned id) override;
 	virtual void test_unit_aborted(unsigned id) override;
@@ -148,6 +149,7 @@ private:
 	void RunChecked();
 	void RunAll();
 	void Run();
+	void EndTestCase(unsigned id, unsigned long /*elapsed*/, bool succeeded);
 
 	std::wstring m_pathName;
 	std::wstring m_logFileName;

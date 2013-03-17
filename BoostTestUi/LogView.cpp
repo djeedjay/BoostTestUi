@@ -23,7 +23,7 @@ BEGIN_MSG_MAP_TRY(CLogView)
 	MSG_WM_CONTEXTMENU(OnContextMenu);
 	REFLECTED_NOTIFY_CODE_HANDLER(NM_CUSTOMDRAW, OnCustomDraw)
 	REFLECTED_NOTIFY_CODE_HANDLER(NM_DBLCLK, OnDblClick)
-	REFLECTED_NOTIFY_CODE_HANDLER(LVN_ITEMCHANGING, OnItemChanging)
+	REFLECTED_NOTIFY_CODE_HANDLER(LVN_ITEMCHANGED, OnItemChanged)
 	REFLECTED_NOTIFY_CODE_HANDLER(LVN_GETINFOTIP, OnGetInfoTip)
 	REFLECTED_NOTIFY_CODE_HANDLER(LVN_GETDISPINFO, OnGetDispInfo)
 	DEFAULT_REFLECTION_HANDLER()
@@ -102,11 +102,14 @@ void CLogView::Clear()
 
 void CLogView::InvalidateLines(int begin, int end)
 {
+	if (begin >= end)
+		return;
+
 	RECT recBegin;
 	GetItemRect(begin, &recBegin, LVIR_BOUNDS);
 
 	RECT recEnd;
-	GetItemRect(end, &recEnd, LVIR_BOUNDS);
+	GetItemRect(end - 1, &recEnd, LVIR_BOUNDS);
 
 	recBegin.bottom = recEnd.bottom;
 	InvalidateRect(&recBegin);
@@ -132,19 +135,11 @@ void CLogView::SetHighLight(int begin, int end)
 
 void CLogView::Add(unsigned id, const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg)
 {
-	auto it = msg.end();
-	while (it > msg.begin())
-	{
-		if (*(it - 1) >= ' ')
-			break;
-		--it;
-	}
-
 	int focus = GetNextItem(0, LVNI_FOCUSED);
 	bool selectLast = focus < 0 || focus == GetItemCount() - 1;
 
 	int item = m_logLines.size();
-	m_logLines.push_back(LogLine(id, localTime, t, severity, std::string(msg.begin(), it)));
+	m_logLines.push_back(LogLine(id, localTime, t, severity, msg));
 	SetItemCount(m_logLines.size());
 
 	if (selectLast)
@@ -287,7 +282,7 @@ LRESULT CLogView::OnCustomDraw(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
 		return CDRF_NOTIFYSUBITEMDRAW;
 
 	case CDDS_ITEMPREPAINT | CDDS_SUBITEM:
-		pCustomDraw->clrTextBk = GetHighLightBkColor(m_logLines[item].severity, item >= m_logHighLightBegin && item <= m_logHighLightEnd);
+		pCustomDraw->clrTextBk = GetHighLightBkColor(m_logLines[item].severity, item >= m_logHighLightBegin && item < m_logHighLightEnd);
 		return CDRF_DODEFAULT;
 	}
 
@@ -301,14 +296,18 @@ LRESULT CLogView::OnDblClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
 	std::string line = GetItemText(pItemActivate->iItem, 1);
 	static const std::regex re1("(.+)\\((\\d+)\\): .*");
 	static const std::regex re2("file (.+), line (\\d+)");
+	static const std::regex re3(" in (.+):line (\\d+)");
+
 	std::smatch sm;
-	if (std::regex_match(line, sm, re1) || std::regex_search(line, sm, re2))
+	if (std::regex_match(line, sm, re1) ||
+		std::regex_search(line, sm, re2) ||
+		std::regex_search(line, sm, re3))
 		ShowSourceLine(sm[1], to_int(sm[2]));
 
 	return 0;
 }
 
-LRESULT CLogView::OnItemChanging(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
+LRESULT CLogView::OnItemChanged(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
 {
 	NMLISTVIEW* pListView = reinterpret_cast<NMLISTVIEW*>(pnmh);
 

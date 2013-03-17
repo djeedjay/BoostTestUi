@@ -145,6 +145,7 @@
     <ClCompile Include="GetUnitTestType.cpp" />
     <ClCompile Include="LogView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="NUnitTest.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="ShowSourceLine.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -170,6 +171,7 @@
     <ClInclude Include="GetUnitTestType.h" />
     <ClInclude Include="LogView.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="NUnitTest.h" />
     <ClInclude Include="OffscreenPaint.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="resource.h" />

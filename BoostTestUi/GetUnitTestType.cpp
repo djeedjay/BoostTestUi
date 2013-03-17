@@ -36,15 +36,23 @@ const IMAGE_SECTION_HEADER* GetEnclosingSectionHeader(DWORD rva, const ImageNtHe
 static const std::string unit_test_type_("unit_test_type_");
 
 template <typename ImageNtHeaders>
+std::string GetNUnitTestType(const void* base, const ImageNtHeaders* pNTHeader)
+{
+	if (pNTHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR].VirtualAddress != 0)
+		return "nunit";
+	return "";
+}
+
+template <typename ImageNtHeaders>
 std::string GetUnitTestType(const void* base, const ImageNtHeaders* pNTHeader)
-{    
+{
 	DWORD exportsStartRVA = pNTHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
 
 	// Get the IMAGE_SECTION_HEADER that contains the exports.  This is
 	// usually the .edata section, but doesn't have to be.
 	const IMAGE_SECTION_HEADER* header = GetEnclosingSectionHeader(exportsStartRVA, pNTHeader);
 	if (!header)
-		return "";
+		return GetNUnitTestType(base, pNTHeader);
 
 	int delta = static_cast<int>(header->VirtualAddress - header->PointerToRawData);
 	const IMAGE_EXPORT_DIRECTORY* exportDir = GetPtr<IMAGE_EXPORT_DIRECTORY>(base, exportsStartRVA - delta);   
@@ -56,10 +64,9 @@ std::string GetUnitTestType(const void* base, const ImageNtHeaders* pNTHeader)
 		std::string name = GetPtr<char>(base, names[j] - delta);
 		if (name.substr(0, unit_test_type_.size()) == unit_test_type_)
 			return name.substr(unit_test_type_.size());
-		if (name == "init_unit_test")
-			return "boost";
 	}
-	return "";
+
+	return GetNUnitTestType(base, pNTHeader);
 }
 
 std::string GetUnitTestType(const IMAGE_DOS_HEADER* pDosHeader, size_t size)

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!--This file represents the results of running a test suite-->
+<test-results name="C:\Projects\nunit\nunit-2.6.2\bin\Debug\tests\nunit-console.tests.dll" total="8" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2013-03-08" time="20:27:49">
+  <environment nunit-version="2.6.2.0" clr-version="2.0.50727.3643" os-version="Microsoft Windows NT 5.1.2600 Service Pack 3" platform="Win32NT" cwd="C:\Projects\BoostTestUi\BoostTestUi" machine-name="INSPIRON" user="Gert-Jan" user-domain="INSPIRON" />
+  <culture-info current-culture="en-GB" current-uiculture="en-US" />
+  <test-suite type="Assembly" name="C:\Projects\nunit\nunit-2.6.2\bin\Debug\tests\nunit-console.tests.dll" executed="True" result="Success" success="True" time="0.344" asserts="0">
+    <results>
+      <test-suite type="Namespace" name="NUnit" executed="True" result="Success" success="True" time="0.328" asserts="0">
+        <results>
+          <test-suite type="Namespace" name="ConsoleRunner" executed="True" result="Success" success="True" time="0.313" asserts="0">
+            <results>
+              <test-suite type="Namespace" name="Tests" executed="True" result="Success" success="True" time="0.313" asserts="0">
+                <results>
+                  <test-suite type="TestFixture" name="CommandLineTests" executed="True" result="Success" success="True" time="0.297" asserts="0">
+                    <results>
+                      <test-suite type="ParameterizedTest" name="BooleanOptionAreRecognized" executed="True" result="Success" success="True" time="0.281" asserts="0">
+                        <results>
+                          <test-case name="NUnit.ConsoleRunner.Tests.CommandLineTests.BooleanOptionAreRecognized(&quot;nologo&quot;,&quot;nologo&quot;)" executed="True" result="Success" success="True" time="0.219" asserts="6" />
+                          <test-case name="NUnit.ConsoleRunner.Tests.CommandLineTests.BooleanOptionAreRecognized(&quot;help&quot;,&quot;?&quot;)" executed="True" result="Success" success="True" time="0.000" asserts="6" />
+                          <test-case name="NUnit.ConsoleRunner.Tests.CommandLineTests.BooleanOptionAreRecognized(&quot;wait&quot;,&quot;wait&quot;)" executed="True" result="Success" success="True" time="0.000" asserts="6" />
+                          <test-case name="NUnit.ConsoleRunner.Tests.CommandLineTests.BooleanOptionAreRecognized(&quot;xmlConsole&quot;,&quot;xmlConsole&quot;)" executed="True" result="Success" success="True" time="0.000" asserts="6" />
+                          <test-case name="NUnit.ConsoleRunner.Tests.CommandLineTests.BooleanOptionAreRecognized(&quot;labels&quot;,&quot;labels&quot;)" executed="True" result="Success" success="True" time="0.000" asserts="6" />
+                          <test-case name="NUnit.ConsoleRunner.Tests.CommandLineTests.BooleanOptionAreRecognized(&quot;noshadow&quot;,&quot;noshadow&quot;)" executed="True" result="Success" success="True" time="0.000" asserts="6" />
+                          <test-case name="NUnit.ConsoleRunner.Tests.CommandLineTests.BooleanOptionAreRecognized(&quot;nothread&quot;,&quot;nothread&quot;)" executed="True" result="Success" success="True" time="0.000" asserts="6" />
+                          <test-case name="NUnit.ConsoleRunner.Tests.CommandLineTests.BooleanOptionAreRecognized(&quot;help&quot;,&quot;help&quot;)" executed="True" result="Success" success="True" time="0.000" asserts="6" />
+                        </results>
+                      </test-suite>
+                    </results>
+                  </test-suite>
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

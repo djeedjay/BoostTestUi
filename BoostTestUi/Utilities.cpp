@@ -13,6 +13,24 @@
 
 namespace gj {
 
+std::string chomp(std::string s)
+{
+	size_t n = s.size();
+	while (n > 0 && s[n - 1] < ' ')
+		--n;
+	s.resize(n);
+	return s;
+}
+
+std::wstring chomp(std::wstring s)
+{
+	size_t n = s.size();
+	while (n > 0 && s[n - 1] < L' ')
+		--n;
+	s.resize(n);
+	return s;
+}
+
 std::wstring LoadString(int id)
 {
 	CString cs;

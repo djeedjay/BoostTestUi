@@ -82,6 +82,7 @@ public:
 	virtual void test_suite_start(unsigned id) = 0;
 	virtual void test_case_start(unsigned id) = 0;
 	virtual void test_case_finish(unsigned id, unsigned long elapsed) = 0;
+	virtual void test_case_finish(unsigned id, unsigned long /*elapsed*/, bool succeeded) = 0;
 	virtual void test_suite_finish(unsigned id, unsigned long elapsed) = 0;
 	virtual void test_unit_skipped(unsigned id) = 0;
 	virtual void test_unit_aborted(unsigned id) = 0;
@@ -122,6 +123,7 @@ struct TestRunner
 
 struct ArgumentBuilder
 {
+	virtual std::wstring GetExePathName() = 0;
 	virtual std::wstring GetListArg() = 0;
 	virtual void LoadTestUnits(TestUnitNode& node, std::istream& is, const std::string& testName) = 0;
 
