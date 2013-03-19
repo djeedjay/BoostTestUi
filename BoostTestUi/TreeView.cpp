@@ -244,15 +244,18 @@ void CTreeView::Clear()
 	DeleteAllItems();
 	m_parents.clear();
 	m_parents.push_back(TVI_ROOT);
+	m_depth = 0;
+	m_levels.clear();
+	m_levels.push_back(0);
 }
 
 void CTreeView::AddTestCase(unsigned id, const std::string& name, bool check)
 {
 	HTREEITEM hItem = InsertItem(WStr(name), m_iEmpty, m_iEmpty, m_parents.back(), TVI_LAST);
-	Expand(m_parents.back(), TVE_EXPAND);
 	SetItemData(hItem, id);
 	SetCheckState(hItem, check);
 	m_items[id] = hItem;
+	++m_levels[m_depth];
 }
 
 void CTreeView::EnterTestSuite(unsigned id, const std::string& name, bool check)
@@ -263,12 +266,41 @@ void CTreeView::EnterTestSuite(unsigned id, const std::string& name, bool check)
 	m_items[id] = hItem;
 
 	m_parents.push_back(hItem);
+	++m_levels[m_depth];
+	++m_depth;
+	if (m_depth >= m_levels.size())
+		m_levels.push_back(0);
+}
+
+void CTreeView::ExpandToDepth(HTREEITEM hItem, int depth)
+{
+	Expand(hItem, depth > 0? TVE_EXPAND: TVE_COLLAPSE);
+	HTREEITEM hChild = GetChildItem(hItem);
+	while (hChild)
+	{
+		ExpandToDepth(hChild, depth - 1);
+		hChild = GetNextSiblingItem(hChild);
+	}
+}
+
+void CTreeView::ExpandToView()
+{
+	int count = 0;
+	int depth = 0;
+	for (auto it = m_levels.begin(); it != m_levels.end(); ++it)
+	{
+		count += *it;
+		if (count > GetVisibleCount())
+			break;
+		++depth;
+	}
+	ExpandToDepth(TVI_ROOT, depth);
 }
 
 void CTreeView::LeaveTestSuite()
 {
-	Expand(m_parents.back(), TVE_EXPAND);
 	m_parents.pop_back();
+	--m_depth;
 }
 
 bool CTreeView::IsChecked(unsigned id) const

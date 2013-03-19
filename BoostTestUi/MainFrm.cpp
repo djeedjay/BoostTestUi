@@ -393,6 +393,8 @@ void CMainFrame::Load(const std::wstring& fileName, int mruId)
 	m_logView.Clear();
 	GetTestUnits getUnits(*this);
 	m_pRunner->TraverseTestTree(getUnits);
+	m_treeView.ExpandToView();
+
 	m_progressBar.SetPos(0);
 	UpdateUI();
 

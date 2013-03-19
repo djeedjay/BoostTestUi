@@ -33,6 +33,7 @@ public:
 	void AddTestCase(unsigned id, const std::string& name, bool check);
 	void EnterTestSuite(unsigned id, const std::string& name, bool check);
 	void LeaveTestSuite();
+	void ExpandToView();
 
 	bool IsChecked(unsigned id) const;
 	void Check(unsigned id, bool check);
@@ -67,6 +68,7 @@ public:
 	void DoPaint(CDCHandle hdc, const RECT& rcClip);
 
 private:
+	void ExpandToDepth(HTREEITEM hItem, int depth);
 	void CheckSubTreeItems(HTREEITEM hItem, bool check);
 	void UncheckTreeItem(HTREEITEM hItem);
 	void CheckTreeItem(HTREEITEM hItem);
@@ -90,6 +92,8 @@ private:
 	int m_runIndex;
 	HTREEITEM m_hCurrentItem;
 	std::vector<HTREEITEM> m_parents;
+	std::vector<int> m_levels;
+	int m_depth;
 	std::map<unsigned, HTREEITEM> m_items;
 };
 
