@@ -126,7 +126,7 @@ void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const 
 
 unsigned ArgumentBuilder::GetEnabledOptions(unsigned options) const
 {
-	return ExeRunner::Randomize | ExeRunner::Repeat | ExeRunner::WaitForDebugger;
+	return ExeRunner::Randomize | ExeRunner::WaitForDebugger;
 }
 
 std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int /*logLevel*/, unsigned& options)
@@ -136,10 +136,6 @@ std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int /*logLevel*/, un
 
 	if (options & ExeRunner::Randomize)
 		args << L" --gtest_shuffle";
-
-	if (options & ExeRunner::Repeat)
-		args << L" --gtest_repeat=-1 --gtest_break_on_failure";
-	options &= ~ExeRunner::Repeat;
 
 	if (options & ExeRunner::WaitForDebugger)
 		args << L" --gui_wait";
