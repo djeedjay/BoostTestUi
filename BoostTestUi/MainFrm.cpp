@@ -263,6 +263,28 @@ private:
 	int m_count;
 };
 
+class CountEnabledTestCases : public TestTreeVisitor
+{
+public:
+	explicit CountEnabledTestCases() : m_count(0)
+	{
+	}
+
+    virtual void VisitTestCase(TestCase& tc) override
+	{
+		if (tc.enabled)
+			++m_count;
+	}
+
+	int count() const
+	{
+		return m_count;
+	}
+
+private:
+	int m_count;
+};
+
 void CMainFrame::AddTestCase(const TestCase& tc)
 {
 	m_treeView.AddTestCase(tc.id, tc.name, tc.enabled);
@@ -577,10 +599,9 @@ void CMainFrame::test_aborted()
 
 void CMainFrame::test_iteration_start(unsigned test_cases_amount)
 {
-	EnQueue([this, test_cases_amount]()
+	EnQueue([this]()
 	{
 		m_currentId = m_pRunner->RootTestSuite().id;
-		m_progressBar.SetRange(0, test_cases_amount);
 		m_progressBar.SetPos(0);
 		m_progressBar.SetBarColor(SuccessColor);
 		m_treeView.ResetTreeImages();
@@ -1033,9 +1054,14 @@ void CMainFrame::Run()
 	if (!IsRunnable())
 		return;
 
+	CountEnabledTestCases counter;
+	m_pRunner->TraverseTestTree(counter);
+
 	m_testIterationCount = 0;
 	m_testsRunCount = 0;
 	m_failedTestCount = 0;
+	m_progressBar.SetRange(0, counter.count());
+	m_progressBar.SetPos(0);
 	if (m_logAutoClear)
 		m_logView.Clear();
 	m_resetTimer = m_logView.Empty();

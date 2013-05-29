@@ -69,4 +69,14 @@
 			throw new System.Exception();
 		}
 	}
+
+	[TestFixture]
+	public class SecondSample
+	{
+		[Test]
+		public void SecondTest()
+		{
+			Assert.AreEqual(1 + 1, 2);
+		}
+	}
 }

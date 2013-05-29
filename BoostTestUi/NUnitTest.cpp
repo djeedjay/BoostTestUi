@@ -165,9 +165,9 @@ std::wstring ArgumentBuilder::GetExePathName()
 {
 	fs::wpath paths[] =
 	{
-		GetParentPath(m_fileName),
+//		GetParentPath(m_fileName),
 		GetTestUiPath(),
-		GetNUnitPath()
+//		GetNUnitPath()
 	};
 	fs::wpath runner(m_exeName);
 	for (auto it = std::begin(paths); it != std::end(paths); ++it)
@@ -182,7 +182,8 @@ std::wstring ArgumentBuilder::GetExePathName()
 
 std::wstring ArgumentBuilder::GetListArg()
 {
-	return L"/nologo /process:Single /nothread /noshadow /gui_list " + m_fileName;
+//	return L"/nologo /process:Single /nothread /noshadow /gui_list " + m_fileName;
+	return L"/list " + m_fileName;
 }
 
 std::string normalize_type(const std::string& s)
@@ -257,23 +258,25 @@ std::string LoadTestUnits(TestUnitNode& node, std::istream& is, int indent = 0)
 
 void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const std::string&)
 {
-	std::string line;
-	std::getline(is, line);
-	std::getline(is, line);
+//	std::string line;
+//	std::getline(is, line);
+//	std::getline(is, line);
 	NUnitTest::LoadTestUnits(tree, is);
 }
 
 unsigned ArgumentBuilder::GetEnabledOptions(unsigned options) const
 {
-	return ExeRunner::WaitForDebugger;
+	return ExeRunner::Randomize | ExeRunner::WaitForDebugger;
 }
 
 std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsigned& options)
 {
 	std::wostringstream args;
-	args << L"/nologo /process:Single /nothread /noshadow /noxml /labels /trace:verbose /gui_run";
+//	args << L"/nologo /process:Single /nothread /noshadow /noxml /labels /trace:verbose /gui_run";
+	if (options & ExeRunner::Randomize)
+		args << L" /randomize";
 	if (options & ExeRunner::WaitForDebugger)
-		args << L" /gui_wait";
+		args << L" /wait";
 
 	GetEnableArg2 getArg;
 	runner.TraverseTestTree(getArg);

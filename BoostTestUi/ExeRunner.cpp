@@ -37,9 +37,9 @@ std::unique_ptr<ArgumentBuilder> CreateArgumentBuilder(const std::wstring& fileN
 	if (type == "google")
 		return std::unique_ptr<ArgumentBuilder>(new GoogleTest::ArgumentBuilder(fileName, runner, observer));
 	if (type == "nunit")
-		return std::unique_ptr<ArgumentBuilder>(new NUnitTest::ArgumentBuilder(L"nunit-testui-runner.exe", fileName, runner, observer));
+		return std::unique_ptr<ArgumentBuilder>(new NUnitTest::ArgumentBuilder(L"nunit-runner.exe", fileName, runner, observer));
 	if (type == "nunit-x86")
-		return std::unique_ptr<ArgumentBuilder>(new NUnitTest::ArgumentBuilder(L"nunit-testui-runner-x86.exe", fileName, runner, observer));
+		return std::unique_ptr<ArgumentBuilder>(new NUnitTest::ArgumentBuilder(L"nunit-runner-x86.exe", fileName, runner, observer));
 
 	throw std::runtime_error("This is not a supported unit test executable");
 }

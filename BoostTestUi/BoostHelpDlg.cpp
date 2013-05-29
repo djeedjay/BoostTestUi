@@ -49,7 +49,7 @@ void SampleContextMenu(CWindow wnd, CRichEditCtrl& ctrl, CPoint pt)
 
 void CBoostHelpDlg::OnContextMenu(CWindow wnd, CPoint pt)
 {
-	SampleContextMenu(wnd, m_sample, pt);
+	SampleContextMenu(*this, m_sample, pt);
 }
 
 void CBoostHelpDlg::OnCopy(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)
