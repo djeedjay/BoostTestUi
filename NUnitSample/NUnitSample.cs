@@ -26,6 +26,14 @@
 		}
 
 		[Test]
+		[Explicit]
+		public void NullException()
+		{
+			string name = null;
+			name.IndexOf('x');
+		}
+
+		[Test]
 		public void Wait1()
 		{
 			System.Console.WriteLine("Waiting");

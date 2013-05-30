@@ -1,4 +1,11 @@
-﻿namespace TestRunner
+﻿//  (C) Copyright Gert-Jan de Vos 2012.
+//  Distributed under the Boost Software License, Version 1.0.
+//  (See accompanying file LICENSE_1_0.txt or copy at 
+//  http://www.boost.org/LICENSE_1_0.txt)
+
+//  See http://www.nunit.org/ for the NUnit test library home page.
+
+namespace TestRunner
 {
 	class TestItem
 	{
@@ -15,6 +22,24 @@
 		}
 	}
 
+	static class Reflection
+	{
+		public static bool HasAttribute(System.Reflection.ICustomAttributeProvider provider, string attributeName, bool inherit)
+		{
+			foreach (var attribute in provider.GetCustomAttributes(inherit))
+			{
+				if (attribute.GetType().FullName == attributeName)
+					return true;
+			}
+			return false;
+		}
+
+		public static bool HasAttribute(System.Reflection.ICustomAttributeProvider provider, System.Type attributeType, bool inherit)
+		{
+			return HasAttribute(provider, attributeType.FullName, inherit);
+		}
+	}
+
 	class Test : TestItem
 	{
 		System.Reflection.MethodInfo methodInfo;
@@ -24,7 +49,7 @@
 		public Test(System.Reflection.MethodInfo methodInfo) : base(methodInfo.Name)
 		{
 			this.methodInfo = methodInfo;
-			HasExplicitAttribute = methodInfo.GetCustomAttributes(typeof(NUnit.Framework.ExplicitAttribute), true).Length > 0;
+			HasExplicitAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.ExplicitAttribute), false);
 		}
 
 		private string GetClientStackTrace(System.Exception e)
@@ -112,7 +137,7 @@
 		public TestFixtureClass(string name, System.Type type) : base(name)
 		{
 			fullName = type.FullName;
-			HasExplicitAttribute = type.GetCustomAttributes(typeof(NUnit.Framework.ExplicitAttribute), true).Length > 0;
+			HasExplicitAttribute = Reflection.HasAttribute(type, typeof(NUnit.Framework.ExplicitAttribute), false);
 			Tests = new System.Collections.Generic.List<Test>();
 			ctorInfo = type.GetConstructor(System.Type.EmptyTypes);
 			if (ctorInfo == null)
@@ -121,20 +146,20 @@
 			var methods = type.GetMethods();
 			foreach (var methodInfo in methods)
 			{
-				if (methodInfo.GetCustomAttributes(typeof(NUnit.Framework.TestAttribute), true).Length == 1 &&
-					methodInfo.GetCustomAttributes(typeof(NUnit.Framework.IgnoreAttribute), true).Length == 0)
+				if (Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestAttribute), false) &&
+					!Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.IgnoreAttribute), false))
 					Tests.Add(new Test(methodInfo));
 
-				if (methodInfo.GetCustomAttributes(typeof(NUnit.Framework.TestFixtureSetUpAttribute), true).Length == 1)
+				if (Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestFixtureSetUpAttribute), false))
 					testFixtureSetUp.Add(methodInfo);
 
-				if (methodInfo.GetCustomAttributes(typeof(NUnit.Framework.SetUpAttribute), true).Length == 1)
+				if (Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.SetUpAttribute), false))
 					setUp.Add(methodInfo);
 
-				if (methodInfo.GetCustomAttributes(typeof(NUnit.Framework.TearDownAttribute), true).Length == 1)
+				if (Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TearDownAttribute), false))
 					tearDown.Add(methodInfo);
 
-				if (methodInfo.GetCustomAttributes(typeof(NUnit.Framework.TestFixtureTearDownAttribute), true).Length == 1)
+				if (Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestFixtureTearDownAttribute), false))
 					testFixtureTearDown.Add(methodInfo);
 			}
 		}
@@ -213,7 +238,7 @@
 			System.Type[] classes = lib.GetExportedTypes();
 			foreach (System.Type type in classes)
 			{
-				if (type.IsClass && type.GetCustomAttributes(typeof(NUnit.Framework.TestFixtureAttribute), true).Length == 1)
+				if (type.IsClass && Reflection.HasAttribute(type, typeof(NUnit.Framework.TestFixtureAttribute), false))
 					global.Add(type.FullName, type);
 			}
 		}
@@ -326,18 +351,19 @@
 		{
 			System.Console.WriteLine("#SuiteStarted {0}", fixtureClass.Id);
 
+			bool setupDone = false;
 			TestFixture fixture = null;
 			try
 			{
 				fixture = fixtureClass.CreateInstance();
 
 				fixture.TestFixtureSetUp();
+				setupDone = true;
 				foreach (var test in GetItemOrder(fixtureClass.Tests))
 				{
 					if (filter.Match(path + '.' + test.Name))
 						Run(path, fixture, test);
 				}
-				fixture.TestFixtureTearDown();
 			}
 			catch (System.Exception e)
 			{
@@ -345,17 +371,19 @@
 			}
 			finally
 			{
-				if (fixture != null)
-					fixture.TearDown();
+				if (setupDone)
+					fixture.TestFixtureTearDown();
 			}
 			System.Console.WriteLine("#SuiteFinished {0} {1}", fixtureClass.Id, 0);
 		}
 
 		static private void Run(string path, TestFixture fixture, Test test)
 		{
+			bool setupDone = false;
 			try
 			{
 				fixture.SetUp();
+				setupDone = true;
 				test.Run(fixture);
 			}
 			catch (System.Exception e)
@@ -364,7 +392,8 @@
 			}
 			finally
 			{
-				fixture.TearDown();
+				if (setupDone)
+					fixture.TearDown();
 			}
 		}
 	}
@@ -444,7 +473,6 @@
 		static bool wait = false;
 		static bool run = false;
 		static int randomize = -1;
-		static bool test = false;
 		static TestCaseFilter filter = null;
 
 		static void HandleOption(string arg)
@@ -464,10 +492,6 @@
 			else if (arg.ToLower() == "wait")
 			{
 				wait = true;
-			}
-			else if (arg.ToLower() == "test")
-			{
-				test = true;
 			}
 			else if (arg.ToLower() == "randomize")
 			{
@@ -499,32 +523,21 @@
 			System.Console.ReadLine();
 		}
 
-		static void Test(string name)
-		{
-			var lib = System.Reflection.Assembly.LoadFile(name);
-			System.Type[] classes = lib.GetExportedTypes();
-			foreach (System.Type type in classes)
-			{
-				var fullName = type.FullName;
-				if (fullName.StartsWith("NUnit.Framework.") && fullName.EndsWith("Attribute"))
-					System.Console.WriteLine(fullName);
-			}
-		}
-
 		static void Main(string[] args)
 		{
 			var libs = ReadOptions(args);
 			foreach (string lib in libs)
 			{
-				TestLib testLib = new TestLib(lib, randomize);
-				if (list)
-					testLib.List();
-				if (wait)
-					Wait();
-				if (run)
-					testLib.Run(filter);
-				if (test)
-					Test(lib);
+				using (AssemblyResolver resolver = new AssemblyResolver(System.IO.Path.GetDirectoryName(lib)))
+				{
+					TestLib testLib = new TestLib(lib, randomize);
+					if (list)
+						testLib.List();
+					if (wait)
+						Wait();
+					if (run)
+						testLib.Run(filter);
+				}
 			}
 		}
 	}

@@ -267,7 +267,7 @@ void CTreeView::EnterTestSuite(unsigned id, const std::string& name, bool check)
 	m_parents.push_back(hItem);
 	++m_levels[m_depth];
 	++m_depth;
-	if (m_depth >= m_levels.size())
+	if (m_depth >= static_cast<int>(m_levels.size()))
 		m_levels.push_back(0);
 }
 
@@ -284,7 +284,7 @@ void CTreeView::ExpandToDepth(HTREEITEM hItem, int depth)
 
 void CTreeView::ExpandToView()
 {
-	int count = 0;
+	unsigned count = 0;
 	int depth = 0;
 	for (auto it = m_levels.begin(); it != m_levels.end(); ++it)
 	{

@@ -37,6 +37,7 @@ public:
 
 	virtual unsigned GetEnabledOptions(unsigned options);
 	virtual bool IsRunning() const override;
+	virtual void SetRepeat(bool repeat) override;
 	virtual void Run(int logLevel, unsigned options) override;
 	virtual void Continue() override;
 	virtual void Abort() override;

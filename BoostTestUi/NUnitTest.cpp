@@ -163,26 +163,12 @@ fs::wpath GetNUnitPath()
 
 std::wstring ArgumentBuilder::GetExePathName()
 {
-	fs::wpath paths[] =
-	{
-//		GetParentPath(m_fileName),
-		GetTestUiPath(),
-//		GetNUnitPath()
-	};
 	fs::wpath runner(m_exeName);
-	for (auto it = std::begin(paths); it != std::end(paths); ++it)
-	{
-		fs::wpath exePath(*it / runner);
-		if (fs::exists(exePath))
-			return exePath.wstring();
-	}
-
-	throw std::runtime_error(stringbuilder() << "Please install " << runner.string());
+	return fs::wpath(GetTestUiPath() / runner).wstring();
 }
 
 std::wstring ArgumentBuilder::GetListArg()
 {
-//	return L"/nologo /process:Single /nothread /noshadow /gui_list " + m_fileName;
 	return L"/list " + m_fileName;
 }
 
@@ -258,9 +244,6 @@ std::string LoadTestUnits(TestUnitNode& node, std::istream& is, int indent = 0)
 
 void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const std::string&)
 {
-//	std::string line;
-//	std::getline(is, line);
-//	std::getline(is, line);
 	NUnitTest::LoadTestUnits(tree, is);
 }
 
@@ -272,7 +255,6 @@ unsigned ArgumentBuilder::GetEnabledOptions(unsigned options) const
 std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsigned& options)
 {
 	std::wostringstream args;
-//	args << L"/nologo /process:Single /nothread /noshadow /noxml /labels /trace:verbose /gui_run";
 	if (options & ExeRunner::Randomize)
 		args << L" /randomize";
 	if (options & ExeRunner::WaitForDebugger)
@@ -280,8 +262,9 @@ std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsign
 
 	GetEnableArg2 getArg;
 	runner.TraverseTestTree(getArg);
+	args << L" /run";
 	if (!getArg.AllCases())
-		args << L" /run:" << getArg.GetArg();
+		args << L":" << getArg.GetArg();
 	args << L" " << m_fileName;
 	return args.str();
 }

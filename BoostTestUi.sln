@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nunit-runner", "nunit-runne
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nunit-runner-x86", "nunit-runner\nunit-runner-x86.csproj", "{C3A33ED7-988C-4460-91B7-134B54F35024}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MakeZip", "MakeZip\MakeZip.vcxproj", "{2F5C543C-053C-4699-9E4F-B3B3D1338EE5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +119,20 @@ Global
 		{C3A33ED7-988C-4460-91B7-134B54F35024}.Release|x64.ActiveCfg = Release|x86
 		{C3A33ED7-988C-4460-91B7-134B54F35024}.Release|x86.ActiveCfg = Release|x86
 		{C3A33ED7-988C-4460-91B7-134B54F35024}.Release|x86.Build.0 = Release|x86
+		{2F5C543C-053C-4699-9E4F-B3B3D1338EE5}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{2F5C543C-053C-4699-9E4F-B3B3D1338EE5}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{2F5C543C-053C-4699-9E4F-B3B3D1338EE5}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{2F5C543C-053C-4699-9E4F-B3B3D1338EE5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2F5C543C-053C-4699-9E4F-B3B3D1338EE5}.Debug|Win32.Build.0 = Debug|Win32
+		{2F5C543C-053C-4699-9E4F-B3B3D1338EE5}.Debug|x64.ActiveCfg = Debug|Win32
+		{2F5C543C-053C-4699-9E4F-B3B3D1338EE5}.Debug|x86.ActiveCfg = Debug|Win32
+		{2F5C543C-053C-4699-9E4F-B3B3D1338EE5}.Release|Any CPU.ActiveCfg = Release|Win32
+		{2F5C543C-053C-4699-9E4F-B3B3D1338EE5}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{2F5C543C-053C-4699-9E4F-B3B3D1338EE5}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{2F5C543C-053C-4699-9E4F-B3B3D1338EE5}.Release|Win32.ActiveCfg = Release|Win32
+		{2F5C543C-053C-4699-9E4F-B3B3D1338EE5}.Release|Win32.Build.0 = Release|Win32
+		{2F5C543C-053C-4699-9E4F-B3B3D1338EE5}.Release|x64.ActiveCfg = Release|Win32
+		{2F5C543C-053C-4699-9E4F-B3B3D1338EE5}.Release|x86.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

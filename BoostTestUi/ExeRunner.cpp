@@ -101,7 +101,7 @@ void ExeRunner::EnableTestUnit(unsigned id, bool enable)
 unsigned ExeRunner::GetEnabledOptions(unsigned options)
 {
 	unsigned enabled = m_pArgBuilder->GetEnabledOptions(options);
-	if ((options & ~enabled & ExeRunner::Repeat) != 0)
+	if ((options & ExeRunner::Repeat) != 0)
 		enabled = (enabled & ~ExeRunner::WaitForDebugger) | ExeRunner::Repeat;
 	return enabled;
 }
@@ -109,6 +109,11 @@ unsigned ExeRunner::GetEnabledOptions(unsigned options)
 bool ExeRunner::IsRunning() const
 {
 	return m_pThread.get() != nullptr;
+}
+
+void ExeRunner::SetRepeat(bool repeat)
+{
+	m_repeat = repeat;
 }
 
 void ExeRunner::Run(int logLevel, unsigned options)

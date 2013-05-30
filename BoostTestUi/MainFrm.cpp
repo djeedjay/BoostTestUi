@@ -112,7 +112,7 @@ void CMainFrame::UpdateUI()
 	UIEnable(ID_FILE_SAVE, isLoaded);
 	UIEnable(ID_FILE_SAVE_AS, isLoaded);
 	UIEnable(ID_TEST_RANDOMIZE, (enabled & TestRunner::Randomize) != 0);
-	UIEnable(ID_TEST_REPEAT, isLoaded && !isRunning);
+	UIEnable(ID_TEST_REPEAT, isLoaded);
 	UIEnable(ID_TEST_DEBUGGER, (enabled & TestRunner::WaitForDebugger) != 0);
 	UIEnable(ID_TREE_RUN, isRunnable);
 	UIEnable(ID_TREE_RUN_CHECKED, isRunnable);
@@ -756,6 +756,7 @@ void CMainFrame::OnTestRandomize(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wn
 void CMainFrame::OnTestRepeat(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_repeat = !m_repeat;
+	m_pRunner->SetRepeat(m_repeat);
 	UpdateUI();
 }
 
