@@ -153,6 +153,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TestRunner.cpp" />
+    <ClCompile Include="TestStateStorage.cpp" />
     <ClCompile Include="TreeView.cpp" />
     <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
@@ -180,6 +181,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="streamredirector.h" />
     <ClInclude Include="TestRunner.h" />
+    <ClInclude Include="TestStateStorage.h" />
     <ClInclude Include="TreeView.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="version.h" />

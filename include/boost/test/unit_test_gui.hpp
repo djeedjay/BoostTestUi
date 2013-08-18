@@ -13,7 +13,7 @@
 #include <iostream>
 #include <iomanip>
 #include <boost/test/unit_test.hpp>
-#if BOOST_VERSION > 105200
+#if BOOST_VERSION > 105400
 #	include <boost/test/tree/visitor.hpp>
 #endif
 #include <boost/test/execution_monitor.hpp>
@@ -26,7 +26,7 @@ namespace boost {
 namespace unit_test {
 namespace gui {
 
-#if BOOST_VERSION <= 105200
+#if BOOST_VERSION <= 105400
 
 const test_unit_type TUT_ANY = tut_any;
 const test_unit_type TUT_CASE = tut_case;

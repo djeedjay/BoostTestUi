@@ -216,32 +216,6 @@ void CMainFrame::OnFileExit(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*
 	PostMessage(WM_CLOSE);
 }
 
-class GetTestUnits : public TestTreeVisitor
-{
-public:
-	explicit GetTestUnits(CMainFrame& app) : m_pApp(&app)
-	{
-	}
-
-    virtual void VisitTestCase(TestCase& tc) override
-	{
-		m_pApp->AddTestCase(tc);
-	}
-
-	virtual void EnterTestSuite(TestSuite& ts) override
-	{
-		m_pApp->EnterTestSuite(ts);
-	}
-
-	virtual void LeaveTestSuite() override
-	{
-		m_pApp->LeaveTestSuite();
-	}
-
-private:
-	CMainFrame* m_pApp;
-};
-
 class CountTestCases : public TestTreeVisitor
 {
 public:
@@ -285,21 +259,86 @@ private:
 	int m_count;
 };
 
-void CMainFrame::AddTestCase(const TestCase& tc)
+class TestCaseLoader : public TestTreeVisitor
 {
-	m_treeView.AddTestCase(tc.id, tc.name, tc.enabled);
-	++m_testCaseCount;
-}
+public:
+	explicit TestCaseLoader(CTreeView& treeView) :
+		m_treeView(treeView),
+		m_testCaseCount(0)
+	{
+	}
 
-void CMainFrame::EnterTestSuite(const TestSuite& ts)
-{
-	m_treeView.EnterTestSuite(ts.id, ts.name, ts.enabled);
-}
+    virtual void VisitTestCase(TestCase& tc) override
+	{
+		m_treeView.AddTestCase(tc.id, tc.name, tc.enabled);
+		++m_testCaseCount;
+	}
 
-void CMainFrame::LeaveTestSuite()
+	virtual void EnterTestSuite(TestSuite& ts) override
+	{
+		m_treeView.EnterTestSuite(ts.id, ts.name, ts.enabled);
+	}
+
+	virtual void LeaveTestSuite() override
+	{
+		m_treeView.LeaveTestSuite();
+	}
+
+	int TestCaseCount() const
+	{
+		return m_testCaseCount;
+	}
+
+private:
+	CTreeView& m_treeView;
+	int m_testCaseCount;
+};
+
+class TestCaseStateSaveVisitor : public TestTreeVisitor
 {
-	m_treeView.LeaveTestSuite();
-}
+public:
+	TestCaseStateSaveVisitor(TestStateStorage& testState, const CTreeView& treeView) :
+		m_testState(testState),
+		m_treeView(treeView)
+	{
+	}
+
+	void VisitTestCase(TestCase& tc)
+	{
+		m_testState.SaveState(tc, m_treeView.IsChecked(tc.id));
+	}
+
+	void EnterTestSuite(TestSuite& ts)
+	{
+		m_testState.SaveState(ts, m_treeView.IsChecked(ts.id));
+	}
+
+private:
+	TestStateStorage& m_testState;
+	const CTreeView& m_treeView;
+};
+
+class TestCaseStateRestoreVisitor : public TestTreeVisitor
+{
+public:
+	explicit TestCaseStateRestoreVisitor(const TestStateStorage& testState) :
+		m_testState(testState)
+	{
+	}
+
+	void VisitTestCase(TestCase& tc)
+	{
+		m_testState.RestoreState(tc);
+	}
+
+	void EnterTestSuite(TestSuite& ts)
+	{
+		m_testState.RestoreState(ts);
+	}
+
+private:
+	const TestStateStorage& m_testState;
+};
 
 void CMainFrame::EnQueue(const std::function<void ()>& fn)
 {
@@ -355,6 +394,24 @@ bool operator!=(const FILETIME& ft1, const FILETIME& ft2)
 	return !(ft1 == ft2);
 }
 
+void CMainFrame::SaveTestState()
+{
+	if (!m_pRunner)
+		return;
+
+	m_testStateStorage.Clear();
+	TestCaseStateSaveVisitor vis(m_testStateStorage, m_treeView);
+	m_pRunner->TraverseTestTree(vis);
+}
+
+void CMainFrame::RestoreTestState()
+{
+	if (!m_pRunner)
+		return;
+	TestCaseStateRestoreVisitor vis(m_testStateStorage);
+	m_pRunner->TraverseTestTree(vis);
+}
+
 void CMainFrame::OnTimer(UINT_PTR /*nIDEvent*/)
 {
 	if (!m_pRunner || m_pRunner->IsRunning())
@@ -371,6 +428,7 @@ void CMainFrame::OnTimer(UINT_PTR /*nIDEvent*/)
 	if (fileTime == m_fileTime)
 		return;
 
+	SaveTestState();
 	Load(m_pathName);
 }
 
@@ -413,8 +471,11 @@ void CMainFrame::Load(const std::wstring& fileName, int mruId)
 	m_failedTestCount = 0;
 	m_treeView.Clear();
 	m_logView.Clear();
-	GetTestUnits getUnits(*this);
-	m_pRunner->TraverseTestTree(getUnits);
+	RestoreTestState();
+	m_testStateStorage.Clear();
+	TestCaseLoader loadTestCases(m_treeView);
+	m_pRunner->TraverseTestTree(loadTestCases);
+	m_testCaseCount = loadTestCases.TestCaseCount();
 	m_treeView.ExpandToView();
 
 	m_progressBar.SetPos(0);
@@ -603,6 +664,7 @@ void CMainFrame::test_iteration_start(unsigned test_cases_amount)
 	{
 		m_currentId = m_pRunner->RootTestSuite().id;
 		m_progressBar.SetPos(0);
+		m_progressBar.SetState(PBST_NORMAL);
 		m_progressBar.SetBarColor(SuccessColor);
 		m_treeView.ResetTreeImages();
 	});
@@ -661,6 +723,7 @@ void CMainFrame::EndTestCase(unsigned id, unsigned long /*elapsed*/, bool succee
 
 	if (!succeeded)
 	{
+		m_progressBar.SetState(PBST_ERROR);
 		m_progressBar.SetBarColor(FailColor);
 		++m_failedTestCount;
 	}
@@ -668,6 +731,7 @@ void CMainFrame::EndTestCase(unsigned id, unsigned long /*elapsed*/, bool succee
 	++m_testsRunCount;
 	UpdateStatusBar();
 	m_progressBar.OffsetPos(1);
+	m_progressBar.SetPos(m_progressBar.GetPos()); // Win7 progress bar is one off when calling SetPos() just once ?!
 }
 
 void CMainFrame::test_suite_finish(unsigned id, unsigned long /*elapsed*/)
@@ -713,6 +777,7 @@ void CMainFrame::assertion_result(bool passed)
 	EnQueue([this]()
 	{
 		m_testCaseFailed = true;
+		m_progressBar.SetState(PBST_ERROR);
 		m_progressBar.SetBarColor(FailColor);
 	});
 }
@@ -723,6 +788,7 @@ void CMainFrame::exception_caught(const std::string& /*what*/)
 	EnQueue([this, id]()
 	{
 		m_testCaseFailed = true;
+		m_progressBar.SetState(PBST_ERROR);
 		m_progressBar.SetBarColor(FailColor);
 		UpdateStatusBar();
 	});
@@ -926,6 +992,7 @@ void CMainFrame::SaveSettings()
 
 	m_mru.WriteToRegistry(RegistryPath);
 }
+
 
 class SingleTestCaseSelector : public TestTreeVisitor
 {

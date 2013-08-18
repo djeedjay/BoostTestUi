@@ -28,6 +28,7 @@ struct TestUnit
 	unsigned id;
 	Type type;
 	std::string name;
+	std::string fullName;
 	bool enabled;
 };
 

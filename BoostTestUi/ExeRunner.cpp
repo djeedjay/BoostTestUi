@@ -18,6 +18,37 @@
 
 namespace gj {
 
+class PathNameVisitor : public TestTreeVisitor
+{
+public:
+    virtual void VisitTestCase(TestCase& tc) override
+	{
+		tc.fullName = GetFullName(tc.name); 
+	}
+
+	virtual void EnterTestSuite(TestSuite& ts) override
+	{
+		m_path = GetFullName(ts.name);
+		ts.fullName = m_path;
+		m_suites.push_back(&ts);
+	}
+
+	virtual void LeaveTestSuite() override
+	{
+		m_suites.pop_back();
+		m_path = m_suites.empty() ? "" : m_suites.back()->fullName;
+	}
+
+private:
+	std::string GetFullName(const std::string& name)
+	{
+		return m_path.empty() ? name : m_path + "." + name;
+	}
+
+	std::string m_path;
+	std::vector<TestSuite*> m_suites;
+};
+
 void ExeRunner::Load()
 {
 	Process proc(m_pArgBuilder->GetExePathName(), m_pArgBuilder->GetListArg());
@@ -27,6 +58,9 @@ void ExeRunner::Load()
 	m_pArgBuilder->LoadTestUnits(m_tree, hs, Str(proc.GetName()));
 	if (m_tree.children.empty())
 		throw std::runtime_error("No test cases");
+
+	PathNameVisitor setFullNames;
+	TraverseTestTree(setFullNames);
 }
 
 std::unique_ptr<ArgumentBuilder> CreateArgumentBuilder(const std::wstring& fileName, ExeRunner& runner, TestObserver& observer)
