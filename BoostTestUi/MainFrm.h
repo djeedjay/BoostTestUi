@@ -23,6 +23,7 @@
 #include "TreeView.h"
 #include "LogView.h"
 #include "TestRunner.h"
+#include "TestStateStorage.h"
 
 namespace gj {
 
@@ -39,10 +40,6 @@ public:
 	DECLARE_FRAME_WND_CLASS(nullptr, IDR_MAINFRAME)
 
 	void SetLogHighLight(unsigned id);
-
-	void AddTestCase(const TestCase& tc);
-	void EnterTestSuite(const TestSuite& ts);
-	void LeaveTestSuite();
 
 	void AddLogMessage(const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg);
 	void SelectItem(unsigned id);
@@ -139,6 +136,8 @@ public:
 private:
 	void UpdateUI();
 	void UpdateStatusBar();
+	void SaveTestState();
+	void RestoreTestState();
 	void Load(const std::wstring& fileName, int mruId = 0);
 	void CreateHpp(int resourceId, const std::wstring& fileName);
 	unsigned GetOptions() const;
@@ -165,6 +164,7 @@ private:
 	CLogView m_logView;
 	CRecentDocumentList m_mru;
 	std::unique_ptr<TestRunner> m_pRunner;
+	TestStateStorage m_testStateStorage;
 	unsigned m_currentId;
 	bool m_autoRun;
 	bool m_logAutoClear;
