@@ -71,6 +71,12 @@
 		}
 
 		[Test]
+		public void Values([Values("one", "two", "three")] string s)
+		{
+			System.Console.WriteLine("Value: \"{0}\"", s);
+		}
+
+		[Test]
 		public void MultiplyCombinatorial([Values(1, 2, 3)] double a, [Values(4, 5, 6)] double b)
 		{
 			Assert.AreEqual(a * b, b * a);

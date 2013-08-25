@@ -9,6 +9,54 @@ namespace TestRunner
 {
 	using System.Linq;
 
+	class TestReporter
+	{
+		private static int BoolAsInt(bool b)
+		{
+			return b ? 1 : 0;
+		}
+
+		public void BeginRun()
+		{
+			System.Console.WriteLine("#RunStarted {0}", 0);
+		}
+
+		public void BeginSuite(TestItem suite)
+		{
+			System.Console.WriteLine("#SuiteStarted {0}", suite.Id);
+			System.Console.WriteLine("Entering test suite {0}", suite.Name);
+		}
+
+		public void BeginTest(TestItem test)
+		{
+			System.Console.WriteLine("#TestStarted {0}", test.Id);
+			System.Console.WriteLine("Entering test case {0}", test.Name);
+		}
+
+		public void Exception(string message)
+		{
+			System.Console.WriteLine("Exception: {0}", message);
+			System.Console.WriteLine("#Exception");
+		}
+
+		public void EndTest(TestItem test, int ms, bool success)
+		{
+			System.Console.WriteLine("Leaving test case {0}", test.Name);
+			System.Console.WriteLine("#TestFinished {0} {1} {2}", test.Id, ms, BoolAsInt(success));
+		}
+
+		public void EndSuite(TestItem suite, int ms)
+		{
+			System.Console.WriteLine("Leaving test suite {0}", suite.Name);
+			System.Console.WriteLine("#SuiteFinished {0} {1}", suite.Id, ms);
+		}
+
+		public void EndRun()
+		{
+			System.Console.WriteLine("#RunFinished {0}", 0);
+		}
+	};
+
 	class TestItem
 	{
 		public int Id { get; private set; }
@@ -82,21 +130,20 @@ namespace TestRunner
 			return index < 0 ? e.StackTrace : e.StackTrace.Substring(index + 1);
 		}
 
-		public static void Report(System.Reflection.TargetInvocationException e)
+		public static void Report(System.Reflection.TargetInvocationException e, TestReporter reporter)
 		{
-			Report(e.InnerException);
+			Report(e.InnerException, reporter);
 		}
 
-		public static void Report(System.Exception e)
+		public static void Report(System.Exception e, TestReporter reporter)
 		{
 			if (e is System.Reflection.TargetInvocationException)
 			{
-				Report(e as System.Reflection.TargetInvocationException);
+				Report(e as System.Reflection.TargetInvocationException, reporter);
 				return;
 			}
 
-			System.Console.WriteLine("Exception: " + e.Message + "\n" + GetClientStackTrace(e));
-			System.Console.WriteLine("#Exception");
+			reporter.Exception(e.Message + "\n" + GetClientStackTrace(e));
 		}
 	}
 
@@ -172,9 +219,20 @@ namespace TestRunner
 			this.arguments = args;
 		}
 
-		public void Run(TestFixture fixture)
+		public void Run(TestFixture fixture, TestReporter reporter)
 		{
-			fixture.Invoke(methodInfo, arguments);
+			reporter.BeginTest(this);
+			bool success = false;
+			try
+			{
+				fixture.Invoke(methodInfo, arguments);
+				success = true;
+			}
+			catch (System.Exception e)
+			{
+				Exception.Report(e, reporter);
+			}
+			reporter.EndTest(this, 0, success);
 		}
 	}
 
@@ -256,31 +314,31 @@ namespace TestRunner
 			}
 		}
 
-		public void Run(TestFixture fixture)
+		public void Run(TestFixture fixture, TestReporter reporter)
 		{
-			System.Console.WriteLine("#TestStarted {0}", Id);
-			int success = 0;
+			if (TestCases.Count > 0)
+			{
+				reporter.BeginSuite(this);
+				foreach (var testCase in TestCases)
+				{
+					testCase.Run(fixture, reporter);
+				}
+				reporter.EndSuite(this, 0);
+				return;
+			}
+
+			reporter.BeginTest(this);
+			bool success = false;
 			try
 			{
-				System.Console.WriteLine(Name);
-				if (TestCases.Count == 0)
-				{
-					fixture.Invoke(methodInfo);
-				}
-				else
-				{
-					foreach (var testCase in TestCases)
-					{
-						testCase.Run(fixture);
-					}
-				}
-				success = 1;
+				fixture.Invoke(methodInfo);
+				success = true;
 			}
 			catch (System.Exception e)
 			{
-				Exception.Report(e);
+				Exception.Report(e, reporter);
 			}
-			System.Console.WriteLine("#TestFinished {0} {1} {2}", Id, 0, success);
+			reporter.EndTest(this, 0, success);
 		}
 	}
 
@@ -536,11 +594,11 @@ namespace TestRunner
 			}
 		}
 
-		public void Run(TestCaseFilter filter)
+		public void Run(TestCaseFilter filter, TestReporter reporter)
 		{
-			System.Console.WriteLine("#RunStarted {0}", 0);
-			Run("", global, filter);
-			System.Console.WriteLine("#RunFinished {0}", 0);
+			reporter.BeginRun();
+			Run("", global, filter, reporter);
+			reporter.EndRun();
 		}
 
 		public System.Collections.Generic.IList<T> GetItemOrder<T>(System.Collections.Generic.IList<T> items)
@@ -553,9 +611,9 @@ namespace TestRunner
 			return list;
 		}
 
-		private void Run(string path, TestNamespace ns, TestCaseFilter filter)
+		private void Run(string path, TestNamespace ns, TestCaseFilter filter, TestReporter reporter)
 		{
-			System.Console.WriteLine("#SuiteStarted {0}", ns.Id);
+			reporter.BeginSuite(ns);
 			foreach (var item in GetItemOrder(ns.Items))
 			{
 				string itemPath = path;
@@ -565,15 +623,15 @@ namespace TestRunner
 				if (filter.Match(itemPath))
 				{
 					if (item is TestNamespace)
-						Run(itemPath, item as TestNamespace, filter);
+						Run(itemPath, item as TestNamespace, filter, reporter);
 					if (item is TestFixtureClass)
-						Run(itemPath, item as TestFixtureClass, filter);
+						Run(itemPath, item as TestFixtureClass, filter, reporter);
 				}
 			}
-			System.Console.WriteLine("#SuiteFinished {0} {1}", ns.Id, 0);
+			reporter.EndSuite(ns, 0);
 		}
 
-		static private void TestFixtureTearDown(TestFixture fixture)
+		static private void TestFixtureTearDown(TestFixture fixture, TestReporter reporter)
 		{
 			try
 			{
@@ -581,13 +639,13 @@ namespace TestRunner
 			}
 			catch (System.Exception e)
 			{
-				Exception.Report(e);
+				Exception.Report(e, reporter);
 			}
 		}
 
-		private void Run(string path, TestFixtureClass fixtureClass, TestCaseFilter filter)
+		private void Run(string path, TestFixtureClass fixtureClass, TestCaseFilter filter, TestReporter reporter)
 		{
-			System.Console.WriteLine("#SuiteStarted {0}", fixtureClass.Id);
+			reporter.BeginSuite(fixtureClass);
 
 			bool setupDone = false;
 			TestFixture fixture = null;
@@ -600,22 +658,22 @@ namespace TestRunner
 				foreach (var test in GetItemOrder(fixtureClass.Tests))
 				{
 					if (filter.Match(path + '.' + test.Name))
-						Run(path, fixture, test, filter);
+						Run(path, fixture, test, filter, reporter);
 				}
 			}
 			catch (System.Exception e)
 			{
-				Exception.Report(e);
+				Exception.Report(e, reporter);
 			}
 			finally
 			{
 				if (setupDone)
-					TestFixtureTearDown(fixture);
+					TestFixtureTearDown(fixture, reporter);
 			}
-			System.Console.WriteLine("#SuiteFinished {0} {1}", fixtureClass.Id, 0);
+			reporter.EndSuite(fixtureClass, 0);
 		}
 
-		static private void TearDown(TestFixture fixture)
+		static private void TearDown(TestFixture fixture, TestReporter reporter)
 		{
 			try
 			{
@@ -623,11 +681,11 @@ namespace TestRunner
 			}
 			catch (System.Exception e)
 			{
-				Exception.Report(e);
+				Exception.Report(e, reporter);
 			}
 		}
 
-		private void Run(string path, TestFixture fixture, Test test, TestCaseFilter filter)
+		private void Run(string path, TestFixture fixture, Test test, TestCaseFilter filter, TestReporter reporter)
 		{
 			bool setupDone = false;
 			try
@@ -636,25 +694,27 @@ namespace TestRunner
 				setupDone = true;
 				if (test.TestCases.Count == 0)
 				{
-					test.Run(fixture);
+					test.Run(fixture, reporter);
 				}
 				else
 				{
+					reporter.BeginSuite(test);
 					foreach (var testCase in GetItemOrder(test.TestCases))
 					{
-						if (filter.Match(path + '.' + test.Name))
-							testCase.Run(fixture);
+						if (filter.Match(path + '.' + test.Name + '.' + testCase.Name))
+							testCase.Run(fixture, reporter);
 					}
+					reporter.EndSuite(test, 0);
 				}
 			}
 			catch (System.Exception e)
 			{
-				Exception.Report(e);
+				Exception.Report(e, reporter);
 			}
 			finally
 			{
 				if (setupDone)
-					TearDown(fixture);
+					TearDown(fixture, reporter);
 			}
 		}
 	}
@@ -688,32 +748,32 @@ namespace TestRunner
 			{
 				switch (arg[i])
 				{
-					case '(':
-						if (!inQuotes)
-							++parens;
-						break;
-					case ')':
-						if (!inQuotes)
-							--parens;
-						break;
-					case '<':
-						if (!inQuotes)
-							++angles;
-						break;
-					case '>':
-						if (!inQuotes)
-							--angles;
-						break;
-					case '"':
-						inQuotes = !inQuotes;
-						break;
-					case ',':
-						if (!inQuotes && angles == 0 && parens == 0)
-						{
-							names.Add(arg.Substring(begin, i - begin));
-							begin = i + 1;
-						}
-						break;
+				case '(':
+					if (!inQuotes)
+						++parens;
+					break;
+				case ')':
+					if (!inQuotes)
+						--parens;
+					break;
+				case '<':
+					if (!inQuotes)
+						++angles;
+					break;
+				case '>':
+					if (!inQuotes)
+						--angles;
+					break;
+				case '"':
+					inQuotes = !inQuotes;
+					break;
+				case ',':
+					if (!inQuotes && angles == 0 && parens == 0)
+					{
+						names.Add(arg.Substring(begin, i - begin));
+						begin = i + 1;
+					}
+					break;
 				}
 			}
 			if (begin < arg.Length)
@@ -817,6 +877,7 @@ namespace TestRunner
 
 		static void Main(string[] args)
 		{
+			System.Console.WriteLine("Bogus startup message");
 			var libs = ReadOptions(args);
 			foreach (string lib in libs)
 			{
@@ -829,9 +890,7 @@ namespace TestRunner
 					if (wait)
 						Wait();
 					if (run)
-					{
-						testLib.Run(filter);
-					}
+						testLib.Run(filter, new TestReporter());
 				}
 			}
 		}
