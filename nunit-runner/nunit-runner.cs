@@ -7,6 +7,56 @@
 
 namespace TestRunner
 {
+	using System.Linq;
+
+	class TestReporter
+	{
+		private static int BoolAsInt(bool b)
+		{
+			return b ? 1 : 0;
+		}
+
+		public void BeginRun()
+		{
+			System.Console.WriteLine("#RunStarted {0}", 0);
+		}
+
+		public void BeginSuite(TestItem suite)
+		{
+			System.Console.WriteLine("#SuiteStarted {0}", suite.Id);
+			System.Console.WriteLine("Entering test suite {0}", suite.Name);
+		}
+
+		public void BeginTest(TestItem test)
+		{
+			System.Console.WriteLine("#TestStarted {0}", test.Id);
+			System.Console.WriteLine("Entering test case {0}", test.Name);
+		}
+
+		public void Exception(string message)
+		{
+			System.Console.WriteLine("Exception: {0}", message);
+			System.Console.WriteLine("#Exception");
+		}
+
+		public void EndTest(TestItem test, int ms, bool success)
+		{
+			System.Console.WriteLine("Leaving test case {0}", test.Name);
+			System.Console.WriteLine("#TestFinished {0} {1} {2}", test.Id, ms, BoolAsInt(success));
+		}
+
+		public void EndSuite(TestItem suite, int ms)
+		{
+			System.Console.WriteLine("Leaving test suite {0}", suite.Name);
+			System.Console.WriteLine("#SuiteFinished {0} {1}", suite.Id, ms);
+		}
+
+		public void EndRun()
+		{
+			System.Console.WriteLine("#RunFinished {0}", 0);
+		}
+	};
+
 	class TestItem
 	{
 		public int Id { get; private set; }
@@ -24,11 +74,41 @@ namespace TestRunner
 
 	static class Reflection
 	{
+		public static bool IsA(System.Type type, string typeName)
+		{
+			if (type.FullName == typeName)
+				return true;
+			else if (type == typeof(object))
+				return false;
+			else
+				return IsA(type.BaseType, typeName);
+		}
+
+		public static bool IsA(System.Type testType, System.Type baseType)
+		{
+			return IsA(testType, baseType.FullName);
+		}
+
+		public static object GetAttribute(System.Reflection.ICustomAttributeProvider provider, string attributeName, bool inherit)
+		{
+			foreach (var attribute in provider.GetCustomAttributes(inherit))
+			{
+				if (IsA(attribute.GetType(), attributeName))
+					return attribute;
+			}
+			return null;
+		}
+
+		public static object GetAttribute(System.Reflection.ICustomAttributeProvider provider, System.Type attributeType, bool inherit)
+		{
+			return GetAttribute(provider, attributeType.FullName, inherit);
+		}
+
 		public static bool HasAttribute(System.Reflection.ICustomAttributeProvider provider, string attributeName, bool inherit)
 		{
 			foreach (var attribute in provider.GetCustomAttributes(inherit))
 			{
-				if (attribute.GetType().FullName == attributeName)
+				if (IsA(attribute.GetType(), attributeName))
 					return true;
 			}
 			return false;
@@ -40,19 +120,9 @@ namespace TestRunner
 		}
 	}
 
-	class Test : TestItem
+	static class Exception
 	{
-		System.Reflection.MethodInfo methodInfo;
-
-		public bool HasExplicitAttribute { get; private set; }
-
-		public Test(System.Reflection.MethodInfo methodInfo) : base(methodInfo.Name)
-		{
-			this.methodInfo = methodInfo;
-			HasExplicitAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.ExplicitAttribute), false);
-		}
-
-		private string GetClientStackTrace(System.Exception e)
+		private static string GetClientStackTrace(System.Exception e)
 		{
 			int index = e.StackTrace.LastIndexOf("NUnit.Framework.Assert.");
 			if (index >= 0)
@@ -60,23 +130,272 @@ namespace TestRunner
 			return index < 0 ? e.StackTrace : e.StackTrace.Substring(index + 1);
 		}
 
-		public void Run(TestFixture fixture)
+		public static bool IsExpected(System.Reflection.TargetInvocationException e)
 		{
-			System.Console.WriteLine("#TestStarted {0}", Id);
-			int success = 0;
+			return IsExpected(e.InnerException);
+		}
+
+		public static bool IsExpected(System.Reflection.TargetInvocationException e, string expectedExceptionName)
+		{
+			return IsExpected(e.InnerException, expectedExceptionName);
+		}
+
+		public static bool IsExpected(System.Exception e)
+		{
+			if (e is System.Reflection.TargetInvocationException)
+			{
+				return IsExpected(e as System.Reflection.TargetInvocationException);
+			}
+			return e.GetType().FullName == typeof(NUnit.Framework.SuccessException).FullName;
+		}
+
+		public static bool IsExpected(System.Exception e, string expectedExceptionName)
+		{
+			if (e is System.Reflection.TargetInvocationException)
+			{
+				return IsExpected(e as System.Reflection.TargetInvocationException, expectedExceptionName);
+			}
+			return
+				e.GetType().FullName == typeof(NUnit.Framework.SuccessException).FullName ||
+				e.GetType().FullName == expectedExceptionName;
+		}
+
+		public static void Report(System.Reflection.TargetInvocationException e, TestReporter reporter)
+		{
+			Report(e.InnerException, reporter);
+		}
+
+		public static void Report(System.Exception e, TestReporter reporter)
+		{
+			if (e is System.Reflection.TargetInvocationException)
+			{
+				Report(e as System.Reflection.TargetInvocationException, reporter);
+				return;
+			}
+
+			reporter.Exception(e.Message + "\n" + GetClientStackTrace(e));
+		}
+	}
+
+	class Parameter
+	{
+		System.Reflection.ParameterInfo paramInfo;
+		object dataAttribute;
+		System.Reflection.MethodInfo methodInfo;
+
+		public Parameter(System.Reflection.ParameterInfo paramInfo)
+		{
+			this.paramInfo = paramInfo;
+			dataAttribute = Reflection.GetAttribute(paramInfo, typeof(NUnit.Framework.ParameterDataAttribute), false);
+			if (dataAttribute == null)
+				throw new System.Exception("Missing ParameterData Attribute");
+			methodInfo = dataAttribute.GetType().GetMethod("GetData");
+		}
+
+		public System.Collections.IEnumerable GetData()
+		{
+			return (System.Collections.IEnumerable)methodInfo.Invoke(dataAttribute, new object[] { paramInfo });
+		}
+	}
+
+	class TestCase : TestItem
+	{
+		System.Reflection.MethodInfo methodInfo;
+		object[] arguments;
+
+		static private string FormatArg(object arg)
+		{
+			if (arg == null)
+				return "null";
+			if (arg.GetType() == typeof(string))
+				return "\"" + arg.ToString() + "\"";
+			return arg.ToString();
+		}
+
+		static private string FormatMethod(ref System.Reflection.MethodInfo methodInfo, object[] args)
+		{
+			string s = methodInfo.Name;
+			if (methodInfo.IsGenericMethod)
+			{
+				s += "<";
+				bool first = true;
+				System.Type[] argTypes = args.Select(arg => arg.GetType()).ToArray();
+				methodInfo = methodInfo.MakeGenericMethod(argTypes);
+				foreach (var type in methodInfo.GetGenericArguments())
+				{
+					if (first)
+						first = false;
+					else
+						s += ",";
+					s += type.Name;
+				}
+				s += ">";
+			}
+
+			s += "(";
+			for (int i = 0; i < args.GetLength(0); ++i)
+			{
+				if (i > 0)
+					s += ",";
+				s += FormatArg(args[i]);
+			}
+			s += ")";
+			return s;
+		}
+
+		public TestCase(System.Reflection.MethodInfo methodInfo, object[] args) : base(FormatMethod(ref methodInfo, args))
+		{
+			this.methodInfo = methodInfo;
+			this.arguments = args;
+		}
+
+		public void Run(TestFixture fixture, TestReporter reporter)
+		{
+			reporter.BeginTest(this);
+			bool success = false;
+			bool setUpDone = false;
 			try
 			{
-				System.Console.WriteLine(Name);
-				fixture.Invoke(methodInfo);
-				success = 1;
+				fixture.SetUp();
+				setUpDone = true;
+				fixture.Invoke(methodInfo, arguments);
+				success = true;
 			}
-			catch (System.Reflection.TargetInvocationException e) // NUnit.Framework.AssertionException e)
+			catch (System.Exception e)
 			{
-				var ex = e.InnerException;
-				System.Console.WriteLine("Exception: " + ex.Message + "\n" + GetClientStackTrace(ex));
-				System.Console.WriteLine("#Exception");
+				if (Exception.IsExpected(e))
+					success = true;
+				else
+					Exception.Report(e, reporter);
 			}
-			System.Console.WriteLine("#TestFinished {0} {1} {2}", Id, 0, success);
+			finally
+			{
+				if (setUpDone)
+					fixture.TearDown();
+			}
+			reporter.EndTest(this, 0, success);
+		}
+	}
+
+	class Test : TestItem
+	{
+		System.Reflection.MethodInfo methodInfo;
+
+		public bool HasExplicitAttribute { get; private set; }
+
+		public System.Collections.Generic.List<TestCase> TestCases { get; private set; }
+
+		public Test(System.Reflection.MethodInfo methodInfo) : base(methodInfo.Name)
+		{
+			this.methodInfo = methodInfo;
+			this.TestCases = new System.Collections.Generic.List<TestCase>();
+			HasExplicitAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.ExplicitAttribute), false);
+
+			var parameterData = new System.Collections.Generic.List<System.Collections.IEnumerable>();
+			foreach (var paramInfo in methodInfo.GetParameters())
+			{
+				var p = new Parameter(paramInfo);
+				parameterData.Add(p.GetData());
+			}
+			if (parameterData.Count == 0)
+				return;
+
+			if (Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.SequentialAttribute), false))
+				AddSequentialParameterSet(parameterData);
+			else
+				AddCombinatorialParamaterSet(parameterData, 0, new object[parameterData.Count]);
+		}
+
+		void AddSequentialParameterSet(System.Collections.Generic.List<System.Collections.IEnumerable> parameterData)
+		{
+			int args = 0;
+			foreach (var values in parameterData)
+			{
+				int count = 0;
+				foreach (var value in values)
+					++count;
+				args = System.Math.Max(args, count);
+			}
+
+			var parameterSets = new System.Collections.Generic.List<object[]>();
+			for (int i = 0; i < args; ++i)
+				parameterSets.Add(new object[parameterData.Count]);
+
+			int arg = 0;
+			foreach (var values in parameterData)
+			{
+				int i = 0;
+				foreach (var value in values)
+				{
+					parameterSets[i][arg] = value;
+					++i;
+				}
+				++arg;
+			}
+
+			foreach (var parameterSet in parameterSets)
+			{
+				TestCases.Add(new TestCase(methodInfo, parameterSet));
+			}
+		}
+
+		void AddCombinatorialParamaterSet(System.Collections.Generic.List<System.Collections.IEnumerable> parameterData, int parameterIndex, object[] parameterSet)
+		{
+			if (parameterIndex == parameterData.Count)
+			{
+				TestCases.Add(new TestCase(methodInfo, (object[])parameterSet.Clone()));
+			}
+			else
+			{
+				foreach (var value in parameterData[parameterIndex])
+				{
+					parameterSet[parameterIndex] = value;
+					AddCombinatorialParamaterSet(parameterData, parameterIndex + 1, parameterSet);
+				}
+			}
+		}
+
+		public void Run(TestFixture fixture, TestReporter reporter)
+		{
+			var exception = Reflection.GetAttribute(methodInfo, typeof(NUnit.Framework.ExpectedExceptionAttribute), false);
+			string expectedExceptionName = null;
+			if (exception != null)
+				expectedExceptionName = (string)exception.GetType().GetProperty("ExpectedExceptionName").GetValue(exception, null);
+
+			if (TestCases.Count > 0)
+			{
+				reporter.BeginSuite(this);
+				foreach (var testCase in TestCases)
+				{
+					testCase.Run(fixture, reporter);
+				}
+				reporter.EndSuite(this, 0);
+				return;
+			}
+
+			reporter.BeginTest(this);
+			bool success = false;
+			bool setUpDone = false;
+			try
+			{
+				fixture.SetUp();
+				setUpDone = true;
+				fixture.Invoke(methodInfo);
+				success = true;
+			}
+			catch (System.Exception e)
+			{
+				if (Exception.IsExpected(e, expectedExceptionName))
+					success = true;
+				else
+					Exception.Report(e, reporter);
+			}
+			finally
+			{
+				if (setUpDone)
+					fixture.TearDown();
+			}
+			reporter.EndTest(this, 0, success);
 		}
 	}
 
@@ -104,6 +423,11 @@ namespace TestRunner
 		public void Invoke(System.Reflection.MethodInfo method)
 		{
 			method.Invoke(instance, null);
+		}
+
+		public void Invoke(System.Reflection.MethodInfo method, object[] parameters)
+		{
+			method.Invoke(instance, parameters);
 		}
 
 		public void TearDown()
@@ -243,9 +567,17 @@ namespace TestRunner
 			}
 		}
 
-		private static string Label(Test test)
+		private static string Label(Test test, TestCase testCase)
 		{
 			char type = test.HasExplicitAttribute ? 'c' : 'C';
+			return string.Format("{0}{1}:{2}", type, testCase.Id, testCase.Name);
+		}
+
+		private static string Label(Test test)
+		{
+			string type = test.TestCases.Count == 0 ? "C" : "S";
+			if (test.HasExplicitAttribute)
+				type = type.ToLower();
 			return string.Format("{0}{1}:{2}", type, test.Id, test.Name);
 		}
 
@@ -295,6 +627,15 @@ namespace TestRunner
 		static private void List(string indent, Test test)
 		{
 			System.Console.WriteLine(indent + Label(test));
+			foreach (var testCase in test.TestCases)
+			{
+				List(indent + "  ", test, testCase);
+			}
+		}
+
+		static private void List(string indent, Test test, TestCase testCase)
+		{
+			System.Console.WriteLine(indent + Label(test, testCase));
 		}
 
 		public void Shuffle<T>(System.Collections.Generic.IList<T> list)
@@ -310,11 +651,11 @@ namespace TestRunner
 			}
 		}
 
-		public void Run(TestCaseFilter filter)
+		public void Run(TestCaseFilter filter, TestReporter reporter)
 		{
-			System.Console.WriteLine("#RunStarted {0}", 0);
-			Run("", global, filter);
-			System.Console.WriteLine("#RunFinished {0}", 0);
+			reporter.BeginRun();
+			Run("", global, filter, reporter);
+			reporter.EndRun();
 		}
 
 		public System.Collections.Generic.IList<T> GetItemOrder<T>(System.Collections.Generic.IList<T> items)
@@ -322,14 +663,14 @@ namespace TestRunner
 			if (random == null)
 				return items;
 
-			System.Collections.Generic.IList<T> list = new System.Collections.Generic.List<T>(items);
+			var list = new System.Collections.Generic.List<T>(items);
 			Shuffle(list);
 			return list;
 		}
 
-		private void Run(string path, TestNamespace ns, TestCaseFilter filter)
+		private void Run(string path, TestNamespace ns, TestCaseFilter filter, TestReporter reporter)
 		{
-			System.Console.WriteLine("#SuiteStarted {0}", ns.Id);
+			reporter.BeginSuite(ns);
 			foreach (var item in GetItemOrder(ns.Items))
 			{
 				string itemPath = path;
@@ -339,17 +680,29 @@ namespace TestRunner
 				if (filter.Match(itemPath))
 				{
 					if (item is TestNamespace)
-						Run(itemPath, item as TestNamespace, filter);
+						Run(itemPath, item as TestNamespace, filter, reporter);
 					if (item is TestFixtureClass)
-						Run(itemPath, item as TestFixtureClass, filter);
+						Run(itemPath, item as TestFixtureClass, filter, reporter);
 				}
 			}
-			System.Console.WriteLine("#SuiteFinished {0} {1}", ns.Id, 0);
+			reporter.EndSuite(ns, 0);
 		}
 
-		private void Run(string path, TestFixtureClass fixtureClass, TestCaseFilter filter)
+		static private void TestFixtureTearDown(TestFixture fixture, TestReporter reporter)
 		{
-			System.Console.WriteLine("#SuiteStarted {0}", fixtureClass.Id);
+			try
+			{
+				fixture.TestFixtureTearDown();
+			}
+			catch (System.Exception e)
+			{
+				Exception.Report(e, reporter);
+			}
+		}
+
+		private void Run(string path, TestFixtureClass fixtureClass, TestCaseFilter filter, TestReporter reporter)
+		{
+			reporter.BeginSuite(fixtureClass);
 
 			bool setupDone = false;
 			TestFixture fixture = null;
@@ -362,38 +715,55 @@ namespace TestRunner
 				foreach (var test in GetItemOrder(fixtureClass.Tests))
 				{
 					if (filter.Match(path + '.' + test.Name))
-						Run(path, fixture, test);
+						Run(path, fixture, test, filter, reporter);
 				}
 			}
 			catch (System.Exception e)
 			{
-				System.Console.WriteLine("Error: " + e.ToString() + e.StackTrace);
+				Exception.Report(e, reporter);
 			}
 			finally
 			{
 				if (setupDone)
-					fixture.TestFixtureTearDown();
+					TestFixtureTearDown(fixture, reporter);
 			}
-			System.Console.WriteLine("#SuiteFinished {0} {1}", fixtureClass.Id, 0);
+			reporter.EndSuite(fixtureClass, 0);
 		}
 
-		static private void Run(string path, TestFixture fixture, Test test)
+		static private void TearDown(TestFixture fixture, TestReporter reporter)
 		{
-			bool setupDone = false;
 			try
 			{
-				fixture.SetUp();
-				setupDone = true;
-				test.Run(fixture);
+				fixture.TearDown();
 			}
 			catch (System.Exception e)
 			{
-				System.Console.WriteLine("Error: " + e.ToString());
+				Exception.Report(e, reporter);
 			}
-			finally
+		}
+
+		private void Run(string path, TestFixture fixture, Test test, TestCaseFilter filter, TestReporter reporter)
+		{
+			try
 			{
-				if (setupDone)
-					fixture.TearDown();
+				if (test.TestCases.Count == 0)
+				{
+					test.Run(fixture, reporter);
+				}
+				else
+				{
+					reporter.BeginSuite(test);
+					foreach (var testCase in GetItemOrder(test.TestCases))
+					{
+						if (filter.Match(path + '.' + test.Name + '.' + testCase.Name))
+							testCase.Run(fixture, reporter);
+					}
+					reporter.EndSuite(test, 0);
+				}
+			}
+			catch (System.Exception e)
+			{
+				Exception.Report(e, reporter);
 			}
 		}
 	}
@@ -415,23 +785,55 @@ namespace TestRunner
 	{
 		System.Collections.Generic.List<string> names = new System.Collections.Generic.List<string>();
 
+		public System.Collections.Generic.IList<string> Names { get { return names; } }
+
 		public TestCaseNameFilter(string arg)
 		{
+			int parens = 0;
+			int angles = 0;
+			bool inQuotes = false;
 			int begin = 0;
-			int end = arg.IndexOf(',');
-			while (end > 0)
+			for (int i = 0; i < arg.Length; ++i)
 			{
-				names.Add(arg.Substring(begin, end - begin));
-				begin = end + 1;
-				end = arg.IndexOf(',', begin);
+				switch (arg[i])
+				{
+				case '(':
+					if (!inQuotes)
+						++parens;
+					break;
+				case ')':
+					if (!inQuotes)
+						--parens;
+					break;
+				case '<':
+					if (!inQuotes)
+						++angles;
+					break;
+				case '>':
+					if (!inQuotes)
+						--angles;
+					break;
+				case '"':
+					inQuotes = !inQuotes;
+					break;
+				case ',':
+					if (!inQuotes && angles == 0 && parens == 0)
+					{
+						names.Add(arg.Substring(begin, i - begin));
+						begin = i + 1;
+					}
+					break;
+				}
 			}
-			names.Add(arg.Substring(begin));
+			if (begin < arg.Length)
+				names.Add(arg.Substring(begin));
 		}
 
 		public bool Match(string name)
 		{
 			int depth = Depth(name);
-			return names.Count == 0 || names.Exists(item => name.StartsWith(Prefix(item, depth)));
+			string n = name + ".";
+			return names.Count == 0 || names.Exists(item => n.StartsWith(Prefix(item, depth)));
 		}
 
 		static public string Prefix(string path, int depth)
@@ -446,7 +848,7 @@ namespace TestRunner
 				if (index < 0)
 					break;
 			}
-			return index < 0 ? path: path.Substring(0, index);
+			return index < 0 ? path + "." : path.Substring(0, index + 1);
 		}
 
 		static public int Depth(string path)
@@ -528,15 +930,16 @@ namespace TestRunner
 			var libs = ReadOptions(args);
 			foreach (string lib in libs)
 			{
-				using (AssemblyResolver resolver = new AssemblyResolver(System.IO.Path.GetDirectoryName(lib)))
+				var filename = System.IO.Path.GetFullPath(lib);
+				using (AssemblyResolver resolver = new AssemblyResolver(System.IO.Path.GetDirectoryName(filename)))
 				{
-					TestLib testLib = new TestLib(lib, randomize);
+					TestLib testLib = new TestLib(filename, randomize);
 					if (list)
 						testLib.List();
 					if (wait)
 						Wait();
 					if (run)
-						testLib.Run(filter);
+						testLib.Run(filter, new TestReporter());
 				}
 			}
 		}

@@ -418,6 +418,13 @@ void CMainFrame::RestoreTestSelection()
 	m_pRunner->TraverseTestTree(vis);
 }
 
+void CMainFrame::LoadNew(const std::wstring& fileName, int mruId)
+{
+	m_progressBar.SetPos(0);
+	m_logView.Clear();
+	Load(fileName, mruId);
+}
+
 void CMainFrame::Reload()
 {
 	Load(m_pathName);
@@ -451,7 +458,7 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 	{
 		std::vector<wchar_t> fileName(DragQueryFile(hDropInfo, 0, nullptr, 0) + 1);
 		if (DragQueryFile(hDropInfo, 0, fileName.data(), fileName.size()))
-			Load(fileName.data());
+			LoadNew(fileName.data());
 	}
 }
 
@@ -538,7 +545,7 @@ void CMainFrame::OnFileOpen(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*
 	if (dlg.DoModal() != IDOK)
 		return;
 
-	Load(dlg.m_szFileName);
+	LoadNew(dlg.m_szFileName);
 }
 
 void CMainFrame::OnFileSave(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
@@ -934,7 +941,7 @@ void CMainFrame::OnMruMenuItem(UINT /*uCode*/, int nID, HWND /*hwndCtrl*/)
 {
 	wchar_t pathName[m_mru.m_cchMaxItemLen_Max + 1];
 	if (m_mru.GetFromList(nID, pathName, m_mru.m_cchMaxItemLen_Max))
-		Load(pathName, nID);
+		LoadNew(pathName, nID);
 }
 
 void CMainFrame::SetLogHighLight(unsigned id)

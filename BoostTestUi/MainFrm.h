@@ -140,6 +140,7 @@ private:
 	void ClearTestSelection();
 	void SaveTestSelection();
 	void RestoreTestSelection();
+	void LoadNew(const std::wstring& fileName, int mruId = 0);
 	void Reload();
 	void Load(const std::wstring& fileName, int mruId = 0);
 	void CreateHpp(int resourceId, const std::wstring& fileName);
