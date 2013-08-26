@@ -297,7 +297,7 @@ private:
 class TestCaseStateSaveVisitor : public TestTreeVisitor
 {
 public:
-	TestCaseStateSaveVisitor(TestStateStorage& testState, const CTreeView& treeView) :
+	TestCaseStateSaveVisitor(TreeViewStateStorage& testState, const CTreeView& treeView) :
 		m_testState(testState),
 		m_treeView(treeView)
 	{
@@ -305,39 +305,48 @@ public:
 
 	void VisitTestCase(TestCase& tc)
 	{
-		m_testState.SaveState(tc, m_treeView.IsChecked(tc.id));
+		m_testState.SaveState(tc, m_treeView.GetTestItemState(tc.id));
 	}
 
 	void EnterTestSuite(TestSuite& ts)
 	{
-		m_testState.SaveState(ts, m_treeView.IsChecked(ts.id));
+		m_testState.SaveState(ts, m_treeView.GetTestItemState(ts.id));
 	}
 
 private:
-	TestStateStorage& m_testState;
+	TreeViewStateStorage& m_testState;
 	const CTreeView& m_treeView;
 };
 
 class TestCaseStateRestoreVisitor : public TestTreeVisitor
 {
 public:
-	explicit TestCaseStateRestoreVisitor(const TestStateStorage& testState) :
-		m_testState(testState)
+	TestCaseStateRestoreVisitor(const TreeViewStateStorage& testState, CTreeView& treeView) :
+		m_testState(testState),
+		m_treeView(treeView)
 	{
 	}
 
-	void VisitTestCase(TestCase& tc)
+	virtual void VisitTestCase(TestCase& tc)
 	{
-		m_testState.RestoreState(tc);
+		EnterTestUnit(tc);
 	}
 
-	void EnterTestSuite(TestSuite& ts)
+	virtual void EnterTestSuite(TestSuite& ts)
 	{
-		m_testState.RestoreState(ts);
+		EnterTestUnit(ts);
+	}
+
+	void EnterTestUnit(TestUnit& tu)
+	{
+		TreeViewItemState state(false, false);
+		if (m_testState.RestoreState(tu, state))
+			m_treeView.SetTestItemState(tu.id, state);
 	}
 
 private:
-	const TestStateStorage& m_testState;
+	const TreeViewStateStorage& m_testState;
+	CTreeView& m_treeView;
 };
 
 void CMainFrame::EnQueue(const std::function<void ()>& fn)
@@ -408,7 +417,7 @@ void CMainFrame::RestoreTestState()
 {
 	if (!m_pRunner)
 		return;
-	TestCaseStateRestoreVisitor vis(m_testStateStorage);
+	TestCaseStateRestoreVisitor vis(m_testStateStorage, m_treeView);
 	m_pRunner->TraverseTestTree(vis);
 }
 
@@ -471,11 +480,11 @@ void CMainFrame::Load(const std::wstring& fileName, int mruId)
 	m_failedTestCount = 0;
 	m_treeView.Clear();
 	m_logView.Clear();
-	RestoreTestState();
-	m_testStateStorage.Clear();
 	TestCaseLoader loadTestCases(m_treeView);
 	m_pRunner->TraverseTestTree(loadTestCases);
 	m_testCaseCount = loadTestCases.TestCaseCount();
+	RestoreTestState();
+	m_testStateStorage.Clear();
 	m_treeView.ExpandToView();
 
 	m_progressBar.SetPos(0);
@@ -1135,6 +1144,26 @@ void CMainFrame::Run()
 	m_resetTimer = m_logView.Empty();
 	m_pRunner->Run(m_combo.GetCurSel(), GetOptions());
 	UpdateUI();
+}
+
+void TreeViewStateStorage::Clear()
+{
+	m_tests.clear();
+}
+
+void TreeViewStateStorage::SaveState(const TestUnit& tu, const TreeViewItemState& state)
+{
+	m_tests.insert(std::make_pair(tu.fullName, state));
+}
+
+bool TreeViewStateStorage::RestoreState(TestUnit& tu, TreeViewItemState& state) const
+{
+	auto it = m_tests.find(tu.fullName);
+	if (it == m_tests.end())
+		return false;
+
+	state = it->second;
+	return true;
 }
 
 } // namespace gj

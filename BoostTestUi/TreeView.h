@@ -13,6 +13,17 @@ namespace gj {
 
 class CMainFrame;
 
+struct TreeViewItemState
+{
+	TreeViewItemState(bool enable, bool expand) :
+		enable(enable), expand(expand)
+	{
+	}
+
+	bool enable;
+	bool expand;
+};
+
 typedef CWinTraitsOR<TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT | TVS_SHOWSELALWAYS> CTreeViewTraits;
 
 class CTreeView :
@@ -35,6 +46,10 @@ public:
 	void LeaveTestSuite();
 	void ExpandToView();
 
+	TreeViewItemState GetTestItemState(unsigned id) const;
+	void SetTestItemState(unsigned id, const TreeViewItemState& state);
+	bool IsExpanded(unsigned id) const;
+	void Expand(unsigned id, bool expand);
 	bool IsChecked(unsigned id) const;
 	void Check(unsigned id, bool check);
 	void SelectTestItem(unsigned id);

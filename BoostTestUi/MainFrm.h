@@ -23,9 +23,19 @@
 #include "TreeView.h"
 #include "LogView.h"
 #include "TestRunner.h"
-#include "TestStateStorage.h"
 
 namespace gj {
+
+class TreeViewStateStorage
+{
+public:
+	void Clear();
+	void SaveState(const TestUnit& tu, const TreeViewItemState& state);
+	bool RestoreState(TestUnit& tu, TreeViewItemState& state) const;
+
+private:
+	std::map<std::string, TreeViewItemState> m_tests;
+};
 
 class CMainFrame :
 	public CFrameWindowImpl<CMainFrame>,
@@ -164,7 +174,7 @@ private:
 	CLogView m_logView;
 	CRecentDocumentList m_mru;
 	std::unique_ptr<TestRunner> m_pRunner;
-	TestStateStorage m_testStateStorage;
+	TreeViewStateStorage m_testStateStorage;
 	unsigned m_currentId;
 	bool m_autoRun;
 	bool m_logAutoClear;

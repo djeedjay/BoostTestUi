@@ -273,7 +273,7 @@ void CTreeView::EnterTestSuite(unsigned id, const std::string& name, bool check)
 
 void CTreeView::ExpandToDepth(HTREEITEM hItem, int depth)
 {
-	Expand(hItem, depth > 0? TVE_EXPAND: TVE_COLLAPSE);
+	CTreeViewCtrl::Expand(hItem, depth > 0 ? TVE_EXPAND : TVE_COLLAPSE);
 	HTREEITEM hChild = GetChildItem(hItem);
 	while (hChild)
 	{
@@ -302,10 +302,57 @@ void CTreeView::LeaveTestSuite()
 	--m_depth;
 }
 
+void ExpandTreeViewItem(CTreeViewCtrl& treeView, HTREEITEM item, bool expand)
+{
+	treeView.Expand(item, expand ? TVE_EXPAND : TVE_COLLAPSE);
+}
+
+bool IsTreeViewItemChecked(const CTreeViewCtrl& treeView, HTREEITEM item)
+{
+	return treeView.GetCheckState(item) != FALSE;
+}
+
+bool IsTreeViewItemExpanded(const CTreeViewCtrl& treeView, HTREEITEM item)
+{
+	return treeView.GetItemState(item, TVIS_EXPANDED) == TVIS_EXPANDED;
+}
+
+TreeViewItemState CTreeView::GetTestItemState(unsigned id) const
+{
+	auto it = m_items.find(id);
+	if (it == m_items.end())
+		return TreeViewItemState(false, false);
+
+	return TreeViewItemState(IsTreeViewItemChecked(*this, it->second), IsTreeViewItemExpanded(*this, it->second));
+}
+
+void CTreeView::SetTestItemState(unsigned id, const TreeViewItemState& state)
+{
+	auto it = m_items.find(id);
+	if (it == m_items.end())
+		return;
+
+	ExpandTreeViewItem(*this, it->second, state.expand);
+	SetCheckState(it->second, state.enable);
+}
+
+bool CTreeView::IsExpanded(unsigned id) const
+{
+	auto it = m_items.find(id);
+	return it != m_items.end() && IsTreeViewItemExpanded(*this, it->second);
+}
+
+void CTreeView::Expand(unsigned id, bool expand)
+{
+	auto it = m_items.find(id);
+	if (it != m_items.end())
+		ExpandTreeViewItem(*this, it->second, expand);
+}
+
 bool CTreeView::IsChecked(unsigned id) const
 {
 	auto it = m_items.find(id);
-	return it != m_items.end() && GetCheckState(it->second) != FALSE;
+	return it != m_items.end() && IsTreeViewItemChecked(*this, it->second);
 }
 
 void CTreeView::Check(unsigned id, bool check)
