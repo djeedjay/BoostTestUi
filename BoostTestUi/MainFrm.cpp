@@ -50,6 +50,7 @@ BEGIN_MSG_MAP_TRY(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_FILE_CREATE_BOOST_HPP, OnFileCreateBoostHpp)
 	COMMAND_ID_HANDLER_EX(ID_FILE_CREATE_GOOGLE_HPP, OnFileCreateGoogleHpp)
 	COMMAND_ID_HANDLER_EX(ID_LOG_AUTO_CLEAR, OnLogAutoClear)
+	COMMAND_ID_HANDLER_EX(ID_RESET_SELECTION, OnResetSelection)
 	COMMAND_ID_HANDLER_EX(ID_LOG_SELECTALL, OnLogSelectAll)
 	COMMAND_ID_HANDLER_EX(ID_LOG_CLEAR, OnLogClear)
 	COMMAND_ID_HANDLER_EX(ID_LOG_TIME, OnLogTime)
@@ -159,11 +160,11 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 //	CreateSimpleToolBar();
 
 	m_hWndStatusBar = m_statusBar.Create(*this);
-    UIAddStatusBar(m_hWndStatusBar);
+	UIAddStatusBar(m_hWndStatusBar);
 //	CreateSimpleStatusBar();
 
 	int paneIds[] = { ID_DEFAULT_PANE, IDPANE_TESTCASE_ITERATIONS, IDPANE_TESTCASE_TOTAL, IDPANE_TESTCASE_RUN, IDPANE_TESTCASE_FAILED };
-    m_statusBar.SetPanes(paneIds, 5, false);
+	m_statusBar.SetPanes(paneIds, 5, false);
 
 	// client rect for vertical splitter
 	WTL::CRect rcVert;
@@ -223,7 +224,7 @@ public:
 	{
 	}
 
-    virtual void VisitTestCase(TestCase& /*tc*/) override
+	virtual void VisitTestCase(TestCase& /*tc*/) override
 	{
 		++m_count;
 	}
@@ -244,7 +245,7 @@ public:
 	{
 	}
 
-    virtual void VisitTestCase(TestCase& tc) override
+	virtual void VisitTestCase(TestCase& tc) override
 	{
 		if (tc.enabled)
 			++m_count;
@@ -268,7 +269,7 @@ public:
 	{
 	}
 
-    virtual void VisitTestCase(TestCase& tc) override
+	virtual void VisitTestCase(TestCase& tc) override
 	{
 		m_treeView.AddTestCase(tc.id, tc.name, tc.enabled);
 		++m_testCaseCount;
@@ -403,22 +404,39 @@ bool operator!=(const FILETIME& ft1, const FILETIME& ft2)
 	return !(ft1 == ft2);
 }
 
-void CMainFrame::SaveTestState()
+void CMainFrame::ClearTestSelection()
+{
+	m_testStateStorage.Clear();
+}
+
+void CMainFrame::SaveTestSelection()
 {
 	if (!m_pRunner)
 		return;
 
-	m_testStateStorage.Clear();
+	ClearTestSelection();
 	TestCaseStateSaveVisitor vis(m_testStateStorage, m_treeView);
 	m_pRunner->TraverseTestTree(vis);
 }
 
-void CMainFrame::RestoreTestState()
+void CMainFrame::RestoreTestSelection()
 {
 	if (!m_pRunner)
 		return;
 	TestCaseStateRestoreVisitor vis(m_testStateStorage, m_treeView);
 	m_pRunner->TraverseTestTree(vis);
+}
+
+void CMainFrame::LoadNew(const std::wstring& fileName, int mruId)
+{
+	m_progressBar.SetPos(0);
+	m_logView.Clear();
+	Load(fileName, mruId);
+}
+
+void CMainFrame::Reload()
+{
+	Load(m_pathName);
 }
 
 void CMainFrame::OnTimer(UINT_PTR /*nIDEvent*/)
@@ -437,8 +455,8 @@ void CMainFrame::OnTimer(UINT_PTR /*nIDEvent*/)
 	if (fileTime == m_fileTime)
 		return;
 
-	SaveTestState();
-	Load(m_pathName);
+	SaveTestSelection();
+	Reload();
 }
 
 void CMainFrame::OnDropFiles(HDROP hDropInfo)
@@ -449,7 +467,7 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 	{
 		std::vector<wchar_t> fileName(DragQueryFile(hDropInfo, 0, nullptr, 0) + 1);
 		if (DragQueryFile(hDropInfo, 0, fileName.data(), fileName.size()))
-			Load(fileName.data());
+			LoadNew(fileName.data());
 	}
 }
 
@@ -480,10 +498,11 @@ void CMainFrame::Load(const std::wstring& fileName, int mruId)
 	m_failedTestCount = 0;
 	m_treeView.Clear();
 	m_logView.Clear();
+	RestoreTestSelection();
+	ClearTestSelection();
 	TestCaseLoader loadTestCases(m_treeView);
 	m_pRunner->TraverseTestTree(loadTestCases);
 	m_testCaseCount = loadTestCases.TestCaseCount();
-	RestoreTestState();
 	m_testStateStorage.Clear();
 	m_treeView.ExpandToView();
 
@@ -536,7 +555,7 @@ void CMainFrame::OnFileOpen(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*
 	if (dlg.DoModal() != IDOK)
 		return;
 
-	Load(dlg.m_szFileName);
+	LoadNew(dlg.m_szFileName);
 }
 
 void CMainFrame::OnFileSave(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
@@ -596,6 +615,12 @@ void CMainFrame::OnLogAutoClear(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wnd
 {
 	m_logAutoClear = !m_logAutoClear;
 	UpdateUI();
+}
+
+void CMainFrame::OnResetSelection(UINT uNotifyCode, int nID, CWindow wndCtl)
+{
+	ClearTestSelection();
+	Reload();
 }
 
 void CMainFrame::OnLogSelectAll(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
@@ -926,7 +951,7 @@ void CMainFrame::OnMruMenuItem(UINT /*uCode*/, int nID, HWND /*hwndCtrl*/)
 {
 	wchar_t pathName[m_mru.m_cchMaxItemLen_Max + 1];
 	if (m_mru.GetFromList(nID, pathName, m_mru.m_cchMaxItemLen_Max))
-		Load(pathName, nID);
+		LoadNew(pathName, nID);
 }
 
 void CMainFrame::SetLogHighLight(unsigned id)
@@ -1013,7 +1038,7 @@ public:
 	{
 	}
 
-    virtual void VisitTestCase(TestCase& tc) override
+	virtual void VisitTestCase(TestCase& tc) override
 	{
 		if (tc.id == m_id)
 			EnableSuites();
@@ -1074,7 +1099,7 @@ public:
 	{
 	}
 
-    virtual void VisitTestCase(TestCase& tc) override
+	virtual void VisitTestCase(TestCase& tc) override
 	{
 		tc.enabled = m_pTreeView->IsChecked(tc.id);
 	}
@@ -1105,7 +1130,7 @@ void CMainFrame::RunChecked()
 
 struct TestCaseSelector : TestTreeVisitor
 {
-    virtual void VisitTestCase(TestCase& tc) override
+	virtual void VisitTestCase(TestCase& tc) override
 	{
 		tc.enabled = true;
 	}
