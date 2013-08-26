@@ -55,7 +55,7 @@ BEGIN
     BUTTON      ID_FILE_SAVE
     SEPARATOR
     BUTTON      ID_LOG_CLEAR
-    BUTTON      ID_LOG_AUTO_CLEAR
+    BUTTON      ID_RESET_SELECTION
     BUTTON      ID_LOG_TIME
     BUTTON      ID_LOG_COPY
     SEPARATOR
@@ -313,7 +313,16 @@ BEGIN
     ID_TREE_RUN_ALL         "Run all unit tests\nRun All"
     ID_TREE_CHECK_ALL       "Check all tests\nCheck All"
     ID_TREE_UNCHECK_ALL     "Uncheck all tests\nUncheck All"
+END
+
+STRINGTABLE
+BEGIN
     ID_TREE_CHECK_FAILED    "Check only failed tests\nCheck Failed"
+    ID_TEST_REPEAT          "Repeat the selected test cases until a failure occurs\nRepeat"
+    ID_HELP_BOOST           "Display how to build a boost unit test\nBoost Unit Test"
+    ID_HELP_GOOGLE          "Display how to build a google unit test\nGoogle Unit Test"
+    ID_LOG_TIME             "Show clock time\nClock Time"
+    ID_RESET_SELECTION      "Reset Test Case Selection\nReset Selection"
 END
 
 STRINGTABLE
@@ -322,14 +331,6 @@ BEGIN
     ID_LOG_SELECTALL        "Select all log lines\nSelect All"
     ID_LOG_COPY             "Copy selected log lines to the clipboard\nCopy"
     ID_LOG_CLEAR            "Clear log display\nClear Log"
-END
-
-STRINGTABLE
-BEGIN
-    ID_TEST_REPEAT          "Repeat the selected test cases until a failure occurs\nRepeat"
-    ID_HELP_BOOST           "Display how to build a boost unit test\nBoost Unit Test"
-    ID_HELP_GOOGLE          "Display how to build a google unit test\nGoogle Unit Test"
-    ID_LOG_TIME             "Show clock time\nClock Time"
 END
 
 STRINGTABLE
@@ -366,10 +367,10 @@ END
 
 STRINGTABLE
 BEGIN
-	IDPANE_TESTCASE_ITERATIONS "Test iterations: #####"
-	IDPANE_TESTCASE_TOTAL   "Test cases: #####"
-	IDPANE_TESTCASE_RUN     "Tests run: #####"
-	IDPANE_TESTCASE_FAILED  "Failed tests: #####"
+    IDPANE_TESTCASE_ITERATIONS "Test iterations: #####"
+    IDPANE_TESTCASE_TOTAL   "Test cases: #####"
+    IDPANE_TESTCASE_RUN     "Tests run: #####"
+    IDPANE_TESTCASE_FAILED  "Failed tests: #####"
 END
 
 STRINGTABLE
@@ -449,6 +450,7 @@ IDR_UNIT_TEST_GUI_HPP   RCDATA                  "boost/test/unit_test_gui.hpp"
 IDR_GTEST_GUI_H         RCDATA                  "gtest/gtest-gui.h"
 IDR_BOOSTTESTSAMPLE_RTF RCDATA                  "BoostTestSample.rtf"
 IDR_GOOGLETESTSAMPLE_RTF RCDATA                  "GoogleTestSample.rtf"
-
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
+
+

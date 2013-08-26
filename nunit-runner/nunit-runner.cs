@@ -235,7 +235,7 @@ namespace TestRunner
 				System.Console.WriteLine("Test cases order is shuffled using seed: {0}", randomSeed);
 
 			var lib = System.Reflection.Assembly.LoadFile(name);
-			System.Type[] classes = lib.GetExportedTypes();
+			System.Type[] classes = lib.GetTypes();
 			foreach (System.Type type in classes)
 			{
 				if (type.IsClass && Reflection.HasAttribute(type, typeof(NUnit.Framework.TestFixtureAttribute), false))

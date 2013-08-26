@@ -113,6 +113,7 @@ public:
 	void OnFileCreateBoostHpp(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnFileCreateGoogleHpp(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnLogAutoClear(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnResetSelection(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnLogSelectAll(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnLogClear(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnLogTime(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -136,8 +137,10 @@ public:
 private:
 	void UpdateUI();
 	void UpdateStatusBar();
-	void SaveTestState();
-	void RestoreTestState();
+	void ClearTestSelection();
+	void SaveTestSelection();
+	void RestoreTestSelection();
+	void Reload();
 	void Load(const std::wstring& fileName, int mruId = 0);
 	void CreateHpp(int resourceId, const std::wstring& fileName);
 	unsigned GetOptions() const;

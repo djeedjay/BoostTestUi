@@ -49,23 +49,23 @@ private:
 class test_tree_reporter : public test_tree_visitor
 {
 public:
-    test_tree_reporter() : m_indent(0)
+	test_tree_reporter() : m_indent(0)
 	{
 	}
 
 private:
-    virtual void visit(test_case const& tc)
-    {
+	virtual void visit(test_case const& tc)
+	{
 		std::cout << std::setw(m_indent) << "" << (tc.p_enabled? 'C': 'c') << tc.p_id << ":" << tc.p_name << "\n";
-    }
+	}
 
-    virtual bool test_suite_start(test_suite const& ts)
-    {
+	virtual bool test_suite_start(test_suite const& ts)
+	{
 		if (m_indent >= 0)
 			std::cout << std::setw(m_indent) << "" << (ts.p_enabled? 'S': 's') << ts.p_id << ":" << ts.p_name << "\n";
 		m_indent += 4;
 		return true;
-    }
+	}
 
 	virtual void test_suite_finish(test_suite const&)
 	{
@@ -247,22 +247,22 @@ inline test_case* enable_test_case(test_case* tc, bool enable)
 
 #define BOOST_FIXTURE_TEST_CASE_ENABLE(test_name, F, enable)              \
 struct test_name : public F { void test_method(); };                      \
-                                                                          \
+																		  \
 static void BOOST_AUTO_TC_INVOKER( test_name )()                          \
 {                                                                         \
-    test_name t;                                                          \
-    t.test_method();                                                      \
+	test_name t;                                                          \
+	t.test_method();                                                      \
 }                                                                         \
-                                                                          \
+																		  \
 struct BOOST_AUTO_TC_UNIQUE_ID( test_name ) {};                           \
-                                                                          \
+																		  \
 BOOST_AUTO_TU_REGISTRAR( test_name )(                                     \
-    boost::unit_test::enable_test_case(                                   \
-        boost::unit_test::make_test_case(                                 \
-            &BOOST_AUTO_TC_INVOKER( test_name ), #test_name ), enable ),  \
-        boost::unit_test::ut_detail::auto_tc_exp_fail<                    \
-            BOOST_AUTO_TC_UNIQUE_ID( test_name )>::instance()->value() ); \
-                                                                          \
+	boost::unit_test::enable_test_case(                                   \
+		boost::unit_test::make_test_case(                                 \
+			&BOOST_AUTO_TC_INVOKER( test_name ), #test_name ), enable ),  \
+		boost::unit_test::ut_detail::auto_tc_exp_fail<                    \
+			BOOST_AUTO_TC_UNIQUE_ID( test_name )>::instance()->value() ); \
+																		  \
 void test_name::test_method()                                             \
 
 #define BOOST_AUTO_TEST_CASE_ENABLE(test_name, enable)                    \

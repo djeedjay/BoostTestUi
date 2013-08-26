@@ -6,7 +6,7 @@
 //  See http://www.boost.org/libs/test for the boost test library home page.
 
 
-#define BOOST_TEST_MODULE Boost Test Sample
+//#define BOOST_TEST_MODULE Boost Test Sample
 #include <boost/test/unit_test_gui.hpp>
 
 #ifndef BOOST_TEST_MODULE
