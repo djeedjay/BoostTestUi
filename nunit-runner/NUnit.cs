@@ -20,4 +20,12 @@ namespace NUnit.Framework
 	public static class TearDownAttribute { }
 	public static class TestFixtureTearDownAttribute { }
 	public static class SuccessException { }
+
+	public class NoExpectedException : System.Exception
+	{
+		public NoExpectedException(string message)
+			: base(message)
+		{
+		}
+	}
 }

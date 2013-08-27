@@ -26,6 +26,28 @@
 		}
 
 		[Test]
+		[ExpectedException("System.Exception")]
+		public void ExpectedException()
+		{
+			throw new System.Exception("Failed Test");
+		}
+
+		[Test]
+		[Explicit]
+		[ExpectedException("System.InvalidCastException")]
+		public void ExpectedException2()
+		{
+			throw new System.Exception("Failed Test");
+		}
+
+		[Test]
+		[Explicit]
+		[ExpectedException("System.Exception")]
+		public void NoExpectedException()
+		{
+		}
+
+		[Test]
 		[Explicit]
 		public void NullException()
 		{

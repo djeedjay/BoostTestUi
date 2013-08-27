@@ -175,10 +175,20 @@ std::string get_name(std::istream& is)
 	return name;
 }
 
-std::string LoadTestUnits(TestUnitNode& node, std::istream& is, int indent = 0)
+std::string LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pObserver, int indent = 0)
 {
+	static const std::regex re("\\s*[cCsS]\\d+:.+");
+
 	std::string line;
-	std::getline(is, line);
+	while (std::getline(is, line))
+	{
+		line = chomp(line);
+		std::smatch sm;
+		if (std::regex_match(line, sm, re))
+			break;
+		pObserver->test_message(Severity::Info, line);
+	}
+
 	while (is)
 	{
 		line = chomp(line);
@@ -211,7 +221,7 @@ std::string LoadTestUnits(TestUnitNode& node, std::istream& is, int indent = 0)
 
 		node.children.push_back(TestUnit(id, type, normalize_type(get_name(ss)), enable));
 		if (type == TestUnit::TestSuite)
-			line = LoadTestUnits(node.children.back(), is, lineIndent + 1);
+			line = LoadTestUnits(node.children.back(), is, pObserver, lineIndent + 1);
 		else
 			std::getline(is, line);
 	}
@@ -220,7 +230,7 @@ std::string LoadTestUnits(TestUnitNode& node, std::istream& is, int indent = 0)
 
 void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const std::string&)
 {
-	BoostTest::LoadTestUnits(tree, is);
+	BoostTest::LoadTestUnits(tree, is, m_pObserver);
 }
 
 unsigned ArgumentBuilder::GetEnabledOptions(unsigned options) const

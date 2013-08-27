@@ -156,7 +156,7 @@ namespace TestRunner
 				return IsExpected(e as System.Reflection.TargetInvocationException, expectedExceptionName);
 			}
 			return
-                Reflection.IsA(e.GetType(), typeof(NUnit.Framework.SuccessException).FullName) ||
+				Reflection.IsA(e.GetType(), typeof(NUnit.Framework.SuccessException).FullName) ||
 				Reflection.IsA(e.GetType(), expectedExceptionName);
 		}
 
@@ -346,7 +346,11 @@ namespace TestRunner
 			var exception = Reflection.GetAttribute(methodInfo, typeof(NUnit.Framework.ExpectedExceptionAttribute), false);
 			string expectedExceptionName = null;
 			if (exception != null)
+			{
 				expectedExceptionName = (string)exception.GetType().GetProperty("ExpectedExceptionName").GetValue(exception, null);
+				if (expectedExceptionName == null)
+					expectedExceptionName = "";
+			}
 
 			try
 			{
@@ -354,9 +358,13 @@ namespace TestRunner
 			}
 			catch (System.Exception e)
 			{
-                if (!Exception.IsExpected(e, expectedExceptionName))
-                    throw;
-            }
+				if (expectedExceptionName != "" && !Exception.IsExpected(e, expectedExceptionName))
+					throw;
+				return;
+			}
+
+			if (expectedExceptionName != null)
+				throw new NUnit.Framework.NoExpectedException("expected " + expectedExceptionName);
 		}
 	}
 
@@ -672,7 +680,7 @@ namespace TestRunner
 				fixture = fixtureClass.CreateInstance();
 				fixture.TestFixtureSetUp();
 				setupDone = true;
-            }
+			}
 			catch (System.Exception e)
 			{
 				Exception.Report(e, reporter);
@@ -680,106 +688,106 @@ namespace TestRunner
 
 			foreach (var test in GetItemOrder(fixtureClass.Tests))
 			{
-                var testPath = path + '.' + test.Name;
+				var testPath = path + '.' + test.Name;
 				if (filter.Match(testPath))
-                    Run(setupDone, testPath, fixture, test, filter, reporter);
+					Run(setupDone, testPath, fixture, test, filter, reporter);
 			}
 
-            if (setupDone)
+			if (setupDone)
 				TestFixtureTearDown(fixture, reporter);
 
-            reporter.EndSuite(fixtureClass, 0);
+			reporter.EndSuite(fixtureClass, 0);
 		}
 
 		private void Run(bool ok, string path, TestFixture fixture, Test test, TestCaseFilter filter, TestReporter reporter)
 		{
-            if (test.TestCases.Count > 0)
-            {
-                reporter.BeginSuite(test);
-                foreach (var testCase in GetItemOrder(test.TestCases))
-                {
-                    if (filter.Match(path + "." + testCase.Name))
-                        Run(ok, fixture, test, testCase, reporter);
-                }
-                reporter.EndSuite(test, 0);
-                return;
-            }
+			if (test.TestCases.Count > 0)
+			{
+				reporter.BeginSuite(test);
+				foreach (var testCase in GetItemOrder(test.TestCases))
+				{
+					if (filter.Match(path + "." + testCase.Name))
+						Run(ok, fixture, test, testCase, reporter);
+				}
+				reporter.EndSuite(test, 0);
+				return;
+			}
 
-            reporter.BeginTest(test);
-            if (!ok)
-            {
-                reporter.EndTest(test, 0, false);
-                return;
-            }
+			reporter.BeginTest(test);
+			if (!ok)
+			{
+				reporter.EndTest(test, 0, false);
+				return;
+			}
 
-            bool setUpDone = false;
-            bool runOk = false;
-            try
-            {
-                fixture.SetUp();
-                setUpDone = true;
-                test.Run(fixture);
-                runOk = true;
-            }
-            catch (System.Exception e)
-            {
-                Exception.Report(e, reporter);
-            }
+			bool setUpDone = false;
+			bool runOk = false;
+			try
+			{
+				fixture.SetUp();
+				setUpDone = true;
+				test.Run(fixture);
+				runOk = true;
+			}
+			catch (System.Exception e)
+			{
+				Exception.Report(e, reporter);
+			}
 
-            bool success = false;
-            if (setUpDone)
-            {
-                try
-                {
-                    fixture.TearDown();
-                    success = runOk;
-                }
-                catch (System.Exception e)
-                {
-                    Exception.Report(e, reporter);
-                }
-            }
-            reporter.EndTest(test, 0, success);
-        }
+			bool success = false;
+			if (setUpDone)
+			{
+				try
+				{
+					fixture.TearDown();
+					success = runOk;
+				}
+				catch (System.Exception e)
+				{
+					Exception.Report(e, reporter);
+				}
+			}
+			reporter.EndTest(test, 0, success);
+		}
 
-        private void Run(bool ok, TestFixture fixture, Test test, TestCase testCase, TestReporter reporter)
-        {
-            reporter.BeginTest(testCase);
-            if (!ok)
-            {
-                reporter.EndTest(testCase, 0, false);
-                return;
-            }
+		private void Run(bool ok, TestFixture fixture, Test test, TestCase testCase, TestReporter reporter)
+		{
+			reporter.BeginTest(testCase);
+			if (!ok)
+			{
+				reporter.EndTest(testCase, 0, false);
+				return;
+			}
 
-            bool setUpDone = false;
-            bool runOk = false;
-            try
-            {
-                fixture.SetUp();
-                setUpDone = true;
-                testCase.Run(fixture);
-                runOk = true;
-            }
-            catch (System.Exception e)
-            {
-                Exception.Report(e, reporter);
-            }
+			bool setUpDone = false;
+			bool runOk = false;
+			try
+			{
+				fixture.SetUp();
+				setUpDone = true;
+				testCase.Run(fixture);
+				runOk = true;
+			}
+			catch (System.Exception e)
+			{
+				Exception.Report(e, reporter);
+			}
 
-            bool success = false;
-            if (setUpDone)
-            {
-                try
-                {
-                    fixture.TearDown();
-                    success = runOk;
-                }
-                catch (System.Exception e)
-                {
-                    Exception.Report(e, reporter);
-                }
-            }
-            reporter.EndTest(testCase, 0, success);
-        }
+			bool success = false;
+			if (setUpDone)
+			{
+				try
+				{
+					fixture.TearDown();
+					success = runOk;
+				}
+				catch (System.Exception e)
+				{
+					Exception.Report(e, reporter);
+				}
+			}
+			reporter.EndTest(testCase, 0, success);
+		}
 	}
 
 	interface TestCaseFilter
@@ -848,7 +856,7 @@ namespace TestRunner
 			int depth = Depth(name);
 			string n = name + ".";
 			return names.Count == 0 || names.Exists(item => n.StartsWith(Prefix(item, depth)));
-        }
+		}
 
 		static public string Prefix(string path, int depth)
 		{
