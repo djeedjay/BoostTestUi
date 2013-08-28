@@ -46,6 +46,7 @@
 #include <windows.h>
 #include <limits.h>
 #include <gtest/gtest-gui.h>
+//#include <gtest/gtest.h>
 #include "sample1.h"
 
 #ifdef _DEBUG

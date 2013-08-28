@@ -6,8 +6,13 @@
 //  See http://www.boost.org/libs/test for the boost test library home page.
 
 
-//#define BOOST_TEST_MODULE Boost Test Sample
+#define BOOST_TEST_MODULE Boost Test Sample
 #include <boost/test/unit_test_gui.hpp>
+//#include <boost/test/unit_test.hpp>
+
+#ifndef BOOST_AUTO_TEST_CASE_ENABLE
+#define BOOST_AUTO_TEST_CASE_ENABLE(name, enable) BOOST_AUTO_TEST_CASE(name)
+#endif
 
 #ifndef BOOST_TEST_MODULE
 

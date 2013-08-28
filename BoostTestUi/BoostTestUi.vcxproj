@@ -166,7 +166,6 @@
     <ClInclude Include="ExeRunner.h" />
     <ClInclude Include="GoogleHelpDlg.h" />
     <ClInclude Include="GoogleTest.h" />
-    <ClInclude Include="gtest\gtest-gui.h" />
     <ClInclude Include="hstream.h" />
     <ClInclude Include="GetUnitTestType.h" />
     <ClInclude Include="LogView.h" />

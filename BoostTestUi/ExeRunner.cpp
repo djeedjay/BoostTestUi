@@ -75,6 +75,11 @@ std::unique_ptr<ArgumentBuilder> CreateArgumentBuilder(const std::wstring& fileN
 	if (type == "nunit-x86")
 		return std::unique_ptr<ArgumentBuilder>(new NUnitTest::ArgumentBuilder(L"nunit-runner-x86.exe", fileName, runner, observer));
 
+	if (type == "boost/noheader")
+		throw std::runtime_error("Did you forget to #include <boost/test/unit_test_gui.hpp>?");
+	if (type == "google/noheader")
+		throw std::runtime_error("Did you forget to #include <gtest/gtest-gui.h>?");
+
 	throw std::runtime_error("This is not a supported unit test executable");
 }
 

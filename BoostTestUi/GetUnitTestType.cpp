@@ -103,7 +103,21 @@ std::string GetUnitTestType(const std::string& path)
 	if (pDosHeader->e_magic != IMAGE_DOS_SIGNATURE)
 		return "";
 
-	return GetUnitTestType(pDosHeader, file.size());
+	auto testType = GetUnitTestType(pDosHeader, file.size());
+	if (!testType.empty())
+		return testType;
+
+	// do a strings like search to try and identify boost or google test executables without our header.
+	// Build magic string at run time to not identify our own executable as a boost or google test :-)
+	std::string BOOST_TESTS_TO_RUN("BOOST_"); BOOST_TESTS_TO_RUN.append("TESTS_TO_RUN");
+	if (std::search(file.begin(), file.end(), BOOST_TESTS_TO_RUN.begin(), BOOST_TESTS_TO_RUN.end()) != file.end())
+		return "boost/noheader";
+
+	std::string GTEST_COLOR("GTEST_"); GTEST_COLOR.append("COLOR");
+	if (std::search(file.begin(), file.end(), GTEST_COLOR.begin(), GTEST_COLOR.end()) != file.end())
+		return "google/noheader";
+
+	return "";
 }
 
 } // namespace gj
