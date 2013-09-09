@@ -37,6 +37,7 @@ private:
 	std::wstring m_fileName;
 	ExeRunner* m_pRunner;
 	TestObserver* m_pObserver;
+	bool m_exception;
 };
 
 } // namespace NUnitTest

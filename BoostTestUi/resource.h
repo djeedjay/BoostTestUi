@@ -5,6 +5,8 @@
 #define IDD_ABOUTBOX                    100
 #define IDD_BOOSTHELP                   101
 #define IDD_GOOGLEHELP                  102
+#define IDD_NOHEADER                    103
+#define IDD_MESSAGE                     103
 #define IDR_MAINFRAME                   128
 #define IDR_APPNAME                     129
 #define IDR_UNIT_TEST_GUI_HPP           200
@@ -33,6 +35,8 @@
 #define IDC_SAMPLE                      1013
 #define IDC_SEEALSO                     1014
 #define IDC_URL                         1015
+#define IDC_MESSAGE                     1017
+#define IDC_ICO                         1018
 #define IDPANE_TESTCASE_ITERATIONS      2000
 #define IDPANE_TESTCASE_TOTAL           2001
 #define IDPANE_TESTCASE_RUN             2002
@@ -77,7 +81,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        211
 #define _APS_NEXT_COMMAND_VALUE         32814
-#define _APS_NEXT_CONTROL_VALUE         1016
-#define _APS_NEXT_SYMED_VALUE           101
+#define _APS_NEXT_CONTROL_VALUE         1019
+#define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

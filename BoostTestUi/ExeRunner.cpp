@@ -14,6 +14,8 @@
 #include "BoostTest.h"
 #include "GoogleTest.h"
 #include "NUnitTest.h"
+#include "MessageDlg.h"
+#include "BoostHelpDlg.h"
 #include "ExeRunner.h"
 
 namespace gj {

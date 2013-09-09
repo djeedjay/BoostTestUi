@@ -20,8 +20,8 @@ const wchar_t* GetLogLevelArg(int logLevel)
 {
 	switch (logLevel)
 	{
-	case 0: return L"error";
-	case 1: return L"message";
+	case 0: return L"minimal";
+	case 1: return L"medium";
 	case 2:
 	default: return L"all";
 	}
@@ -145,7 +145,8 @@ ArgumentBuilder::ArgumentBuilder(const std::wstring& exeName, const std::wstring
 	m_exeName(exeName),
 	m_fileName(fileName),
 	m_pRunner(&runner),
-	m_pObserver(&observer)
+	m_pObserver(&observer),
+	m_exception(false)
 {
 }
 
@@ -278,6 +279,8 @@ unsigned ArgumentBuilder::GetEnabledOptions(unsigned options) const
 std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsigned& options)
 {
 	std::wostringstream args;
+	args << L"/log:" << GetLogLevelArg(logLevel);
+
 	if (options & ExeRunner::Randomize)
 		args << L" /randomize";
 	if (options & ExeRunner::WaitForDebugger)
@@ -330,12 +333,23 @@ void ArgumentBuilder::HandleClientNotification(const std::string& line)
 		if (auto p = m_pRunner->GetTestUnitPtr(id))
 			m_pRunner->OnTestSuiteFinish(p->id, elapsed);
 	}
-	else if (command == "Exception")
+	else if (command == "BeginException")
+	{
 		m_pRunner->OnTestExceptionCaught(get_arg<std::string>(ss));
+		m_exception = true;
+	}
+	else if (command == "EndException")
+	{
+		m_exception = false;
+	}
 	else if (command == "Waiting")
+	{
 		m_pRunner->OnWaiting();
+	}
 	else
+	{
 		m_pObserver->test_message(Severity::Info, line);
+	}
 }
 
 void ArgumentBuilder::FilterMessage(const std::string& msg)
@@ -343,16 +357,16 @@ void ArgumentBuilder::FilterMessage(const std::string& msg)
 	if (msg[0] == '#')
 		return HandleClientNotification(msg);
 
-	Severity::type severity = Severity::Info;
+	Severity::type severity = m_exception ? Severity::Fatal : Severity::Info;
 
-	static const std::regex reError(": Error$");
-	std::smatch sm;
-	if (std::regex_search(msg, sm, reError))
-		severity = Severity::Error;
+//	static const std::regex reError(": Error$");
+//	std::smatch sm;
+//	if (std::regex_search(msg, sm, reError))
+//		severity = Severity::Error;
 
-	static const std::regex reFailure(": Failure$");
-	if (std::regex_search(msg, sm, reFailure))
-		severity = Severity::Fatal;
+//	static const std::regex reFailure(": Failure$");
+//	if (std::regex_search(msg, sm, reFailure))
+//		severity = Severity::Fatal;
 
 	m_pObserver->test_message(severity, msg);
 }

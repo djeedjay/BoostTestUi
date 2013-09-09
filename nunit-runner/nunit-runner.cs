@@ -9,8 +9,17 @@ namespace TestRunner
 {
 	using System.Linq;
 
+	enum LogLevel { Minimal, Medium, All };
+
 	class TestReporter
 	{
+		LogLevel logLevel;
+
+		public TestReporter(LogLevel logLevel)
+		{
+			this.logLevel = logLevel;
+		}
+
 		private static int BoolAsInt(bool b)
 		{
 			return b ? 1 : 0;
@@ -24,30 +33,35 @@ namespace TestRunner
 		public void BeginSuite(TestItem suite)
 		{
 			System.Console.WriteLine("#SuiteStarted {0}", suite.Id);
-			System.Console.WriteLine("Entering test suite {0}", suite.Name);
+			if (logLevel == LogLevel.All)
+				System.Console.WriteLine("Entering test suite {0}", suite.Name);
 		}
 
 		public void BeginTest(TestItem test)
 		{
 			System.Console.WriteLine("#TestStarted {0}", test.Id);
-			System.Console.WriteLine("Entering test case {0}", test.Name);
+			if (logLevel == LogLevel.All)
+				System.Console.WriteLine("Entering test case {0}", test.Name);
 		}
 
 		public void Exception(string message)
 		{
+			System.Console.WriteLine("#BeginException");
 			System.Console.WriteLine("Exception: {0}", message);
-			System.Console.WriteLine("#Exception");
+			System.Console.WriteLine("#EndException");
 		}
 
 		public void EndTest(TestItem test, int ms, bool success)
 		{
-			System.Console.WriteLine("Leaving test case {0}", test.Name);
+			if (logLevel == LogLevel.All)
+				System.Console.WriteLine("Leaving test case {0}", test.Name);
 			System.Console.WriteLine("#TestFinished {0} {1} {2}", test.Id, ms, BoolAsInt(success));
 		}
 
 		public void EndSuite(TestItem suite, int ms)
 		{
-			System.Console.WriteLine("Leaving test suite {0}", suite.Name);
+			if (logLevel == LogLevel.All)
+				System.Console.WriteLine("Leaving test suite {0}", suite.Name);
 			System.Console.WriteLine("#SuiteFinished {0} {1}", suite.Id, ms);
 		}
 
@@ -352,9 +366,15 @@ namespace TestRunner
 					expectedExceptionName = "";
 			}
 
+			var repeat = Reflection.GetAttribute(methodInfo, typeof(NUnit.Framework.RepeatAttribute), false);
+			int repeatCount = 1;
+			if (repeat != null)
+				repeatCount = (int)repeat.GetType().GetProperty("Count").GetValue(repeat, null);
+
 			try
 			{
-				fixture.Invoke(methodInfo);
+				for (int i = 0; i < repeatCount; ++i)
+					fixture.Invoke(methodInfo);
 			}
 			catch (System.Exception e)
 			{
@@ -894,10 +914,22 @@ namespace TestRunner
 	class Program
 	{
 		static bool list = false;
+		static LogLevel logLevel = LogLevel.All;
 		static bool wait = false;
 		static bool run = false;
 		static int randomize = -1;
 		static TestCaseFilter filter = null;
+
+		static LogLevel GetLogLevel(string arg)
+		{
+			switch (arg)
+			{
+				case "minimal": return LogLevel.Minimal;
+				case "medium": return LogLevel.Medium;
+				case "all":
+				default: return LogLevel.All;
+			}
+		}
 
 		static void HandleOption(string arg)
 		{
@@ -912,6 +944,10 @@ namespace TestRunner
 			if (arg.ToLower() == "list")
 			{
 				list = true;
+			}
+			else if (arg.ToLower() == "log")
+			{
+				logLevel = GetLogLevel(value);
 			}
 			else if (arg.ToLower() == "wait")
 			{
@@ -961,7 +997,7 @@ namespace TestRunner
 					if (wait)
 						Wait();
 					if (run)
-						testLib.Run(filter, new TestReporter());
+						testLib.Run(filter, new TestReporter(logLevel));
 				}
 			}
 		}

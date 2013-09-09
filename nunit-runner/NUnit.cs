@@ -19,6 +19,7 @@ namespace NUnit.Framework
 	public static class SetUpAttribute { }
 	public static class TearDownAttribute { }
 	public static class TestFixtureTearDownAttribute { }
+	public static class RepeatAttribute { }
 	public static class SuccessException { }
 
 	public class NoExpectedException : System.Exception

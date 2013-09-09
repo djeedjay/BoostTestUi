@@ -144,18 +144,15 @@ IDR_MAINFRAME           ICON                    "res\\BoostTestUi.ico"
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOGEX 0, 0, 187, 127
+IDD_MESSAGE DIALOGEX 0, 0, 218, 82
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About Boost Test Runner"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,130,108,50,14
-    CTEXT           "Boost Test Runner V1.0",IDC_VERSION,54,22,118,8
-    ICON            IDR_MAINFRAME,IDC_STATIC,21,26,20,20
-    GROUPBOX        "",IDC_STATIC,7,7,173,91
-    CTEXT           "http://www.boost.org/libs/test",IDC_BOOST_URL,16,82,156,8
-    CTEXT           "© Gert-Jan de Vos 2012",IDC_STATIC,54,48,118,8
-    CTEXT           "Dec 18 2012",IDC_DATE,54,35,118,8
+    DEFPUSHBUTTON   "OK",IDOK,157,62,56,14
+    CTEXT           "Message",IDC_MESSAGE,54,18,149,34
+    ICON            IDR_MAINFRAME,IDC_ICO,16,16,21,20
+    DEFPUSHBUTTON   "Help",IDHELP,97,62,56,14
 END
 
 IDD_BOOSTHELP DIALOGEX 0, 0, 244, 222
@@ -182,6 +179,20 @@ BEGIN
     LTEXT           "http://code.google.com/p/googletest/",IDC_URL,37,207,123,8
 END
 
+IDD_ABOUTBOX DIALOGEX 0, 0, 187, 127
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About Boost Test Runner"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,130,108,50,14
+    CTEXT           "Boost Test Runner V1.0",IDC_VERSION,54,22,118,8
+    ICON            IDR_MAINFRAME,IDC_STATIC,21,26,20,20
+    GROUPBOX        "",IDC_STATIC,7,7,173,91
+    CTEXT           "http://www.boost.org/libs/test",IDC_BOOST_URL,16,82,156,8
+    CTEXT           "© Gert-Jan de Vos 2012",IDC_STATIC,54,48,118,8
+    CTEXT           "Dec 18 2012",IDC_DATE,54,35,118,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -191,12 +202,12 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
-    IDD_ABOUTBOX, DIALOG
+    IDD_MESSAGE, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 180
+        RIGHTMARGIN, 211
         TOPMARGIN, 7
-        BOTTOMMARGIN, 98
+        BOTTOMMARGIN, 76
     END
 
     IDD_BOOSTHELP, DIALOG
@@ -210,6 +221,14 @@ BEGIN
     IDD_GOOGLEHELP, DIALOG
     BEGIN
         BOTTOMMARGIN, 221
+    END
+
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 180
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 98
     END
 END
 #endif    // APSTUDIO_INVOKED

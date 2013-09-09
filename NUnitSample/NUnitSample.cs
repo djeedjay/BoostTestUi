@@ -63,10 +63,9 @@
 		}
 
 		[Test]
+		[Repeat(3)]
 		public void Wait2()
 		{
-			System.Console.WriteLine("Line1");
-			System.Console.WriteLine("Line2");
 			System.Console.WriteLine("Waiting");
 			System.Threading.Thread.Sleep(1000);
 		}
