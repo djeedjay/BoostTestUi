@@ -173,6 +173,7 @@ void ExeRunner::StartTestProcess()
 	m_pProcess.reset(new Process(m_pArgBuilder->GetExePathName(), m_testArgs));
 	m_pObserver->test_start();
 	m_pObserver->test_message(Severity::Info, stringbuilder() << "Process " << m_pProcess->GetProcessId() << ": " << Str(m_pProcess->GetName()) << ", started");
+	m_testFinished = false;
 }
 
 void ExeRunner::WaitForTestProcess()
@@ -218,6 +219,11 @@ void ExeRunner::Wait()
 void ExeRunner::OnWaiting()
 {
 	m_pObserver->test_waiting(m_pProcess->GetName(), m_pProcess->GetProcessId());
+}
+
+void ExeRunner::OnTestIterationStart(unsigned count)
+{
+	m_pObserver->test_iteration_start(count);
 }
 
 void ExeRunner::OnTestSuiteStart(unsigned id)
@@ -269,6 +275,12 @@ void ExeRunner::OnTestUnitAborted(unsigned id)
 	m_pObserver->test_unit_aborted(id);
 }
 
+void ExeRunner::OnTestIterationFinish()
+{
+	m_pObserver->test_iteration_finish();
+	m_testFinished = true;
+}
+
 TestUnitNode* GetTestUnitNodePtr(TestUnitNode& node, unsigned id)
 {
 	if (node.data.id == id)
@@ -311,6 +323,12 @@ try
 	{
 		RunTestIteration();
 		WaitForTestProcess();
+		if (!m_testFinished)
+		{
+			OnTestAssertion(false);
+			m_pObserver->test_message(Severity::Fatal, "Unexpected end of test process");
+		}
+
 		if (!m_repeat)
 			break;
 

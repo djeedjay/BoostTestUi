@@ -44,6 +44,7 @@ public:
 	virtual void Wait() override;
 
 	void OnWaiting();
+	void OnTestIterationStart(unsigned count);
 	void OnTestSuiteStart(unsigned id);
 	void OnTestCaseStart(unsigned id);
 	void OnTestAssertion(bool result);
@@ -53,6 +54,7 @@ public:
 	void OnTestSuiteFinish(unsigned id, unsigned elapsed);
 	void OnTestUnitSkipped(unsigned id);
 	void OnTestUnitAborted(unsigned id);
+	void OnTestIterationFinish();
 
 	TestUnit& GetTestUnit(unsigned id);
 	TestUnit* GetTestUnitPtr(unsigned id);
@@ -74,6 +76,7 @@ private:
 	TestUnitNode m_tree;
 	std::unique_ptr<ArgumentBuilder> m_pArgBuilder;
 	std::unique_ptr<Process> m_pProcess;
+	bool m_testFinished;
 	std::unique_ptr<boost::thread> m_pThread;
 };
 

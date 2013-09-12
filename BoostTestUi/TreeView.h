@@ -77,9 +77,9 @@ public:
 	LRESULT OnCreate(const CREATESTRUCT* pCreate);
 	void OnTimer(UINT_PTR /*nIDEvent*/);
 	void OnContextMenu(HWND hWnd, CPoint pt);
-	LRESULT OnSelChanged(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
-	LRESULT OnClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
-	LRESULT OnRClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
+	LRESULT OnSelChanged(LPNMHDR pnmh);
+	LRESULT OnClick(LPNMHDR pnmh);
+	LRESULT OnRClick(LPNMHDR pnmh);
 	void DoPaint(CDCHandle hdc, const RECT& rcClip);
 
 private:

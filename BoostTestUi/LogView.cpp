@@ -21,11 +21,11 @@ namespace gj {
 BEGIN_MSG_MAP_TRY(CLogView)
 	MSG_WM_CREATE(OnCreate)
 	MSG_WM_CONTEXTMENU(OnContextMenu);
-	REFLECTED_NOTIFY_CODE_HANDLER(NM_CUSTOMDRAW, OnCustomDraw)
-	REFLECTED_NOTIFY_CODE_HANDLER(NM_DBLCLK, OnDblClick)
-	REFLECTED_NOTIFY_CODE_HANDLER(LVN_ITEMCHANGED, OnItemChanged)
-	REFLECTED_NOTIFY_CODE_HANDLER(LVN_GETINFOTIP, OnGetInfoTip)
-	REFLECTED_NOTIFY_CODE_HANDLER(LVN_GETDISPINFO, OnGetDispInfo)
+	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CUSTOMDRAW, OnCustomDraw)
+	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_DBLCLK, OnDblClick)
+	REFLECTED_NOTIFY_CODE_HANDLER_EX(LVN_ITEMCHANGED, OnItemChanged)
+	REFLECTED_NOTIFY_CODE_HANDLER_EX(LVN_GETINFOTIP, OnGetInfoTip)
+	REFLECTED_NOTIFY_CODE_HANDLER_EX(LVN_GETDISPINFO, OnGetDispInfo)
 	DEFAULT_REFLECTION_HANDLER()
 	CHAIN_MSG_MAP(COffscreenPaint<CLogView>)
 END_MSG_MAP_CATCH(ExceptionHandler)
@@ -118,8 +118,17 @@ void CLogView::InvalidateLines(int begin, int end)
 void CLogView::SetHighLight(unsigned id)
 {
 	auto it = m_items.find(id);
-	if (it != m_items.end())
-		SetHighLight(it->second.beginLine, it->second.endLine);
+	if (it == m_items.end())
+		return;
+
+	int begin = it->second.beginLine;
+	int end = it->second.endLine;
+	SetHighLight(begin, end);
+
+	EnsureVisible(end, true);
+	EnsureVisible(begin, true);
+//	SetSelectionMark(begin);
+	SetItemState(begin, LVIS_FOCUSED, LVIS_FOCUSED);
 }
 
 void CLogView::SetHighLight(int begin, int end)
@@ -128,9 +137,6 @@ void CLogView::SetHighLight(int begin, int end)
 	m_logHighLightBegin = begin;
 	m_logHighLightEnd = end;
 	InvalidateLines(m_logHighLightBegin, m_logHighLightEnd);
-	SetSelectionMark(begin);
-	EnsureVisible(end, true);
-	EnsureVisible(begin, true);
 }
 
 void CLogView::Add(unsigned id, const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg)
@@ -208,7 +214,7 @@ void CLogView::EndTestUnit(unsigned id)
 {
 	m_items[id].endLine = GetItemCount();
 	if (m_logHighLightEnd > GetItemCount())
-		SetHighLight(id);
+		SetHighLight(m_items[id].beginLine, m_items[id].endLine);
 }
 
 void CLogView::SelectAll()
@@ -268,7 +274,7 @@ COLORREF GetHighLightBkColor(Severity::type sev, bool highLight)
 	return CLR_DEFAULT;
 }
 
-LRESULT CLogView::OnCustomDraw(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
+LRESULT CLogView::OnCustomDraw(LPNMHDR pnmh)
 {
 	NMLVCUSTOMDRAW* pCustomDraw = reinterpret_cast<NMLVCUSTOMDRAW*>(pnmh);
 
@@ -289,7 +295,7 @@ LRESULT CLogView::OnCustomDraw(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
 	return CDRF_DODEFAULT;
 }
 
-LRESULT CLogView::OnDblClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
+LRESULT CLogView::OnDblClick(LPNMHDR pnmh)
 {
 	NMITEMACTIVATE* pItemActivate = reinterpret_cast<NMITEMACTIVATE*>(pnmh);
 
@@ -307,7 +313,7 @@ LRESULT CLogView::OnDblClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
 	return 0;
 }
 
-LRESULT CLogView::OnItemChanged(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
+LRESULT CLogView::OnItemChanged(LPNMHDR pnmh)
 {
 	NMLISTVIEW* pListView = reinterpret_cast<NMLISTVIEW*>(pnmh);
 
@@ -321,7 +327,7 @@ LRESULT CLogView::OnItemChanged(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/
 	return 0;
 }
 
-LRESULT CLogView::OnGetInfoTip(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
+LRESULT CLogView::OnGetInfoTip(LPNMHDR pnmh)
 {
 	NMLVGETINFOTIP* pGetInfoTip = reinterpret_cast<NMLVGETINFOTIP*>(pnmh);
 
@@ -352,7 +358,7 @@ std::string CLogView::GetTimeText(const LogLine& log) const
 	return m_clockTime? GetTimeText(log.localTime): GetTimeText(log.time);
 }
 
-LRESULT CLogView::OnGetDispInfo(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
+LRESULT CLogView::OnGetDispInfo(LPNMHDR pnmh)
 {
 	NMLVDISPINFO* pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pnmh);
 	LVITEM& item = pDispInfo->item;

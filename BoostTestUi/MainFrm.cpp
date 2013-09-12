@@ -427,11 +427,11 @@ void CMainFrame::RestoreTestSelection()
 	m_pRunner->TraverseTestTree(vis);
 }
 
-void CMainFrame::LoadNew(const std::wstring& fileName, int mruId)
+void CMainFrame::LoadNew(const std::wstring& fileName)
 {
 	m_progressBar.SetPos(0);
 	m_logView.Clear();
-	Load(fileName, mruId);
+	Load(fileName);
 }
 
 void CMainFrame::Reload()
@@ -471,19 +471,23 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 	}
 }
 
-void CMainFrame::Load(const std::wstring& fileName, int mruId)
+class TestFile
+{
+public:
+	explicit TestFile(const std::wstring& fileName);
+
+private:
+	std::unique_ptr<TestRunner> m_pRunner;
+	FILETIME m_fileTime;
+};
+
+void CMainFrame::Load(const std::wstring& fileName)
 {
 	// Store the time stamp of this file so that we don't retry Load()-ing it until it changes:
 	m_fileTime = GetLastWriteTime(fileName);
 
 	ScopedCursor cursor(::LoadCursor(nullptr, IDC_WAIT));
 	UISetText(0, WStr(wstringbuilder() << "Loading " << fileName));
-
-	auto guard = make_guard([this, mruId]()
-	{
-		if (mruId != 0)
-			m_mru.RemoveFromList(mruId);
-	});
 
 	namespace fs = boost::filesystem;
 	fs::wpath fullPath = fs::system_complete(fs::wpath(fileName));
@@ -513,11 +517,7 @@ void CMainFrame::Load(const std::wstring& fileName, int mruId)
 	m_pathName = fullPath.wstring();
 	m_logFileName = fullPath.replace_extension(L"txt").wstring();
 
-	guard.release();
-	if (mruId == 0)
-		m_mru.AddToList(m_pathName.c_str());
-	else
-		m_mru.MoveToTop(mruId);
+	m_mru.AddToList(m_pathName.c_str());
 
 	if (m_autoRun)
 		RunChecked();
@@ -813,6 +813,7 @@ void CMainFrame::assertion_result(bool passed)
 		m_testCaseFailed = true;
 		m_progressBar.SetState(PBST_ERROR);
 		m_progressBar.SetBarColor(FailColor);
+		m_progressBar.SetPos(m_progressBar.GetPos()); // Win7 progress bar is one off when calling SetPos() just once ?!
 	});
 }
 
@@ -824,6 +825,7 @@ void CMainFrame::exception_caught(const std::string& /*what*/)
 		m_testCaseFailed = true;
 		m_progressBar.SetState(PBST_ERROR);
 		m_progressBar.SetBarColor(FailColor);
+		m_progressBar.SetPos(m_progressBar.GetPos()); // Win7 progress bar is one off when calling SetPos() just once ?!
 		UpdateStatusBar();
 	});
 }
@@ -950,8 +952,11 @@ void CMainFrame::OnTreeCheckFailed(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*
 void CMainFrame::OnMruMenuItem(UINT /*uCode*/, int nID, HWND /*hwndCtrl*/)
 {
 	wchar_t pathName[m_mru.m_cchMaxItemLen_Max + 1];
-	if (m_mru.GetFromList(nID, pathName, m_mru.m_cchMaxItemLen_Max))
-		LoadNew(pathName, nID);
+	if (!m_mru.GetFromList(nID, pathName, m_mru.m_cchMaxItemLen_Max))
+		return;
+
+	m_mru.RemoveFromList(nID);
+	LoadNew(pathName);
 }
 
 void CMainFrame::SetLogHighLight(unsigned id)

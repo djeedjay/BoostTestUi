@@ -56,11 +56,11 @@ public:
 
 	LRESULT OnCreate(const CREATESTRUCT* pCreate);
 	void OnContextMenu(HWND hWnd, CPoint pt);
-	LRESULT OnCustomDraw(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
-	LRESULT OnDblClick(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
-	LRESULT OnItemChanged(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
-	LRESULT OnGetInfoTip(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
-	LRESULT OnGetDispInfo(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/);
+	LRESULT OnCustomDraw(LPNMHDR pnmh);
+	LRESULT OnDblClick(LPNMHDR pnmh);
+	LRESULT OnItemChanged(LPNMHDR pnmh);
+	LRESULT OnGetInfoTip(LPNMHDR pnmh);
+	LRESULT OnGetDispInfo(LPNMHDR pnmh);
 	void DoPaint(CDCHandle dc, const RECT& rcClip);
 
 private:

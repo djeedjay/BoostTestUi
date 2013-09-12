@@ -150,9 +150,9 @@ private:
 	void ClearTestSelection();
 	void SaveTestSelection();
 	void RestoreTestSelection();
-	void LoadNew(const std::wstring& fileName, int mruId = 0);
+	void LoadNew(const std::wstring& fileName);
 	void Reload();
-	void Load(const std::wstring& fileName, int mruId = 0);
+	void Load(const std::wstring& fileName);
 	void CreateHpp(int resourceId, const std::wstring& fileName);
 	unsigned GetOptions() const;
 	bool LoadSettings();

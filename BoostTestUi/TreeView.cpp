@@ -17,9 +17,9 @@ BEGIN_MSG_MAP_TRY(CTreeView)
 	MSG_WM_CREATE(OnCreate)
 	MSG_WM_TIMER(OnTimer)
 	MSG_WM_CONTEXTMENU(OnContextMenu);
-	REFLECTED_NOTIFY_CODE_HANDLER(TVN_SELCHANGED, OnSelChanged)
-	REFLECTED_NOTIFY_CODE_HANDLER(NM_CLICK, OnClick)
-	REFLECTED_NOTIFY_CODE_HANDLER(NM_RCLICK, OnRClick)
+	REFLECTED_NOTIFY_CODE_HANDLER_EX(TVN_SELCHANGED, OnSelChanged)
+	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CLICK, OnClick)
+	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_RCLICK, OnRClick)
 	CHAIN_MSG_MAP(COffscreenPaint<CTreeView>)
 END_MSG_MAP_CATCH(ExceptionHandler)
 
@@ -134,14 +134,15 @@ void CTreeView::CheckFailed()
 		CheckTreeItem(it->second, GetTestItemImage(it->second) == m_iCross);
 }
 
-LRESULT CTreeView::OnSelChanged(int /*idCtrl*/, LPNMHDR pnmh, BOOL& /*bHandled*/)
+LRESULT CTreeView::OnSelChanged(LPNMHDR pnmh)
 {
 	NMTREEVIEW* pNmTreeView = reinterpret_cast<NMTREEVIEW*>(pnmh);
-	m_pMainFrame->SetLogHighLight(GetItemData(pNmTreeView->itemNew.hItem));
+	if (pNmTreeView->action != TVC_UNKNOWN)
+		m_pMainFrame->SetLogHighLight(GetItemData(pNmTreeView->itemNew.hItem));
 	return 0;
 }
 
-LRESULT CTreeView::OnClick(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
+LRESULT CTreeView::OnClick(LPNMHDR pnmh)
 {
 	// Q261289
 	DWORD dwpos = GetMessagePos();
@@ -158,11 +159,10 @@ LRESULT CTreeView::OnClick(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 	return 0;
 }
 
-LRESULT CTreeView::OnRClick(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& bHandled)
+LRESULT CTreeView::OnRClick(LPNMHDR pnmh)
 {
 	// Q222905
 	SendMessage(WM_CONTEXTMENU, (WPARAM)m_hWnd, GetMessagePos());
-	bHandled = TRUE;
 	return 0;
 }
 
