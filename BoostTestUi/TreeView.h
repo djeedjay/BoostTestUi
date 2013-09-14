@@ -102,6 +102,7 @@ private:
 	int m_iEmpty;
 	int m_iArrow;
 	int m_iTick;
+	int m_iTickG;
 	int m_iCross;
 	int m_iRun;
 	int m_runIndex;

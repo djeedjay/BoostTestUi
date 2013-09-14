@@ -49,6 +49,7 @@ LRESULT CTreeView::OnCreate(const CREATESTRUCT* /*pCreate*/)
 	m_treeImg.Create(16, 16, ILC_COLOR24 | ILC_MASK, 16, 0);
 	m_iEmpty = m_treeImg.AddIcon(AtlLoadIcon(IDI_EMPTY));
 	m_iTick = m_treeImg.AddIcon(AtlLoadIcon(IDI_TICK));
+	m_iTickG = m_treeImg.AddIcon(AtlLoadIcon(IDI_TICKG));
 	m_iCross = m_treeImg.AddIcon(AtlLoadIcon(IDI_CROSS));
 	m_iRun = m_treeImg.Add(AtlLoadBitmap(IDI_RUN), RGB(255,255,255));
 	SetImageList(m_treeImg, LVSIL_NORMAL);
@@ -443,7 +444,7 @@ void CTreeView::EndTestSuite(unsigned id)
 			break;
 		}
 		if (img == m_iEmpty)
-			suiteImg = m_iEmpty;
+			suiteImg = m_iTickG;
 
 		hChild = GetNextSiblingItem(hChild);
 	}

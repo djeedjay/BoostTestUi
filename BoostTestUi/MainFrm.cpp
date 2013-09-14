@@ -42,6 +42,7 @@ BEGIN_MSG_MAP_TRY(CMainFrame)
 	MESSAGE_HANDLER(UM_DEQUEUE, OnDeQueue);
 	MSG_WM_TIMER(OnTimer)
 	MSG_WM_DROPFILES(OnDropFiles)
+	MSG_WM_HELP(OnHelp)
 	COMMAND_ID_HANDLER_EX(ID_APP_EXIT, OnFileExit)
 	COMMAND_ID_HANDLER_EX(ID_FILE_OPEN, OnFileOpen)
 	COMMAND_ID_HANDLER_EX(ID_FILE_SAVE, OnFileSave)
@@ -471,6 +472,15 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 	}
 }
 
+void CMainFrame::OnHelp(LPHELPINFO lpHelpInfo)
+{
+	switch (m_helpType)
+	{
+	case UnitTestType::Boost: return OnHelpBoost(0, 0, *this);
+	case UnitTestType::Google: return OnHelpGoogle(0, 0, *this); 
+	}
+}
+
 class TestFile
 {
 public:
@@ -482,6 +492,7 @@ private:
 };
 
 void CMainFrame::Load(const std::wstring& fileName)
+try
 {
 	// Store the time stamp of this file so that we don't retry Load()-ing it until it changes:
 	m_fileTime = GetLastWriteTime(fileName);
@@ -491,10 +502,7 @@ void CMainFrame::Load(const std::wstring& fileName)
 
 	namespace fs = boost::filesystem;
 	fs::wpath fullPath = fs::system_complete(fs::wpath(fileName));
-//	if (fullPath.extension() == L".exe")
-		m_pRunner.reset(new ExeRunner(fullPath.wstring(), *this));
-//	else
-//		m_pRunner.reset(new DllRunner(fileName, *this));
+	m_pRunner.reset(new ExeRunner(fullPath.wstring(), *this));
 
 	m_testIterationCount = 0;
 	m_testCaseCount = 0;
@@ -521,6 +529,11 @@ void CMainFrame::Load(const std::wstring& fileName)
 
 	if (m_autoRun)
 		RunChecked();
+}
+catch (NoHeaderError& e)
+{
+	m_helpType = e.GetUnitTestType();
+	MessageBox(WStr(e.what()), LoadString(IDR_APPNAME).c_str(), MB_ICONERROR | MB_HELP | MB_OK);
 }
 
 std::string GetListViewText(const CListViewCtrl& listView, int item, int subItem)
@@ -672,11 +685,17 @@ void CMainFrame::test_waiting(const std::wstring& processName, unsigned processI
 {
 	EnQueue([this, processName, processId]()
 	{
-		this->MessageBox(
+		if (this->MessageBox(
 			WStr(wstringbuilder() << L"Attach debugger to " << processName << L", pid: "<< processId),
 			LoadString(IDR_APPNAME).c_str(),
-			MB_OK);
-		m_pRunner->Continue();
+			MB_OKCANCEL) == IDOK)
+		{
+			m_pRunner->Continue();
+		}
+		else
+		{
+			m_pRunner->Abort();
+		}
 	});
 }
 

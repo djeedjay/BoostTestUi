@@ -22,7 +22,7 @@
 #include "Utilities.h"
 #include "TreeView.h"
 #include "LogView.h"
-#include "TestRunner.h"
+#include "ExeRunner.h"
 
 namespace gj {
 
@@ -115,6 +115,7 @@ public:
 	LRESULT OnDeQueue(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	void OnTimer(UINT_PTR nIDEvent);
 	void OnDropFiles(HDROP hDropInfo);
+	void OnHelp(LPHELPINFO lpHelpInfo);
 	void OnFileExit(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnFileOpen(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnFileSave(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -178,6 +179,7 @@ private:
 	CLogView m_logView;
 	CRecentDocumentList m_mru;
 	std::unique_ptr<TestRunner> m_pRunner;
+	UnitTestType::type m_helpType;
 	TreeViewStateStorage m_testStateStorage;
 	unsigned m_currentId;
 	bool m_autoRun;

@@ -21,6 +21,21 @@
 
 namespace gj {
 
+struct UnitTestType
+{
+	enum type { Boost, Google, NUnit };
+};
+
+class NoHeaderError : public std::runtime_error
+{
+public:
+	NoHeaderError(const char* msg, UnitTestType::type idHelp);
+	UnitTestType::type GetUnitTestType() const;
+
+private:
+	UnitTestType::type m_testType;
+};
+
 class ExeRunner :
 	boost::noncopyable,
 	public TestRunner

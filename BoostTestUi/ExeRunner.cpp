@@ -14,7 +14,6 @@
 #include "BoostTest.h"
 #include "GoogleTest.h"
 #include "NUnitTest.h"
-#include "MessageDlg.h"
 #include "BoostHelpDlg.h"
 #include "ExeRunner.h"
 
@@ -65,6 +64,17 @@ void ExeRunner::Load()
 	TraverseTestTree(setFullNames);
 }
 
+NoHeaderError::NoHeaderError(const char* msg, UnitTestType::type testType) :
+	std::runtime_error(msg),
+	m_testType(testType)
+{
+}
+
+UnitTestType::type NoHeaderError::GetUnitTestType() const
+{
+	return m_testType;
+}
+
 std::unique_ptr<ArgumentBuilder> CreateArgumentBuilder(const std::wstring& fileName, ExeRunner& runner, TestObserver& observer)
 {
 	std::string type = GetUnitTestType(WideCharToMultiByte(fileName));
@@ -78,9 +88,9 @@ std::unique_ptr<ArgumentBuilder> CreateArgumentBuilder(const std::wstring& fileN
 		return std::unique_ptr<ArgumentBuilder>(new NUnitTest::ArgumentBuilder(L"nunit-runner-x86.exe", fileName, runner, observer));
 
 	if (type == "boost/noheader")
-		throw std::runtime_error("Did you forget to #include <boost/test/unit_test_gui.hpp>?");
+		throw NoHeaderError("Did you forget to #include <boost/test/unit_test_gui.hpp>?", UnitTestType::Boost);
 	if (type == "google/noheader")
-		throw std::runtime_error("Did you forget to #include <gtest/gtest-gui.h>?");
+		throw NoHeaderError("Did you forget to #include <gtest/gtest-gui.h>?", UnitTestType::Google);
 
 	throw std::runtime_error("This is not a supported unit test executable");
 }
@@ -332,6 +342,8 @@ try
 		if (!m_repeat)
 			break;
 
+		// Limit to 10 iterations/s to allow GUI to catch up.
+		boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(100));
 		StartTestProcess();
 	}
 }

@@ -145,7 +145,6 @@
     <ClCompile Include="GetUnitTestType.cpp" />
     <ClCompile Include="LogView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
-    <ClCompile Include="MessageDlg.cpp" />
     <ClCompile Include="NUnitTest.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="ShowSourceLine.cpp" />
@@ -167,12 +166,10 @@
     <ClInclude Include="ExeRunner.h" />
     <ClInclude Include="GoogleHelpDlg.h" />
     <ClInclude Include="GoogleTest.h" />
-    <ClInclude Include="gtest\gtest-gui.h" />
     <ClInclude Include="hstream.h" />
     <ClInclude Include="GetUnitTestType.h" />
     <ClInclude Include="LogView.h" />
     <ClInclude Include="MainFrm.h" />
-    <ClInclude Include="MessageDlg.h" />
     <ClInclude Include="NUnitTest.h" />
     <ClInclude Include="OffscreenPaint.h" />
     <ClInclude Include="Process.h" />
@@ -195,6 +192,7 @@
     <None Include="res\run.bmp" />
     <None Include="res\tick.ico" />
     <None Include="res\cross.ico" />
+    <None Include="res\tickg.ico" />
     <None Include="res\toolbar.bmp" />
   </ItemGroup>
   <ItemGroup>

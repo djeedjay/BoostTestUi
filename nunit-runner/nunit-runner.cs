@@ -132,6 +132,18 @@ namespace TestRunner
 		{
 			return HasAttribute(provider, attributeType.FullName, inherit);
 		}
+
+		public static object GetProperty(object obj, string propertyName)
+		{
+			if (obj == null)
+				return null;
+
+			var prop = obj.GetType().GetProperty(propertyName);
+			if (prop == null)
+				return null;
+
+			return prop.GetValue(obj, null);
+		}
 	}
 
 	static class Exception
@@ -188,6 +200,14 @@ namespace TestRunner
 			}
 
 			reporter.Exception(e.Message + "\n" + GetClientStackTrace(e));
+		}
+
+		public static void Handle(System.Exception e, string expectedExceptionName)
+		{
+			if (expectedExceptionName != "" && !Exception.IsExpected(e, expectedExceptionName))
+				throw e;
+			return;
+
 		}
 	}
 
@@ -361,15 +381,14 @@ namespace TestRunner
 			string expectedExceptionName = null;
 			if (exception != null)
 			{
-				expectedExceptionName = (string)exception.GetType().GetProperty("ExpectedExceptionName").GetValue(exception, null);
+				expectedExceptionName = (string)Reflection.GetProperty(exception, "ExpectedExceptionName");
 				if (expectedExceptionName == null)
 					expectedExceptionName = "";
 			}
 
-			var repeat = Reflection.GetAttribute(methodInfo, typeof(NUnit.Framework.RepeatAttribute), false);
-			int repeatCount = 1;
-			if (repeat != null)
-				repeatCount = (int)repeat.GetType().GetProperty("Count").GetValue(repeat, null);
+			var repeatAttribute = Reflection.GetAttribute(methodInfo, typeof(NUnit.Framework.RepeatAttribute), false);
+			var repeatCountValue = Reflection.GetProperty(repeatAttribute, "Count");
+			int repeatCount = (repeatCountValue != null) ? (int)repeatCountValue : 1;
 
 			try
 			{
@@ -378,6 +397,7 @@ namespace TestRunner
 			}
 			catch (System.Exception e)
 			{
+//				Exception.Handle(expectedExceptionName);
 				if (expectedExceptionName != "" && !Exception.IsExpected(e, expectedExceptionName))
 					throw;
 				return;
