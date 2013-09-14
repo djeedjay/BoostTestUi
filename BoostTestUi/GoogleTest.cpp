@@ -187,7 +187,7 @@ void ArgumentBuilder::FilterMessage(const std::string& msg)
 		return m_pRunner->OnWaiting();
 	else if (std::regex_search(msg, sm, reStart))
 	{
-		m_pObserver->test_iteration_start(get_arg<unsigned>(sm[1]));
+		m_pRunner->OnTestIterationStart(get_arg<unsigned>(sm[1]));
 		m_pRunner->OnTestSuiteStart(m_rootId);
 	}
 	else if (std::regex_search(msg, sm, reTest))
@@ -213,7 +213,7 @@ void ArgumentBuilder::FilterMessage(const std::string& msg)
 	else if (std::regex_search(msg, sm, reFinish))
 	{
 		m_pRunner->OnTestSuiteFinish(m_rootId, 0);
-		m_pObserver->test_iteration_finish();
+		m_pRunner->OnTestIterationFinish();
 	}
 	else if (std::regex_search(msg, reAssertion))
 		severity =  Severity::Assertion;

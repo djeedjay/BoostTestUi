@@ -303,9 +303,9 @@ void ArgumentBuilder::HandleClientNotification(const std::string& line)
 	ss >> c >> command;
 
 	if (command == "RunStarted")
-		m_pObserver->test_iteration_start(get_arg<unsigned>(ss));
+		m_pRunner->OnTestIterationStart(get_arg<unsigned>(ss));
 	else if (command == "RunFinished")
-		m_pObserver->test_iteration_finish();
+		m_pRunner->OnTestIterationFinish();
 	else if (command == "aborted")
 		m_pObserver->test_aborted();
 	else if (command == "TestStarted")
