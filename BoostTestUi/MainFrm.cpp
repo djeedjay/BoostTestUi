@@ -418,14 +418,17 @@ void CMainFrame::SaveTestSelection()
 	ClearTestSelection();
 	TestCaseStateSaveVisitor vis(m_testStateStorage, m_treeView);
 	m_pRunner->TraverseTestTree(vis);
+	m_testStateStorage.SaveScrollPos(m_treeView);
 }
 
 void CMainFrame::RestoreTestSelection()
 {
 	if (!m_pRunner)
 		return;
+
 	TestCaseStateRestoreVisitor vis(m_testStateStorage, m_treeView);
 	m_pRunner->TraverseTestTree(vis);
+	m_testStateStorage.RestoreScrollPos(m_treeView);
 }
 
 void CMainFrame::LoadNew(const std::wstring& fileName)
@@ -510,13 +513,12 @@ try
 	m_failedTestCount = 0;
 	m_treeView.Clear();
 	m_logView.Clear();
-	RestoreTestSelection();
-	ClearTestSelection();
 	TestCaseLoader loadTestCases(m_treeView);
 	m_pRunner->TraverseTestTree(loadTestCases);
 	m_testCaseCount = loadTestCases.TestCaseCount();
-	m_testStateStorage.Clear();
 	m_treeView.ExpandToView();
+	RestoreTestSelection();
+	ClearTestSelection();
 
 	m_progressBar.SetPos(0);
 	UpdateUI();
@@ -1198,6 +1200,16 @@ void CMainFrame::Run()
 void TreeViewStateStorage::Clear()
 {
 	m_tests.clear();
+}
+
+void TreeViewStateStorage::SaveScrollPos(const CWindow& treeView)
+{
+	m_scrollPos = treeView.GetScrollPos(SB_VERT);
+}
+
+void TreeViewStateStorage::RestoreScrollPos(CWindow& treeView)
+{
+	 treeView.SetScrollPos(SB_VERT, m_scrollPos);
 }
 
 void TreeViewStateStorage::SaveState(const TestUnit& tu, const TreeViewItemState& state)

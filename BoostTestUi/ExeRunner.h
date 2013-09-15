@@ -93,6 +93,8 @@ private:
 	std::unique_ptr<Process> m_pProcess;
 	bool m_testFinished;
 	std::unique_ptr<boost::thread> m_pThread;
+	HANDLE m_hStdin;
+	HANDLE m_hProcess;
 };
 
 } // namespace gj

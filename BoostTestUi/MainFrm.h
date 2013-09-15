@@ -30,11 +30,14 @@ class TreeViewStateStorage
 {
 public:
 	void Clear();
+	void SaveScrollPos(const CWindow& treeView);
 	void SaveState(const TestUnit& tu, const TreeViewItemState& state);
 	bool RestoreState(TestUnit& tu, TreeViewItemState& state) const;
+	void RestoreScrollPos(CWindow& treeView);
 
 private:
 	std::map<std::string, TreeViewItemState> m_tests;
+	int m_scrollPos;
 };
 
 class CMainFrame :

@@ -5,7 +5,6 @@
 #define IDD_ABOUTBOX                    100
 #define IDD_BOOSTHELP                   101
 #define IDD_GOOGLEHELP                  102
-#define IDD_NOHEADER                    103
 #define IDR_MAINFRAME                   128
 #define IDR_APPNAME                     129
 #define IDR_UNIT_TEST_GUI_HPP           200

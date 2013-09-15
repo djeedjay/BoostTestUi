@@ -98,7 +98,9 @@ std::unique_ptr<ArgumentBuilder> CreateArgumentBuilder(const std::wstring& fileN
 ExeRunner::ExeRunner(const std::wstring& fileName, TestObserver& observer) :
 	m_pObserver(&observer),
 	m_tree(TestUnit(0, TestUnit::TestSuite, "root")),
-	m_pArgBuilder(CreateArgumentBuilder(fileName, *this, observer))
+	m_pArgBuilder(CreateArgumentBuilder(fileName, *this, observer)),
+	m_hProcess(nullptr),
+	m_hStdin(nullptr)
 {
 	Load();
 }
@@ -181,6 +183,7 @@ void ExeRunner::Run(int logLevel, unsigned options)
 void ExeRunner::StartTestProcess()
 {
 	m_pProcess.reset(new Process(m_pArgBuilder->GetExePathName(), m_testArgs));
+	m_hProcess = m_pProcess->GetProcessHandle();
 	m_pObserver->test_start();
 	m_pObserver->test_message(Severity::Info, stringbuilder() << "Process " << m_pProcess->GetProcessId() << ": " << Str(m_pProcess->GetName()) << ", started");
 	m_testFinished = false;
@@ -195,24 +198,26 @@ void ExeRunner::WaitForTestProcess()
 	m_pObserver->test_message(Severity::Info, stringbuilder() << "Process " << m_pProcess->GetProcessId() << ": " << Str(m_pProcess->GetName()) << ", finished");
 	m_pObserver->test_finish();
 	m_pProcess.reset();
+	m_hProcess = nullptr;
 }
 
 void ExeRunner::Continue()
 {
-	if (!m_pProcess)
+	if (!m_hStdin)
 		return;
 
-	hstream hs(m_pProcess->GetStdIn());
+	hstream hs(m_hStdin);
 	hs.put('\n');
+	m_hStdin = nullptr;
 }
 
 void ExeRunner::Abort()
 {
-	if (!m_pThread)
+	if (!m_hProcess)
 		return;
 
 	m_repeat = false;
-	TerminateProcess(m_pProcess->GetProcessHandle(), static_cast<unsigned>(-1));
+	TerminateProcess(m_hProcess, static_cast<unsigned>(-1));
 }
 
 void ExeRunner::Wait()
@@ -222,12 +227,12 @@ void ExeRunner::Wait()
 
 	m_pThread->join();
 	WaitForTestProcess();
-	m_pProcess.reset();
 	m_pThread.reset();
 }
 
 void ExeRunner::OnWaiting()
 {
+	m_hStdin = m_pProcess->GetStdIn();
 	m_pObserver->test_waiting(m_pProcess->GetName(), m_pProcess->GetProcessId());
 }
 
