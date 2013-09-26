@@ -22,6 +22,13 @@
 #include "ExeRunner.h"
 #include "MainFrm.h"
 
+// ComCtrl.h
+// Needs _WIN32_WINNT >= 0x0600 which breaks XP compatibility..
+#define PBM_SETSTATE            (WM_USER+16) // wParam = PBST_[State] (NORMAL, ERROR, PAUSED)
+#define PBST_NORMAL             0x0001
+#define PBST_ERROR              0x0002
+#define PBST_PAUSED             0x0003
+
 namespace gj {
 
 const COLORREF FailColor = RGB(255, 64, 64);
@@ -786,7 +793,9 @@ void CMainFrame::test_iteration_start(unsigned test_cases_amount)
 	{
 		m_currentId = m_pRunner->RootTestSuite().id;
 		m_progressBar.SetPos(0);
-		m_progressBar.SetState(PBST_NORMAL);
+
+		// m_progressBar.SetState(PBST_NORMAL);
+		m_progressBar.SendMessage(PBM_SETSTATE, PBST_NORMAL, 0L);
 		m_progressBar.SetBarColor(SuccessColor);
 		m_treeView.ResetTreeImages();
 	});
@@ -845,7 +854,8 @@ void CMainFrame::EndTestCase(unsigned id, unsigned long /*elapsed*/, bool succee
 
 	if (!succeeded)
 	{
-		m_progressBar.SetState(PBST_ERROR);
+//		m_progressBar.SetState(PBST_ERROR);
+		m_progressBar.SendMessage(PBM_SETSTATE, PBST_ERROR, 0L);
 		m_progressBar.SetBarColor(FailColor);
 		++m_failedTestCount;
 	}
@@ -899,7 +909,8 @@ void CMainFrame::assertion_result(bool passed)
 	EnQueue([this]()
 	{
 		m_testCaseFailed = true;
-		m_progressBar.SetState(PBST_ERROR);
+//		m_progressBar.SetState(PBST_ERROR);
+		m_progressBar.SendMessage(PBM_SETSTATE, PBST_ERROR, 0L);
 		m_progressBar.SetBarColor(FailColor);
 		m_progressBar.SetPos(m_progressBar.GetPos()); // Win7 progress bar is one off when calling SetPos() just once ?!
 	});
@@ -911,7 +922,8 @@ void CMainFrame::exception_caught(const std::string& /*what*/)
 	EnQueue([this, id]()
 	{
 		m_testCaseFailed = true;
-		m_progressBar.SetState(PBST_ERROR);
+//		m_progressBar.SetState(PBST_ERROR);
+		m_progressBar.SendMessage(PBM_SETSTATE, PBST_ERROR, 0L);
 		m_progressBar.SetBarColor(FailColor);
 		m_progressBar.SetPos(m_progressBar.GetPos()); // Win7 progress bar is one off when calling SetPos() just once ?!
 		UpdateStatusBar();
