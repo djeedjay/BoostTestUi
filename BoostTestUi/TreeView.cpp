@@ -6,6 +6,7 @@
 //  See http://www.boost.org/libs/test for the boost test library home page.
 
 #include "stdafx.h"
+#include "dbgstream.h"
 #include "Resource.h"
 #include "Utilities.h"
 #include "MainFrm.h"
@@ -18,6 +19,7 @@ BEGIN_MSG_MAP_TRY(CTreeView)
 	MSG_WM_TIMER(OnTimer)
 	MSG_WM_CONTEXTMENU(OnContextMenu);
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(TVN_SELCHANGED, OnSelChanged)
+//	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CUSTOMDRAW, OnCustomDraw)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CLICK, OnClick)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_RCLICK, OnRClick)
 	CHAIN_MSG_MAP(COffscreenPaint<CTreeView>)
@@ -135,7 +137,7 @@ void CTreeView::CheckFailed()
 		CheckTreeItem(it->second, GetTestItemImage(it->second) == m_iCross);
 }
 
-LRESULT CTreeView::OnSelChanged(LPNMHDR pnmh)
+LRESULT CTreeView::OnSelChanged(NMHDR* pnmh)
 {
 	NMTREEVIEW* pNmTreeView = reinterpret_cast<NMTREEVIEW*>(pnmh);
 	if (pNmTreeView->action != TVC_UNKNOWN)
@@ -143,7 +145,31 @@ LRESULT CTreeView::OnSelChanged(LPNMHDR pnmh)
 	return 0;
 }
 
-LRESULT CTreeView::OnClick(LPNMHDR pnmh)
+LRESULT CTreeView::OnCustomDraw(NMHDR* pnmh)
+{
+	NMTVCUSTOMDRAW* pCustomDraw = reinterpret_cast<NMTVCUSTOMDRAW*>(pnmh);
+
+	switch (pCustomDraw->nmcd.dwDrawStage)
+	{
+	case CDDS_PREPAINT:
+		return CDRF_NOTIFYITEMDRAW;
+
+	case CDDS_ITEMPREPAINT:
+		{
+		HTREEITEM hItem = reinterpret_cast<HTREEITEM>(pCustomDraw->nmcd.dwItemSpec);
+		if (!m_pMainFrame->IsActiveItem(GetItemData(hItem)))
+		{
+			pCustomDraw->clrText = GetSysColor(COLOR_GRAYTEXT);
+			pCustomDraw->clrTextBk = GetSysColor(COLOR_3DLIGHT);
+		}
+		return CDRF_DODEFAULT;
+		}
+	}
+
+	return CDRF_DODEFAULT;
+}
+
+LRESULT CTreeView::OnClick(NMHDR* pnmh)
 {
 	// Q261289
 	DWORD dwpos = GetMessagePos();
@@ -160,7 +186,7 @@ LRESULT CTreeView::OnClick(LPNMHDR pnmh)
 	return 0;
 }
 
-LRESULT CTreeView::OnRClick(LPNMHDR pnmh)
+LRESULT CTreeView::OnRClick(NMHDR* pnmh)
 {
 	// Q222905
 	SendMessage(WM_CONTEXTMENU, (WPARAM)m_hWnd, GetMessagePos());
@@ -313,6 +339,16 @@ bool IsTreeViewItemChecked(const CTreeViewCtrl& treeView, HTREEITEM item)
 	return treeView.GetCheckState(item) != FALSE;
 }
 
+bool IsTreeViewItemEnabled(const CTreeViewCtrl& treeView, HTREEITEM hItem)
+{
+	TVITEMEX item = { 0 };
+	item.mask = TVIF_STATEEX;
+	item.hItem = hItem;
+	treeView.GetItem(&item);
+
+	return (item.uStateEx & TVIS_EX_DISABLED) == 0;
+}
+
 bool IsTreeViewItemExpanded(const CTreeViewCtrl& treeView, HTREEITEM item)
 {
 	return treeView.GetItemState(item, TVIS_EXPANDED) == TVIS_EXPANDED;
@@ -353,7 +389,7 @@ void CTreeView::Expand(unsigned id, bool expand)
 bool CTreeView::IsChecked(unsigned id) const
 {
 	auto it = m_items.find(id);
-	return it != m_items.end() && IsTreeViewItemChecked(*this, it->second);
+	return it != m_items.end() && IsTreeViewItemEnabled(*this, it->second) && IsTreeViewItemChecked(*this, it->second);
 }
 
 void CTreeView::Check(unsigned id, bool check)
@@ -361,6 +397,23 @@ void CTreeView::Check(unsigned id, bool check)
 	auto it = m_items.find(id);
 	if (it != m_items.end())
 		SetCheckState(it->second, check);
+}
+
+BOOL CTreeView::SetExtendedState(HTREEITEM hItem, UINT stateEx)
+{
+	TVITEMEX item = { 0 };
+
+	item.mask = TVIF_STATEEX;
+	item.hItem = hItem;
+	item.uStateEx = stateEx;
+	return SetItem(&item);
+}
+
+void CTreeView::EnableItem(unsigned id, bool enable)
+{
+	auto it = m_items.find(id);
+	if (it != m_items.end())
+		SetExtendedState(it->second, enable ? 0 : TVIS_EX_DISABLED);
 }
 
 void CTreeView::SelectTestItem(unsigned id)

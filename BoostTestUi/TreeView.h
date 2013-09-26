@@ -52,6 +52,8 @@ public:
 	void Expand(unsigned id, bool expand);
 	bool IsChecked(unsigned id) const;
 	void Check(unsigned id, bool check);
+	BOOL SetExtendedState(HTREEITEM hItem, UINT stateEx);
+	void EnableItem(unsigned id, bool enable);
 	void SelectTestItem(unsigned id);
 	unsigned GetSelectedTestItem() const;
 
@@ -77,9 +79,10 @@ public:
 	LRESULT OnCreate(const CREATESTRUCT* pCreate);
 	void OnTimer(UINT_PTR /*nIDEvent*/);
 	void OnContextMenu(HWND hWnd, CPoint pt);
-	LRESULT OnSelChanged(LPNMHDR pnmh);
-	LRESULT OnClick(LPNMHDR pnmh);
-	LRESULT OnRClick(LPNMHDR pnmh);
+	LRESULT OnCustomDraw(NMHDR* pnmh);
+	LRESULT OnSelChanged(NMHDR* pnmh);
+	LRESULT OnClick(NMHDR* pnmh);
+	LRESULT OnRClick(NMHDR* pnmh);
 	void DoPaint(CDCHandle hdc, const RECT& rcClip);
 
 private:

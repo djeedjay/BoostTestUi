@@ -2,7 +2,7 @@
 {
 	using NUnit.Framework;
 
-	[TestFixture]
+	[TestFixture, Category("NUnit"), Category("Sample")]
 	public class NUnitSample
 	{
 		[Test]
@@ -55,36 +55,36 @@
 			name.IndexOf('x');
 		}
 
-		[Test]
+		[Test, Category("Waiting")]
 		public void Wait1()
 		{
 			System.Console.WriteLine("Waiting");
 			System.Threading.Thread.Sleep(1000);
 		}
 
-		[Test]
+		[Test, Category("Waiting")]
 		[Repeat(3)]
 		public void Wait2()
 		{
 			System.Console.WriteLine("Waiting");
 			System.Threading.Thread.Sleep(1000);
 		}
-	
-		[Test]
+
+		[Test, Category("Waiting")]
 		public void Wait3()
 		{
 			System.Console.WriteLine("Waiting");
 			System.Threading.Thread.Sleep(1000);
 		}
-		
-		[Test]
+
+		[Test, Category("Waiting")]
 		public void Wait4()
 		{
 			System.Console.WriteLine("Waiting");
 			System.Threading.Thread.Sleep(1000);
 		}
 
-		[Test]
+		[Test, Category("Waiting")]
 		public void Wait5<T>([Values(1, "aap", false)] T t)
 		{
 			System.Console.WriteLine("Waiting: " + t.ToString());

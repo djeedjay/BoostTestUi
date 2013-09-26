@@ -186,80 +186,91 @@ std::wstring ArgumentBuilder::GetListArg()
 	return L"/list " + m_fileName;
 }
 
-std::string normalize_type(const std::string& s)
-{
-	return s;
-}
-
 template <typename T>
-T get_arg(std::istream& is)
+T GetArg(std::istream& is)
 {
 	T value = T();
 	is >> value;
 	return value;
 }
 
-std::string get_name(std::istream& is)
+template <typename T>
+T GetArg(const std::string& s)
 {
-	std::string name;
-	while (is)
+	std::istringstream ss(s);
+	return GetArg<T>(ss);
+}
+
+TestUnit::Type GetTestUnitType(const std::string& s)
+{
+	if (s.size() == 1)
 	{
-		int c = is.get();
-		if (c < ' ')
-			break;
-		name += static_cast<char>(c);
+		switch (s[0])
+		{
+		case 'c': case 'C': return TestUnit::TestCase;
+		case 's': case 'S': return TestUnit::TestSuite;
+		}
 	}
-	return name;
+	throw std::runtime_error("Unexpected TestUnit");
+}
+
+bool GetTestUnitEnable(const std::string& s)
+{
+	if (s.size() == 1)
+	{
+		switch (s[0])
+		{
+		case 'c': case 's': return false;
+		case 'C': case 'S': return true;
+		}
+	}
+	throw std::runtime_error("Unexpected TestUnit");
+}
+
+std::vector<std::string> GetCategories(const std::string& s)
+{
+	std::vector<std::string> categories;
+	auto it = s.begin();
+	while (it != s.end())
+	{
+		auto next = std::find(it, s.end(), ',');
+		categories.push_back(std::string(it, next));
+		if (next == s.end())
+			break;
+		it = next + 1;
+	}
+	return categories;
 }
 
 std::string LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pObserver, int indent = 0)
 {
-	static const std::regex re("\\s*[cCsS]\\d+:.+");
+	static const std::regex re("(\\s*)([cCsS])(\\d+):\\[(.*)\\](.+)");
 
 	std::string line;
-	while (std::getline(is, line))
-	{
-		line = chomp(line);
-		std::smatch sm;
-		if (std::regex_match(line, sm, re))
-			break;
-		pObserver->test_message(Severity::Info, line);
-	}
-
+	std::getline(is, line);
 	while (is)
 	{
 		line = chomp(line);
-
-		int lineIndent = static_cast<int>(line.find_first_not_of(' '));
-		if (lineIndent < 0)
+		std::smatch sm;
+		if (!std::regex_match(line, sm, re))
 		{
-			std::getline(is, line);
+			pObserver->test_message(Severity::Info, line);
 			continue;
 		}
-		if (lineIndent < indent)
+
+		if (sm[1].length() < indent)
 			return line;
 
-		std::istringstream ss(line.substr(lineIndent));
-		TestUnit::Type type;
-		bool enable = true;
-		switch (get_arg<char>(ss))
-		{
-		case 'c': enable = false;
-		case 'C': type = TestUnit::TestCase; break;
-		case 's': enable = false;
-		case 'S': type = TestUnit::TestSuite; break;
-		default: return "";
-		}
-		unsigned id = get_arg<unsigned>(ss);
-		if (get_arg<char>(ss) != ':')
-		{
-			std::getline(is, line);
-			continue;
-		}
+		unsigned id = GetArg<unsigned>(sm[3]);
+		TestUnit::Type type = GetTestUnitType(sm[2]);
+		std::string name = sm[5];
+		bool enable = GetTestUnitEnable(sm[2]);
 
-		node.children.push_back(TestUnit(id, type, normalize_type(get_name(ss)), enable));
+		TestUnit tu(id, type, name, enable);
+		tu.categories = GetCategories(sm[4]);
+		node.children.push_back(tu);
 		if (type == TestUnit::TestSuite)
-			line = LoadTestUnits(node.children.back(), is, pObserver, lineIndent + 1);
+			line = LoadTestUnits(node.children.back(), is, pObserver, sm[1].length() + 1);
 		else
 			std::getline(is, line);
 	}
@@ -303,39 +314,39 @@ void ArgumentBuilder::HandleClientNotification(const std::string& line)
 	ss >> c >> command;
 
 	if (command == "RunStarted")
-		m_pRunner->OnTestIterationStart(get_arg<unsigned>(ss));
+		m_pRunner->OnTestIterationStart(GetArg<unsigned>(ss));
 	else if (command == "RunFinished")
 		m_pRunner->OnTestIterationFinish();
 	else if (command == "aborted")
 		m_pObserver->test_aborted();
 	else if (command == "TestStarted")
 	{
-		if (auto p = m_pRunner->GetTestUnitPtr(get_arg<unsigned>(ss)))
+		if (auto p = m_pRunner->GetTestUnitPtr(GetArg<unsigned>(ss)))
 			m_pRunner->OnTestCaseStart(p->id);
 	}
 	else if (command == "SuiteStarted")
 	{
-		if (auto p = m_pRunner->GetTestUnitPtr(get_arg<unsigned>(ss)))
+		if (auto p = m_pRunner->GetTestUnitPtr(GetArg<unsigned>(ss)))
 			m_pRunner->OnTestSuiteStart(p->id);
 	}
 	else if (command == "TestFinished")
 	{
-		unsigned id = get_arg<unsigned>(ss);
-		unsigned elapsed = get_arg<unsigned>(ss);
-		bool succeeded = get_arg<bool>(ss);
+		unsigned id = GetArg<unsigned>(ss);
+		unsigned elapsed = GetArg<unsigned>(ss);
+		bool succeeded = GetArg<bool>(ss);
 		if (auto p = m_pRunner->GetTestUnitPtr(id))
 			m_pRunner->OnTestCaseFinish(p->id, elapsed, succeeded);
 	}
 	else if (command == "SuiteFinished")
 	{
-		unsigned id = get_arg<unsigned>(ss);
-		unsigned elapsed = get_arg<unsigned>(ss);
+		unsigned id = GetArg<unsigned>(ss);
+		unsigned elapsed = GetArg<unsigned>(ss);
 		if (auto p = m_pRunner->GetTestUnitPtr(id))
 			m_pRunner->OnTestSuiteFinish(p->id, elapsed);
 	}
 	else if (command == "BeginException")
 	{
-		m_pRunner->OnTestExceptionCaught(get_arg<std::string>(ss));
+		m_pRunner->OnTestExceptionCaught(GetArg<std::string>(ss));
 		m_exception = true;
 	}
 	else if (command == "EndException")

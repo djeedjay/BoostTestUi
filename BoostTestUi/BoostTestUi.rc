@@ -111,6 +111,8 @@ BEGIN
         MENUITEM "&Run Checked\tF5",            ID_TREE_RUN_CHECKED
         MENUITEM "Run &All\tF6",                ID_TREE_RUN_ALL
         MENUITEM "Abort\tCtrl+Break",           ID_TEST_ABORT
+        MENUITEM SEPARATOR
+        MENUITEM "Categories...",               ID_TEST_CATEGORIES
     END
     POPUP "&Log"
     BEGIN
@@ -186,6 +188,23 @@ BEGIN
     CTEXT           "Dec 18 2012",IDC_DATE,54,35,118,8
 END
 
+IDD_CATEGORIES DIALOGEX 0, 0, 223, 150
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Category Selection"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,112,129,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,166,129,50,14
+    LISTBOX         IDC_INCLUDE_LIST,7,19,85,97,LBS_SORT | LBS_MULTIPLESEL | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Include:",IDC_STATIC,7,7,27,8
+    LISTBOX         IDC_EXCLUDE_LIST,131,19,85,97,LBS_SORT | LBS_MULTIPLESEL | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Exclude:",IDC_STATIC,131,7,28,8
+    PUSHBUTTON      "All",IDC_ALL,96,37,31,14
+    PUSHBUTTON      "None",IDC_NONE,96,85,31,14
+    PUSHBUTTON      "<",IDC_INCLUDE,96,53,31,14
+    PUSHBUTTON      ">",IDC_EXCLUDE,96,69,31,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -214,6 +233,14 @@ BEGIN
         RIGHTMARGIN, 180
         TOPMARGIN, 7
         BOTTOMMARGIN, 98
+    END
+
+    IDD_CATEGORIES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 216
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -327,6 +354,7 @@ BEGIN
     ID_HELP_GOOGLE          "Display how to build a google unit test\nGoogle Unit Test"
     ID_LOG_TIME             "Show clock time\nClock Time"
     ID_RESET_SELECTION      "Reset Test Case Selection\nReset Selection"
+    ID_TEST_CATEGORIES      "Select active test categories\nCategories"
 END
 
 STRINGTABLE

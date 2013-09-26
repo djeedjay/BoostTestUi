@@ -71,8 +71,8 @@ public:
 	void OnTestUnitAborted(unsigned id);
 	void OnTestIterationFinish();
 
-	TestUnit& GetTestUnit(unsigned id);
-	TestUnit* GetTestUnitPtr(unsigned id);
+	virtual TestUnit& GetTestUnit(unsigned id);
+	virtual TestUnit* GetTestUnitPtr(unsigned id);
 
 private:
 	TestUnitNode& RootTestUnitNode();

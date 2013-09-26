@@ -8,6 +8,7 @@
 namespace NUnit.Framework
 {
 	public static class TestFixtureAttribute { }
+	public static class CategoryAttribute { }
 	public static class ExplicitAttribute { }
 	public static class ExpectedExceptionAttribute { }
 	public static class TestAttribute { }

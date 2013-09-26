@@ -118,6 +118,22 @@ namespace TestRunner
 			return GetAttribute(provider, attributeType.FullName, inherit);
 		}
 
+		public static System.Collections.Generic.List<object> GetAttributes(System.Reflection.ICustomAttributeProvider provider, string attributeName, bool inherit)
+		{
+			var attributes = new System.Collections.Generic.List<object>();
+			foreach (var attribute in provider.GetCustomAttributes(inherit))
+			{
+				if (IsA(attribute.GetType(), attributeName))
+					attributes.Add(attribute);
+			}
+			return attributes;
+		}
+
+		public static System.Collections.Generic.List<object> GetAttributes(System.Reflection.ICustomAttributeProvider provider, System.Type attributeType, bool inherit)
+		{
+			return GetAttributes(provider, attributeType.FullName, inherit);
+		}
+
 		public static bool HasAttribute(System.Reflection.ICustomAttributeProvider provider, string attributeName, bool inherit)
 		{
 			foreach (var attribute in provider.GetCustomAttributes(inherit))
@@ -143,6 +159,21 @@ namespace TestRunner
 				return null;
 
 			return prop.GetValue(obj, null);
+		}
+	}
+
+	static class CategoryUtils
+	{
+		public static System.Collections.Generic.List<string> GetCategories(System.Reflection.ICustomAttributeProvider provider)
+		{
+			var categories = new System.Collections.Generic.List<string>();
+			foreach (var category in Reflection.GetAttributes(provider, typeof(NUnit.Framework.CategoryAttribute), false))
+			{
+				var categoryName = Reflection.GetProperty(category, "Name");
+				if (categoryName != null)
+					categories.Add(categoryName as string);
+			}
+			return categories;
 		}
 	}
 
@@ -303,12 +334,15 @@ namespace TestRunner
 
 		public bool HasExplicitAttribute { get; private set; }
 
+		public System.Collections.Generic.List<string> Categories { get; private set; }
+
 		public System.Collections.Generic.List<TestCase> TestCases { get; private set; }
 
 		public Test(System.Reflection.MethodInfo methodInfo) : base(methodInfo.Name)
 		{
 			this.methodInfo = methodInfo;
-			this.TestCases = new System.Collections.Generic.List<TestCase>();
+			Categories = CategoryUtils.GetCategories(methodInfo);
+			TestCases = new System.Collections.Generic.List<TestCase>();
 			HasExplicitAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.ExplicitAttribute), false);
 
 			var parameterData = new System.Collections.Generic.List<System.Collections.IEnumerable>();
@@ -454,6 +488,7 @@ namespace TestRunner
 	{
 		string fullName;
 		public System.Collections.Generic.List<Test> Tests { get; private set; }
+		public System.Collections.Generic.List<string> Categories { get; private set; }
 		System.Reflection.ConstructorInfo ctorInfo;
 		System.Collections.Generic.List<System.Reflection.MethodInfo> testFixtureSetUp = new System.Collections.Generic.List<System.Reflection.MethodInfo>();
 		System.Collections.Generic.List<System.Reflection.MethodInfo> setUp = new System.Collections.Generic.List<System.Reflection.MethodInfo>();
@@ -472,6 +507,8 @@ namespace TestRunner
 			fullName = type.FullName;
 			HasExplicitAttribute = Reflection.HasAttribute(type, typeof(NUnit.Framework.ExplicitAttribute), false);
 			Tests = new System.Collections.Generic.List<Test>();
+			Categories = CategoryUtils.GetCategories(type);
+
 			ctorInfo = type.GetConstructor(System.Type.EmptyTypes);
 			if (ctorInfo == null)
 				throw new System.Exception("No default constructor");
@@ -579,26 +616,28 @@ namespace TestRunner
 		private static string Label(Test test, TestCase testCase)
 		{
 			char type = test.HasExplicitAttribute ? 'c' : 'C';
-			return string.Format("{0}{1}:{2}", type, testCase.Id, testCase.Name);
+			return string.Format("{0}{1}:[]{2}", type, testCase.Id, testCase.Name);
 		}
 
 		private static string Label(Test test)
 		{
+			var categories = string.Join(",", test.Categories);
 			string type = test.TestCases.Count == 0 ? "C" : "S";
 			if (test.HasExplicitAttribute)
 				type = type.ToLower();
-			return string.Format("{0}{1}:{2}", type, test.Id, test.Name);
+			return string.Format("{0}{1}:[{2}]{3}", type, test.Id, categories, test.Name);
 		}
 
 		private static string Label(TestFixtureClass fixture)
 		{
+			var categories = string.Join(",", fixture.Categories);
 			char type = fixture.HasExplicitAttribute ? 's' : 'S';
-			return string.Format("{0}{1}:{2}", type, fixture.Id, fixture.Name);
+			return string.Format("{0}{1}:[{2}]{3}", type, fixture.Id, categories, fixture.Name);
 		}
 
 		private static string Label(TestNamespace ns)
 		{
-			return string.Format("S{0}:{1}", ns.Id, ns.Name);
+			return string.Format("S{0}:[]{1}", ns.Id, ns.Name);
 		}
 
 		public void List()

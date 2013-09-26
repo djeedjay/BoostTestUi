@@ -22,6 +22,7 @@
 #include "Utilities.h"
 #include "TreeView.h"
 #include "LogView.h"
+#include "CategoryList.h"
 #include "ExeRunner.h"
 
 namespace gj {
@@ -56,6 +57,7 @@ public:
 
 	void AddLogMessage(const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg);
 	void SelectItem(unsigned id);
+	bool IsActiveItem(unsigned id) const;
 
 	void EnQueue(const std::function<void ()>& fn);
 
@@ -97,6 +99,7 @@ public:
 	    UPDATE_ELEMENT(ID_TREE_RUN_CHECKED, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
 	    UPDATE_ELEMENT(ID_TREE_RUN_ALL, UPDUI_MENUPOPUP)
 	    UPDATE_ELEMENT(ID_TEST_ABORT, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
+		UPDATE_ELEMENT(ID_TEST_CATEGORIES, UPDUI_MENUPOPUP)
 		UPDATE_ELEMENT(ID_VIEW_TOOLBAR, UPDUI_MENUPOPUP)
 		UPDATE_ELEMENT(ID_VIEW_STATUS_BAR, UPDUI_MENUPOPUP)
 		UPDATE_ELEMENT(ID_LOGLEVEL, UPDUI_TOOLBAR)
@@ -136,6 +139,7 @@ public:
 	void OnTestRepeat(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestDebugger(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestAbort(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnTestCategories(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnHelpBoost(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnHelpGoogle(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnAppAbout(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -182,6 +186,7 @@ private:
 	CLogView m_logView;
 	CRecentDocumentList m_mru;
 	std::unique_ptr<TestRunner> m_pRunner;
+	CategoryList m_categories;
 	UnitTestType::type m_helpType;
 	TreeViewStateStorage m_testStateStorage;
 	unsigned m_currentId;

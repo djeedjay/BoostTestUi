@@ -21,7 +21,7 @@ struct TestUnit
 	enum Type { TestSuite, TestCase };
 
 	TestUnit(unsigned id, Type type, const std::string& name, bool enabled = true) :
-		id(id), type(type), name(name), enabled(enabled)
+		id(id), type(type), name(name), enabled(enabled)//, active(true)
 	{
 	}
 
@@ -30,6 +30,8 @@ struct TestUnit
 	std::string name;
 	std::string fullName;
 	bool enabled;
+	std::vector<std::string> categories;
+//	bool active;
 };
 
 struct TestUnitNode
@@ -111,6 +113,8 @@ struct TestRunner
 	virtual void TraverseTestTree(unsigned id, TestTreeVisitor& v) = 0;
 
 	virtual void EnableTestUnit(unsigned id, bool enable) = 0;
+	virtual TestUnit& GetTestUnit(unsigned id) = 0;
+	virtual TestUnit* GetTestUnitPtr(unsigned id) = 0;
 
 	virtual unsigned GetEnabledOptions(unsigned options) = 0;
 	virtual bool IsRunning() const = 0;

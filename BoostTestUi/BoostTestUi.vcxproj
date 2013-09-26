@@ -139,6 +139,8 @@
     <ClCompile Include="BoostHelpDlg.cpp" />
     <ClCompile Include="BoostTest.cpp" />
     <ClCompile Include="BoostTestUi.cpp" />
+    <ClCompile Include="CategoryDlg.cpp" />
+    <ClCompile Include="CategoryList.cpp" />
     <ClCompile Include="ExeRunner.cpp" />
     <ClCompile Include="GoogleHelpDlg.cpp" />
     <ClCompile Include="GoogleTest.cpp" />
@@ -163,9 +165,12 @@
     <ClInclude Include="BoostHelpDlg.h" />
     <ClInclude Include="BoostTest.h" />
     <ClInclude Include="boost\test\unit_test_gui.hpp" />
+    <ClInclude Include="CategoryDlg.h" />
+    <ClInclude Include="CategoryList.h" />
     <ClInclude Include="ExeRunner.h" />
     <ClInclude Include="GoogleHelpDlg.h" />
     <ClInclude Include="GoogleTest.h" />
+    <ClInclude Include="gtest\gtest-gui.h" />
     <ClInclude Include="hstream.h" />
     <ClInclude Include="GetUnitTestType.h" />
     <ClInclude Include="LogView.h" />

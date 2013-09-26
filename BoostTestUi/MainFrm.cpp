@@ -15,6 +15,7 @@
 #include <array>
 #include <boost/filesystem.hpp>
 #include "Utilities.h"
+#include "CategoryDlg.h"
 #include "BoostHelpDlg.h"
 #include "GoogleHelpDlg.h"
 #include "AboutDlg.h"
@@ -60,6 +61,7 @@ BEGIN_MSG_MAP_TRY(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_TEST_REPEAT, OnTestRepeat)
 	COMMAND_ID_HANDLER_EX(ID_TEST_DEBUGGER, OnTestDebugger)
 	COMMAND_ID_HANDLER_EX(ID_TEST_ABORT, OnTestAbort)
+	COMMAND_ID_HANDLER_EX(ID_TEST_CATEGORIES, OnTestCategories)
 	COMMAND_ID_HANDLER_EX(ID_HELP_BOOST, OnHelpBoost)
 	COMMAND_ID_HANDLER_EX(ID_HELP_GOOGLE, OnHelpGoogle)
 	COMMAND_ID_HANDLER_EX(ID_APP_ABOUT, OnAppAbout)
@@ -120,6 +122,7 @@ void CMainFrame::UpdateUI()
 	UIEnable(ID_TREE_RUN_CHECKED, isRunnable);
 	UIEnable(ID_TREE_RUN_ALL, isRunnable);
 	UIEnable(ID_TEST_ABORT, isRunning);
+	UIEnable(ID_TEST_CATEGORIES, !m_categories.IsEmpty());
 	UIEnable(ID_LOGLEVEL, !isRunning);
 	UISetCheck(ID_FILE_AUTO_RUN, m_autoRun);
 	UISetCheck(ID_LOG_AUTO_CLEAR, m_logAutoClear);
@@ -264,20 +267,23 @@ private:
 class TestCaseLoader : public TestTreeVisitor
 {
 public:
-	explicit TestCaseLoader(CTreeView& treeView) :
+	TestCaseLoader(CTreeView& treeView, CategoryList& categories) :
 		m_treeView(treeView),
+		m_categories(categories),
 		m_testCaseCount(0)
 	{
 	}
 
 	virtual void VisitTestCase(TestCase& tc) override
 	{
+		GetCategories(tc);
 		m_treeView.AddTestCase(tc.id, tc.name, tc.enabled);
 		++m_testCaseCount;
 	}
 
 	virtual void EnterTestSuite(TestSuite& ts) override
 	{
+		GetCategories(ts);
 		m_treeView.EnterTestSuite(ts.id, ts.name, ts.enabled);
 	}
 
@@ -291,9 +297,64 @@ public:
 		return m_testCaseCount;
 	}
 
+	void GetCategories(const TestUnit& tu) const
+	{
+		for (auto it = tu.categories.begin(); it != tu.categories.end(); ++it)
+			m_categories.Add(*it);
+	}
+
 private:
 	CTreeView& m_treeView;
+	CategoryList& m_categories;
 	int m_testCaseCount;
+};
+
+class CategoryFilter : public TestTreeVisitor
+{
+public:
+	CategoryFilter(CTreeView& treeView, CategoryList& categories) :
+		m_treeView(treeView),
+		m_categories(categories)
+	{
+	}
+
+	virtual void VisitTestCase(TestCase& tc) override
+	{
+		m_treeView.EnableItem(tc.id, Match(tc.categories));
+	}
+
+	virtual void EnterTestSuite(TestSuite& ts) override
+	{
+		bool active = Match(ts.categories);
+		m_treeView.EnableItem(ts.id, active);
+		m_suites.push_back(active);
+	}
+
+	virtual void LeaveTestSuite() override
+	{
+		m_suites.pop_back();
+	}
+
+private:
+	bool Match(const std::vector<std::string>& categories)
+	{
+		if (m_suites.empty())
+			return true;
+		if (!m_suites.back())
+			return false;
+		if (categories.empty())
+			return m_categories.IsDefaultSelected();
+
+		for (auto it = categories.begin(); it != categories.end(); ++it)
+			if (m_categories.IsSelected(*it))
+				return true;
+
+		return false;
+	}
+
+	CTreeView& m_treeView;
+	CategoryList& m_categories;
+	std::vector<bool> m_suites;
 };
 
 class TestCaseStateSaveVisitor : public TestTreeVisitor
@@ -513,7 +574,8 @@ try
 	m_failedTestCount = 0;
 	m_treeView.Clear();
 	m_logView.Clear();
-	TestCaseLoader loadTestCases(m_treeView);
+	m_categories.Clear();
+	TestCaseLoader loadTestCases(m_treeView, m_categories);
 	m_pRunner->TraverseTestTree(loadTestCases);
 	m_testCaseCount = loadTestCases.TestCaseCount();
 	m_treeView.ExpandToView();
@@ -681,6 +743,11 @@ void CMainFrame::AddLogMessage(const SYSTEMTIME& localTime, double t, Severity::
 void CMainFrame::SelectItem(unsigned id)
 {
 	m_treeView.SelectTestItem(id);
+}
+
+bool CMainFrame::IsActiveItem(unsigned id) const
+{
+	return true; // m_pRunner && m_pRunner->GetTestUnit(id).active;
 }
 
 void CMainFrame::test_waiting(const std::wstring& processName, unsigned processId)
@@ -910,6 +977,17 @@ unsigned CMainFrame::GetOptions() const
 void CMainFrame::OnTestAbort(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_pRunner->Abort();
+}
+
+void CMainFrame::OnTestCategories(UINT uNotifyCode, int nID, CWindow wndCtl)
+{
+	CategoryDlg dlg(m_categories);
+	if (dlg.DoModal() != IDOK)
+		return;
+
+	CategoryFilter filter(m_treeView, m_categories);
+	m_pRunner->TraverseTestTree(filter);
+	m_treeView.RedrawWindow();
 }
 
 void LoadRichEditLibrary()

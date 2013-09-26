@@ -23,10 +23,19 @@ Boost Test GUI ToDo done
 - Auto run new build
 - gtest runner
 - Auto repeat
+- nunit runner
+- Keep testcase and tree selection state on reload
+- Detect missing include file
+- Error on crashed server
+- Pause between repeated runs
+- 
 
 Boost Test GUI ToDo
 ===================
 - Auto Load last test
 - other options?
-- nunit runner
 - check log highlights
+- NUnit Categories
+- Website
+- Sounds
+- load multiple test exceutables
