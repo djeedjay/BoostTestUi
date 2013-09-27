@@ -6,7 +6,6 @@
 //  See http://www.boost.org/libs/test for the boost test library home page.
 
 #include "stdafx.h"
-#include "dbgstream.h"
 #include "Resource.h"
 #include "Utilities.h"
 #include "MainFrm.h"

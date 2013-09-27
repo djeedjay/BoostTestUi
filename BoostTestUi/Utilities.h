@@ -138,6 +138,26 @@ private:
 	HCURSOR m_cursor;
 };
 
+
+class ScopedGdiObjectSelection
+{
+public:
+	ScopedGdiObjectSelection(HDC hDc, HGDIOBJ hObj) :
+		m_hDc(hDc),
+		m_hObj(SelectObject(hDc, hObj))
+	{
+	}
+
+	~ScopedGdiObjectSelection()
+	{
+		SelectObject(m_hDc, m_hObj);
+	}
+
+private:
+	HDC m_hDc;
+	HGDIOBJ m_hObj;
+};
+
 void ThrowWin32Error(DWORD error, const std::string& what = "");
 void ThrowLastError(const std::string& what);
 void ThrowLastError(const std::wstring& what);

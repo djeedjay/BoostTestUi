@@ -7,6 +7,7 @@
 
 #include "stdafx.h"
 #include <vector>
+#include <algorithm>
 #include "resource.h"
 #include "version.h"
 #include "Utilities.h"
@@ -24,6 +25,7 @@ CategoryDlg::CategoryDlg(CategoryList& categoryList) :
 BOOL CategoryDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
 	CenterWindow(GetParent());
+	DlgResize_Init();
 	InitializeLists();
 	return TRUE;
 }
@@ -34,19 +36,43 @@ void ClearListBox(CListBox& box)
 		box.DeleteString(0);
 }
 
+int GetTextWidth(HDC hdc, const std::string& text)
+{
+	SIZE sz;
+	if (!GetTextExtentPoint32A(hdc, text.c_str(), text.length(), &sz))
+		ThrowLastError("GetTextExtentPoint32A");
+
+	return sz.cx;
+}
+
 void CategoryDlg::InitializeLists()
 {
 	CListBox inBox(GetDlgItem(IDC_INCLUDE_LIST));
 	CListBox exBox(GetDlgItem(IDC_EXCLUDE_LIST));
 	ClearListBox(inBox);
 	ClearListBox(exBox);
+	int inWidth = 0;
+	int exWidth = 0;
+	ScopedGdiObjectSelection hIn(inBox.GetDC(), inBox.GetFont());
+	ScopedGdiObjectSelection hEx(exBox.GetDC(), exBox.GetFont());
+
 	for (auto it = m_categories.begin(); it != m_categories.end(); ++it)
 	{
 		if (it->second)
+		{
 			inBox.AddString(WStr(it->first));
+			inWidth = std::max(inWidth, GetTextWidth(inBox.GetDC(), it->first));
+		}
 		else
+		{
 			exBox.AddString(WStr(it->first));
+			exWidth = std::max(exWidth, GetTextWidth(exBox.GetDC(), it->first));
+		}
 	}
+
+	inBox.SetHorizontalExtent(inWidth + 3*GetSystemMetrics(SM_CXBORDER));
+	exBox.SetHorizontalExtent(exWidth + 3*GetSystemMetrics(SM_CXBORDER));
+
 	UpdateUiState();
 }
 

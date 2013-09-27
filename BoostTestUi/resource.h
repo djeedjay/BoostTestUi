@@ -42,6 +42,9 @@
 #define IDC_NONE                        1022
 #define IDC_INCLUDE                     1023
 #define IDC_EXCLUDE                     1024
+#define IDC_INCLUDE_LABEL               1025
+#define IDC_EXCLUDE_LABEL               1026
+#define IDC_INVISIBLE                   1027
 #define IDPANE_TESTCASE_ITERATIONS      2000
 #define IDPANE_TESTCASE_TOTAL           2001
 #define IDPANE_TESTCASE_RUN             2002
@@ -87,7 +90,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        213
 #define _APS_NEXT_COMMAND_VALUE         32815
-#define _APS_NEXT_CONTROL_VALUE         1022
+#define _APS_NEXT_CONTROL_VALUE         1028
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif
