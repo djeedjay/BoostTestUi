@@ -183,7 +183,7 @@ BEGIN
     CTEXT           "Boost Test Runner V1.0",IDC_VERSION,54,22,118,8
     ICON            IDR_MAINFRAME,IDC_STATIC,21,26,20,20
     GROUPBOX        "",IDC_STATIC,7,7,173,91
-    CTEXT           "http://www.boost.org/libs/test",IDC_BOOST_URL,16,82,156,8
+    CTEXT           "http://boosttestui.wordpress.com/",IDC_BOOST_URL,16,82,156,8
     CTEXT           "© Gert-Jan de Vos 2012",IDC_STATIC,54,48,118,8
     CTEXT           "Dec 18 2012",IDC_DATE,54,35,118,8
 END
