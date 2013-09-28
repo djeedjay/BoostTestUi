@@ -162,6 +162,8 @@ private:
 	void Reload();
 	void Load(const std::wstring& fileName);
 	void CreateHpp(int resourceId, const std::wstring& fileName);
+	std::wstring GetLogFileName(const std::wstring& fileName) const;
+	void SaveLogFile(const std::wstring& fileName);
 	unsigned GetOptions() const;
 	bool LoadSettings();
 	void SaveSettings();

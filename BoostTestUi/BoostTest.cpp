@@ -155,76 +155,80 @@ std::string normalize_type(const std::string& s)
 }
 
 template <typename T>
-T get_arg(std::istream& is)
+T GetArg(std::istream& is)
 {
 	T value = T();
 	is >> value;
 	return value;
 }
 
-std::string get_name(std::istream& is)
+template <typename T>
+T GetArg(const std::string& s)
 {
-	std::string name;
-	while (is)
+	std::istringstream ss(s);
+	return GetArg<T>(ss);
+}
+
+TestUnit::Type GetTestUnitType(const std::string& s)
+{
+	if (s.size() == 1)
 	{
-		int c = is.get();
-		if (c < ' ')
-			break;
-		name += static_cast<char>(c);
+		switch (s[0])
+		{
+		case 'c': case 'C': return TestUnit::TestCase;
+		case 's': case 'S': return TestUnit::TestSuite;
+		}
 	}
-	return name;
+	throw std::runtime_error("Unexpected TestUnit");
+}
+
+bool GetTestUnitEnable(const std::string& s)
+{
+	if (s.size() == 1)
+	{
+		switch (s[0])
+		{
+		case 'c': case 's': return false;
+		case 'C': case 'S': return true;
+		}
+	}
+	throw std::runtime_error("Unexpected TestUnit");
 }
 
 std::string LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pObserver, int indent = 0)
 {
-	static const std::regex re("\\s*[cCsS]\\d+:.+");
+	static const std::regex re("(\\s*)([cCsS])(\\d+):(.+)");
 
 	std::string line;
-	while (std::getline(is, line))
-	{
-		line = chomp(line);
-		std::smatch sm;
-		if (std::regex_match(line, sm, re))
-			break;
-		pObserver->test_message(Severity::Info, line);
-	}
-
+	std::getline(is, line);
 	while (is)
 	{
 		line = chomp(line);
-		int lineIndent = static_cast<int>(line.find_first_not_of(' '));
-		if (lineIndent < 0)
+		std::smatch sm;
+		if (!std::regex_match(line, sm, re))
 		{
+			if (line.empty() || line == "Test setup error: unknown type")
+				return "";
+			pObserver->test_message(Severity::Info, line);
 			std::getline(is, line);
 			continue;
 		}
-		if (lineIndent < indent)
+
+		if (sm[1].length() < indent)
 			return line;
 
-		std::istringstream ss(line.substr(lineIndent));
-		TestUnit::Type type;
-		bool enable = true;
-		switch (get_arg<char>(ss))
-		{
-		case 'c': enable = false;
-		case 'C': type = TestUnit::TestCase; break;
-		case 's': enable = false;
-		case 'S': type = TestUnit::TestSuite; break;
-		default: return "";
-		}
-		unsigned id = get_arg<unsigned>(ss);
-		if (get_arg<char>(ss) != ':')
-		{
-			std::getline(is, line);
-			continue;
-		}
+		unsigned id = GetArg<unsigned>(sm[3]);
+		TestUnit::Type type = GetTestUnitType(sm[2]);
+		std::string name = sm[4];
+		bool enable = GetTestUnitEnable(sm[2]);
 
-		node.children.push_back(TestUnit(id, type, normalize_type(get_name(ss)), enable));
+		node.children.push_back(TestUnit(id, type, normalize_type(name), enable));
 		if (type == TestUnit::TestSuite)
-			line = LoadTestUnits(node.children.back(), is, pObserver, lineIndent + 1);
+			line = LoadTestUnits(node.children.back(), is, pObserver, sm[1].length() + 1);
 		else
 			std::getline(is, line);
 	}
+
 	return "";
 }
 
@@ -271,14 +275,14 @@ void ArgumentBuilder::HandleClientNotification(const std::string& line)
 	ss >> c >> command;
 
 	if (command == "start")
-		m_pRunner->OnTestIterationStart(get_arg<unsigned>(ss));
+		m_pRunner->OnTestIterationStart(GetArg<unsigned>(ss));
 	else if (command == "finish")
 		m_pRunner->OnTestIterationFinish();
 	else if (command == "aborted")
 		m_pObserver->test_aborted();
 	else if (command == "unit_start")
 	{
-		if (auto p = m_pRunner->GetTestUnitPtr(get_arg<unsigned>(ss)))
+		if (auto p = m_pRunner->GetTestUnitPtr(GetArg<unsigned>(ss)))
 		{
 			if (p->type == TestUnit::TestCase)
 				m_pRunner->OnTestCaseStart(p->id);
@@ -288,8 +292,8 @@ void ArgumentBuilder::HandleClientNotification(const std::string& line)
 	}
 	else if (command == "unit_finish")
 	{
-		unsigned id = get_arg<unsigned>(ss);
-		unsigned elapsed = get_arg<unsigned>(ss);
+		unsigned id = GetArg<unsigned>(ss);
+		unsigned elapsed = GetArg<unsigned>(ss);
 		if (auto p = m_pRunner->GetTestUnitPtr(id))
 		{
 			if (p->type == TestUnit::TestCase)
@@ -299,13 +303,13 @@ void ArgumentBuilder::HandleClientNotification(const std::string& line)
 		}
 	}
 	else if (command == "unit_skipped")
-		m_pRunner->OnTestUnitSkipped(get_arg<unsigned>(ss));
+		m_pRunner->OnTestUnitSkipped(GetArg<unsigned>(ss));
 	else if (command == "unit_aborted")
-		m_pRunner->OnTestUnitAborted(get_arg<unsigned>(ss));
+		m_pRunner->OnTestUnitAborted(GetArg<unsigned>(ss));
 	else if (command == "assertion")
-		m_pRunner->OnTestAssertion(get_arg<bool>(ss));
+		m_pRunner->OnTestAssertion(GetArg<bool>(ss));
 	else if (command == "exception")
-		m_pRunner->OnTestExceptionCaught(get_arg<std::string>(ss));
+		m_pRunner->OnTestExceptionCaught(GetArg<std::string>(ss));
 	else if (command == "waiting")
 		m_pRunner->OnWaiting();
 	else

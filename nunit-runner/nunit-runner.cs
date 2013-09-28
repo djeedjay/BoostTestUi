@@ -420,9 +420,14 @@ namespace TestRunner
 					expectedExceptionName = "";
 			}
 
+			int repeatCount = 1;
 			var repeatAttribute = Reflection.GetAttribute(methodInfo, typeof(NUnit.Framework.RepeatAttribute), false);
-			var repeatCountValue = Reflection.GetProperty(repeatAttribute, "Count");
-			int repeatCount = (repeatCountValue != null) ? (int)repeatCountValue : 1;
+			var propertiesValue = Reflection.GetProperty(repeatAttribute, "Properties");
+			if (propertiesValue != null)
+			{
+				var properties = (System.Collections.IDictionary)propertiesValue;
+				repeatCount = (int)properties["Repeat"];
+			}
 
 			try
 			{

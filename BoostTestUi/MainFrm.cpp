@@ -504,6 +504,7 @@ void CMainFrame::LoadNew(const std::wstring& fileName)
 	m_progressBar.SetPos(0);
 	m_logView.Clear();
 	Load(fileName);
+	m_logFileName = L"";
 }
 
 void CMainFrame::Reload()
@@ -529,6 +530,9 @@ void CMainFrame::OnTimer(UINT_PTR /*nIDEvent*/)
 
 	SaveTestSelection();
 	Reload();
+	if (m_autoRun)
+		RunChecked();
+
 }
 
 void CMainFrame::OnDropFiles(HDROP hDropInfo)
@@ -594,12 +598,8 @@ try
 
 	SetWindowText(WStr(wstringbuilder() << fullPath.filename().wstring() << L" - Boost Test Runner"));
 	m_pathName = fullPath.wstring();
-	m_logFileName = fullPath.replace_extension(L"txt").wstring();
 
 	m_mru.AddToList(m_pathName.c_str());
-
-	if (m_autoRun)
-		RunChecked();
 }
 catch (NoHeaderError& e)
 {
@@ -642,27 +642,37 @@ void CMainFrame::OnFileOpen(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*
 	LoadNew(dlg.m_szFileName);
 }
 
+std::wstring CMainFrame::GetLogFileName(const std::wstring& fileName) const
+{
+	CFileDialog dlg(false, L".txt", fileName.c_str(), OFN_OVERWRITEPROMPT, L"Text Files (*.txt)\0*.txt\0All Files\0*.*\0\0", 0);
+	dlg.m_ofn.nFilterIndex = 0;
+	dlg.m_ofn.lpstrTitle = L"Save unit test log";
+	return dlg.DoModal() == IDOK ? dlg.m_szFileName : L"";
+}
+
+void CMainFrame::SaveLogFile(const std::wstring& fileName)
+{
+	UISetText(0, WStr(wstringbuilder() << "Saving " << fileName));
+	ScopedCursor cursor(::LoadCursor(nullptr, IDC_WAIT));
+	m_logView.Save(fileName);
+	m_logFileName = fileName;
+	UpdateStatusBar();
+}
+
 void CMainFrame::OnFileSave(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
-	UISetText(0, WStr(wstringbuilder() << "Saving " << m_logFileName));
-	ScopedCursor cursor(::LoadCursor(nullptr, IDC_WAIT));
-	m_logView.Save(m_logFileName);
-	UpdateStatusBar();
+	namespace fs = boost::filesystem;
+
+	auto fileName = m_logFileName.empty() ? GetLogFileName(fs::wpath(m_pathName).replace_extension(L"txt").wstring()) : m_logFileName;
+	if (!fileName.empty())
+		SaveLogFile(fileName);
 }
 
 void CMainFrame::OnFileSaveAs(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
-	CFileDialog dlg(false, L".txt", m_logFileName.c_str(), OFN_OVERWRITEPROMPT, L"Text Files (*.txt)\0*.txt\0All Files\0*.*\0\0", 0);
-	dlg.m_ofn.nFilterIndex = 0;
-	dlg.m_ofn.lpstrTitle = L"Save unit test log";
-	if (dlg.DoModal() != IDOK)
-		return;
-
-	UISetText(0, WStr(wstringbuilder() << "Saving " << dlg.m_szFileName));
-	ScopedCursor cursor(::LoadCursor(nullptr, IDC_WAIT));
-	m_logView.Save(dlg.m_szFileName);
-	m_logFileName = dlg.m_szFileName;
-	UpdateStatusBar();
+	auto fileName = GetLogFileName(m_logFileName);
+	if (!fileName.empty())
+		SaveLogFile(fileName);
 }
 
 void CMainFrame::OnFileAutoRun(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)

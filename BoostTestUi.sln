@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoostTestNoHeader", "BoostT
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GTestNoHeader", "GTestNoHeader\GTestNoHeader.vcxproj", "{903A6E6B-A8F3-4AE9-BDDB-F052B594853E}"
 EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "BoostTestUiSetup", "BoostTestUiSetup\BoostTestUiSetup.wixproj", "{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -165,6 +167,20 @@ Global
 		{903A6E6B-A8F3-4AE9-BDDB-F052B594853E}.Release|Win32.Build.0 = Release|Win32
 		{903A6E6B-A8F3-4AE9-BDDB-F052B594853E}.Release|x64.ActiveCfg = Release|Win32
 		{903A6E6B-A8F3-4AE9-BDDB-F052B594853E}.Release|x86.ActiveCfg = Release|Win32
+		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Debug|Win32.ActiveCfg = Debug|x86
+		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Debug|x64.ActiveCfg = Debug|x86
+		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Debug|x86.ActiveCfg = Debug|x86
+		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Debug|x86.Build.0 = Debug|x86
+		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Release|Any CPU.ActiveCfg = Release|x86
+		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Release|Mixed Platforms.Build.0 = Release|x86
+		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Release|Win32.ActiveCfg = Release|x86
+		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Release|x64.ActiveCfg = Release|x86
+		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Release|x86.ActiveCfg = Release|x86
+		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

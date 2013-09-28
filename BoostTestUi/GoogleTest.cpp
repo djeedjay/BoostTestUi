@@ -178,7 +178,7 @@ void ArgumentBuilder::FilterMessage(const std::string& msg)
 	static const std::regex reError("\\(\\d+\\): error: ");
 //	static const std::regex reEnd("^\\[(       OK )|(  FAILED  )\\] ([\\w\\._]+) \\((\\d+) ms\\)"); // VC regex bug??
 	static const std::regex reEnd("^\\[(       OK |  FAILED  )\\] ([\\w\\._]+) \\((\\d+) ms\\)");
-	static const std::regex reFinish("^\\[==========\\] \\d+ tests from ");
+	static const std::regex reFinish("^\\[==========\\] \\d+ tests? from ");
 	static const std::regex reAssertion("Assertion failed:");
 
 	Severity::type severity = Severity::Info;

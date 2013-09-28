@@ -255,6 +255,7 @@ std::string LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pO
 		if (!std::regex_match(line, sm, re))
 		{
 			pObserver->test_message(Severity::Info, line);
+			std::getline(is, line);
 			continue;
 		}
 

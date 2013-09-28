@@ -28,14 +28,13 @@ Boost Test GUI ToDo done
 - Detect missing include file
 - Error on crashed server
 - Pause between repeated runs
-- 
+- NUnit Categories
+- Website
 
 Boost Test GUI ToDo
 ===================
 - Auto Load last test
 - other options?
 - check log highlights
-- NUnit Categories
-- Website
 - Sounds
 - load multiple test exceutables
