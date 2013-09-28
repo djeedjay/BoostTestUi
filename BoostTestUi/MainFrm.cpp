@@ -3,7 +3,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-//  See http://www.boost.org/libs/test for the boost test library home page.
+//  See http://boosttestui.wordpress.com/ for the boosttestui home page.
 
 #include "stdafx.h"
 
@@ -89,7 +89,7 @@ CMainFrame::CMainFrame(const std::wstring& fileName) :
 	m_treeView(*this),
 	m_logView(*this),
 	m_autoRun(false),
-	m_logAutoClear(false),
+	m_logAutoClear(true),
 	m_randomize(false),
 	m_repeat(false),
 	m_debugger(false)

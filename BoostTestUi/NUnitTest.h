@@ -3,7 +3,7 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-//  See http://www.boost.org/libs/test for the boost test library home page.
+//  See http://boosttestui.wordpress.com/ for the boosttestui home page.
 
 #ifndef BOOST_TESTUI_NUNITTEST_H
 #define BOOST_TESTUI_NUNITTEST_H
