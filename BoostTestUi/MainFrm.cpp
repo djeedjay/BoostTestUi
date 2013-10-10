@@ -762,9 +762,9 @@ void CMainFrame::SelectItem(unsigned id)
 	m_treeView.SelectTestItem(id);
 }
 
-bool CMainFrame::IsActiveItem(unsigned id) const
+TestUnit CMainFrame::GetTestItem(unsigned id) const
 {
-	return true; // m_pRunner && m_pRunner->GetTestUnit(id).active;
+	return m_pRunner->GetTestUnit(id);
 }
 
 void CMainFrame::test_waiting(const std::wstring& processName, unsigned processId)

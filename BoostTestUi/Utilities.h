@@ -93,11 +93,6 @@ public:
 	{
 	}
 
-	operator std::wstring() const
-	{
-		return m_str;
-	}
-
 	operator const wchar_t*() const
 	{
 		return m_str.c_str();

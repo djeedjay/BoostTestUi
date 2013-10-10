@@ -22,7 +22,7 @@ BEGIN_MSG_MAP_TRY(CTreeView)
 	MSG_WM_TIMER(OnTimer)
 	MSG_WM_CONTEXTMENU(OnContextMenu);
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(TVN_SELCHANGED, OnSelChanged)
-//	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CUSTOMDRAW, OnCustomDraw)
+	REFLECTED_NOTIFY_CODE_HANDLER_EX(TVN_GETINFOTIP, OnGetInfoTip)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CLICK, OnClick)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_RCLICK, OnRClick)
 	CHAIN_MSG_MAP(COffscreenPaint<CTreeView>)
@@ -148,28 +148,16 @@ LRESULT CTreeView::OnSelChanged(NMHDR* pnmh)
 	return 0;
 }
 
-LRESULT CTreeView::OnCustomDraw(NMHDR* pnmh)
+LRESULT CTreeView::OnGetInfoTip(NMHDR* pnmh)
 {
-	NMTVCUSTOMDRAW* pCustomDraw = reinterpret_cast<NMTVCUSTOMDRAW*>(pnmh);
-
-	switch (pCustomDraw->nmcd.dwDrawStage)
-	{
-	case CDDS_PREPAINT:
-		return CDRF_NOTIFYITEMDRAW;
-
-	case CDDS_ITEMPREPAINT:
-		{
-		HTREEITEM hItem = reinterpret_cast<HTREEITEM>(pCustomDraw->nmcd.dwItemSpec);
-		if (!m_pMainFrame->IsActiveItem(GetItemData(hItem)))
-		{
-			pCustomDraw->clrText = GetSysColor(COLOR_GRAYTEXT);
-			pCustomDraw->clrTextBk = GetSysColor(COLOR_3DLIGHT);
-		}
-		return CDRF_DODEFAULT;
-		}
-	}
-
-	return CDRF_DODEFAULT;
+	NMTVGETINFOTIP* pNmGetInfoTip = reinterpret_cast<NMTVGETINFOTIP*>(pnmh);
+	std::wstring tooltip = WStr(m_pMainFrame->GetTestItem(GetItemData(pNmGetInfoTip->hItem)).fullName);
+	size_t maxSize = pNmGetInfoTip->cchTextMax;
+	if (tooltip.size() + 1 > maxSize)
+		tooltip = tooltip.substr(maxSize - 4) + L"...";
+	assert(tooltip.size() + 1 <= maxSize);
+	wcsncpy(pNmGetInfoTip->pszText, tooltip.c_str(), tooltip.size() + 1);
+	return 0;
 }
 
 LRESULT CTreeView::OnClick(NMHDR* pnmh)
