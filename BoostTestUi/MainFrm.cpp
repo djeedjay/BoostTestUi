@@ -327,14 +327,15 @@ public:
 
 	virtual void VisitTestCase(TestCase& tc) override
 	{
-		m_treeView.EnableItem(tc.id, Match(tc.categories));
+		tc.active = Match(tc.categories);
+		m_treeView.EnableItem(tc.id, tc.active);
 	}
 
 	virtual void EnterTestSuite(TestSuite& ts) override
 	{
-		bool active = Match(ts.categories);
-		m_treeView.EnableItem(ts.id, active);
-		m_suites.push_back(active);
+		ts.active = Match(ts.categories);
+		m_treeView.EnableItem(ts.id, ts.active);
+		m_suites.push_back(ts.active);
 	}
 
 	virtual void LeaveTestSuite() override
@@ -760,6 +761,11 @@ void CMainFrame::AddLogMessage(const SYSTEMTIME& localTime, double t, Severity::
 void CMainFrame::SelectItem(unsigned id)
 {
 	m_treeView.SelectTestItem(id);
+}
+
+bool CMainFrame::IsActiveItem(unsigned id) const
+{
+	return m_pRunner && m_pRunner->GetTestUnit(id).active;
 }
 
 TestUnit CMainFrame::GetTestItem(unsigned id) const

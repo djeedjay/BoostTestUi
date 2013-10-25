@@ -57,6 +57,7 @@ public:
 
 	void AddLogMessage(const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg);
 	void SelectItem(unsigned id);
+	bool IsActiveItem(unsigned id) const;
 	TestUnit GetTestItem(unsigned id) const;
 
 	void EnQueue(const std::function<void ()>& fn);
