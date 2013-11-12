@@ -66,6 +66,11 @@ public:
 	{
 	}
 
+	std::string str() const
+	{
+		return m_str;
+	}
+
 	operator std::string() const
 	{
 		return m_str;
@@ -91,6 +96,11 @@ public:
 	explicit WStr(const std::wstring& s) :
 		m_str(s)
 	{
+	}
+
+	std::wstring str() const
+	{
+		return m_str;
 	}
 
 	operator std::wstring() const
@@ -243,6 +253,8 @@ std::wstring GetExceptionMessage();
 
 DWORD SetRichEditData(CRichEditCtrl& ctrl, DWORD format, const BYTE* pData, size_t len);
 DWORD SetRichEditData(CRichEditCtrl& ctrl, DWORD format, LPWSTR resourcedId);
+
+std::wstring GetDlgItemText(const CWindow& wnd, int idc);
 
 } // namespace gj
 

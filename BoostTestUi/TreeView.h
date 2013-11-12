@@ -24,7 +24,7 @@ struct TreeViewItemState
 	bool expand;
 };
 
-typedef CWinTraitsOR<TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT | TVS_SHOWSELALWAYS> CTreeViewTraits;
+typedef CWinTraitsOR<TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT | TVS_SHOWSELALWAYS | TVS_INFOTIP> CTreeViewTraits;
 
 class CTreeView :
 	public CWindowImpl<CTreeView, CTreeViewCtrl, CTreeViewTraits>,
@@ -81,6 +81,7 @@ public:
 	void OnContextMenu(HWND hWnd, CPoint pt);
 	LRESULT OnCustomDraw(NMHDR* pnmh);
 	LRESULT OnSelChanged(NMHDR* pnmh);
+	LRESULT OnGetInfoTip(NMHDR* pnmh);
 	LRESULT OnClick(NMHDR* pnmh);
 	LRESULT OnRClick(NMHDR* pnmh);
 	void DoPaint(CDCHandle hdc, const RECT& rcClip);

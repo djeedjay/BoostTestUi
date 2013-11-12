@@ -119,6 +119,8 @@ struct TestRunner
 	virtual unsigned GetEnabledOptions(unsigned options) = 0;
 	virtual bool IsRunning() const = 0;
 	virtual void SetRepeat(bool repeat) = 0;
+	virtual void SetArguments(const std::wstring& args) = 0;
+	virtual std::wstring GetArguments() const = 0;
 	virtual void Run(int logLevel, unsigned options) = 0;
 	virtual void Continue() = 0;
 	virtual void Abort() = 0;

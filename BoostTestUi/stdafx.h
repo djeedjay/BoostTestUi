@@ -19,9 +19,12 @@ using std::max;
 #define _WIN32_IE	0x0603
 #define _RICHEDIT_VER	0x0100
 
+#define _WTL_NO_CSTRING
+
 #pragma warning(push, 3)
 #pragma warning(disable: 4996)
 #include <atlbase.h>
+#include <atlstr.h>
 #include <atlapp.h>
 #include <atlwin.h>
 #include <atlcrack.h>

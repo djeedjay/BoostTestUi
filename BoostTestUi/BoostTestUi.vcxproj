@@ -136,6 +136,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDlg.cpp" />
+    <ClCompile Include="ArgumentsDlg.cpp" />
     <ClCompile Include="BoostHelpDlg.cpp" />
     <ClCompile Include="BoostTest.cpp" />
     <ClCompile Include="BoostTestUi.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="..\include\boost\test\unit_test_gui.hpp" />
     <ClInclude Include="..\include\gtest\gtest-gui.h" />
     <ClInclude Include="AboutDlg.h" />
+    <ClInclude Include="ArgumentsDlg.h" />
     <ClInclude Include="BoostHelpDlg.h" />
     <ClInclude Include="BoostTest.h" />
     <ClInclude Include="boost\test\unit_test_gui.hpp" />

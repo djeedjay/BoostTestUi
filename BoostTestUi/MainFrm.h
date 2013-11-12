@@ -57,7 +57,7 @@ public:
 
 	void AddLogMessage(const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg);
 	void SelectItem(unsigned id);
-	bool IsActiveItem(unsigned id) const;
+	TestUnit GetTestItem(unsigned id) const;
 
 	void EnQueue(const std::function<void ()>& fn);
 
@@ -95,6 +95,7 @@ public:
 	    UPDATE_ELEMENT(ID_TEST_RANDOMIZE, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
 	    UPDATE_ELEMENT(ID_TEST_REPEAT, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
 	    UPDATE_ELEMENT(ID_TEST_DEBUGGER, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
+		UPDATE_ELEMENT(ID_TEST_RUNNERARGS, UPDUI_MENUPOPUP)
 	    UPDATE_ELEMENT(ID_TREE_RUN, UPDUI_MENUPOPUP)
 	    UPDATE_ELEMENT(ID_TREE_RUN_CHECKED, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
 	    UPDATE_ELEMENT(ID_TREE_RUN_ALL, UPDUI_MENUPOPUP)
@@ -138,6 +139,7 @@ public:
 	void OnTestRandomize(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestRepeat(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestDebugger(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnTestRunnerArgs(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestAbort(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestCategories(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnHelpBoost(UINT uNotifyCode, int nID, CWindow wndCtl);

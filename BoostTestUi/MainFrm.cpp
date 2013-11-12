@@ -19,6 +19,7 @@
 #include "BoostHelpDlg.h"
 #include "GoogleHelpDlg.h"
 #include "AboutDlg.h"
+#include "ArgumentsDlg.h"
 #include "ExeRunner.h"
 #include "MainFrm.h"
 
@@ -67,6 +68,7 @@ BEGIN_MSG_MAP_TRY(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_TEST_RANDOMIZE, OnTestRandomize)
 	COMMAND_ID_HANDLER_EX(ID_TEST_REPEAT, OnTestRepeat)
 	COMMAND_ID_HANDLER_EX(ID_TEST_DEBUGGER, OnTestDebugger)
+	COMMAND_ID_HANDLER_EX(ID_TEST_RUNNERARGS, OnTestRunnerArgs)
 	COMMAND_ID_HANDLER_EX(ID_TEST_ABORT, OnTestAbort)
 	COMMAND_ID_HANDLER_EX(ID_TEST_CATEGORIES, OnTestCategories)
 	COMMAND_ID_HANDLER_EX(ID_HELP_BOOST, OnHelpBoost)
@@ -125,6 +127,7 @@ void CMainFrame::UpdateUI()
 	UIEnable(ID_TEST_RANDOMIZE, (enabled & TestRunner::Randomize) != 0);
 	UIEnable(ID_TEST_REPEAT, isLoaded);
 	UIEnable(ID_TEST_DEBUGGER, (enabled & TestRunner::WaitForDebugger) != 0);
+	UIEnable(ID_TEST_RUNNERARGS, isLoaded);
 	UIEnable(ID_TREE_RUN, isRunnable);
 	UIEnable(ID_TREE_RUN_CHECKED, isRunnable);
 	UIEnable(ID_TREE_RUN_ALL, isRunnable);
@@ -762,9 +765,9 @@ void CMainFrame::SelectItem(unsigned id)
 	m_treeView.SelectTestItem(id);
 }
 
-bool CMainFrame::IsActiveItem(unsigned id) const
+TestUnit CMainFrame::GetTestItem(unsigned id) const
 {
-	return true; // m_pRunner && m_pRunner->GetTestUnit(id).active;
+	return m_pRunner->GetTestUnit(id);
 }
 
 void CMainFrame::test_waiting(const std::wstring& processName, unsigned processId)
@@ -976,6 +979,13 @@ void CMainFrame::OnTestDebugger(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wnd
 {
 	m_debugger = !m_debugger;
 	UpdateUI();
+}
+
+void CMainFrame::OnTestRunnerArgs(UINT uNotifyCode, int nID, CWindow wndCtl)
+{
+	CArgumentsDlg dlg(m_pRunner->GetArguments());
+	if (dlg.DoModal() == IDOK)
+		m_pRunner->SetArguments(dlg.GetArguments());
 }
 
 unsigned CMainFrame::GetOptions() const
