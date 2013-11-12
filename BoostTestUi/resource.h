@@ -18,7 +18,6 @@
 #define IDR_LOGLEVEL_MENU               208
 #define IDR_TREE_CONTEXTMENU            209
 #define IDD_AUTORUN                     210
-#define IDI_ICON1                       211
 #define IDI_TICKG                       211
 #define IDD_CATEGORIES                  212
 #define IDC_TREEVIEW                    1000
@@ -56,7 +55,6 @@
 #define ID_LOG_CLEARDISPLAY             32779
 #define ID_LOG_CLEAR                    32780
 #define ID_TEST_RANDOMIZE               32785
-#define ID_TEST_RANDOMIZE32786          32786
 #define ID_TEST_DEBUGGER                32787
 #define ID_TEST_WAITFORDEBUGGER         32788
 #define ID_LOG_AUTO_CLEAR               32789
@@ -78,7 +76,6 @@
 #define ID_TEST_REPEAT                  32805
 #define ID_HELP_BOOST                   32806
 #define ID_HELP_GOOGLE                  32807
-#define ID_BUTTON32809                  32809
 #define ID_LOG_TIME                     32809
 #define ID_LOG_SHOWCLOCKTIME            32810
 #define ID_RESET_SELECTION              32813
