@@ -516,7 +516,12 @@ void CMainFrame::LoadNew(const std::wstring& fileName)
 
 void CMainFrame::Reload()
 {
+	std::wstring argments;
+	if (m_pRunner)
+		argments = m_pRunner->GetArguments();
+
 	Load(m_pathName);
+	m_pRunner->SetArguments(argments);
 }
 
 void CMainFrame::OnTimer(UINT_PTR /*nIDEvent*/)
