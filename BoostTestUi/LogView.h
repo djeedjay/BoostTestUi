@@ -34,6 +34,8 @@ public:
 	void SetClockTime(bool clockTime);
 	void SetHighLight(unsigned id);
 	void SetHighLight(int begin, int end);
+	void FindNext(const std::wstring& text);
+	void FindPrevious(const std::wstring& text);
 	void Save(const std::wstring& fileName);
 	void LoadSettings(CRegKey& reg);
 	void SaveSettings(CRegKey& reg);
@@ -84,6 +86,9 @@ private:
 		int endLine;
 	};
 
+	void Find(const std::string& text, int direction);
+	COLORREF GetHighLightBkColor(Severity::type sev, int item) const;
+	void InvalidateLine(int line);
 	void InvalidateLines(int begin, int end);
 	static std::string GetTimeText(double t);
 	static std::string GetTimeText(const SYSTEMTIME& t);
@@ -95,6 +100,7 @@ private:
 	bool m_clockTime;
 	int m_logHighLightBegin;
 	int m_logHighLightEnd;
+	int m_findHighLight;
 };
 
 } // namespace gj

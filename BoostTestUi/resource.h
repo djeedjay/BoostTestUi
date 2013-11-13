@@ -21,6 +21,7 @@
 #define IDI_TICKG                       211
 #define IDD_CATEGORIES                  212
 #define IDD_ARGUMENTS                   213
+#define IDD_FIND                        214
 #define IDC_TREEVIEW                    1000
 #define IDC_PROGRESSBAR                 1001
 #define IDC_LOGVIEW                     1002
@@ -47,6 +48,9 @@
 #define IDC_INVISIBLE                   1027
 #define IDC_EDIT1                       1028
 #define IDC_ARGUMENTS                   1028
+#define IDC_TEXT                        1028
+#define IDC_PREVIOUS                    1029
+#define IDC_NEXT                        1030
 #define IDPANE_TESTCASE_ITERATIONS      2000
 #define IDPANE_TESTCASE_TOTAL           2001
 #define IDPANE_TESTCASE_RUN             2002
@@ -85,14 +89,15 @@
 #define ID_TEST_CATEGORIES              32814
 #define ID_TEST_COMMANDLINEARGS         32815
 #define ID_TEST_RUNNERARGS              32816
+#define ID_LOG_FIND                     32817
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        214
-#define _APS_NEXT_COMMAND_VALUE         32817
-#define _APS_NEXT_CONTROL_VALUE         1029
+#define _APS_NEXT_RESOURCE_VALUE        215
+#define _APS_NEXT_COMMAND_VALUE         32820
+#define _APS_NEXT_CONTROL_VALUE         1031
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

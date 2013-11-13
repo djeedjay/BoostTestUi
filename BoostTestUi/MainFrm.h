@@ -22,6 +22,7 @@
 #include "Utilities.h"
 #include "TreeView.h"
 #include "LogView.h"
+#include "FindDlg.h"
 #include "CategoryList.h"
 #include "ExeRunner.h"
 
@@ -54,6 +55,8 @@ public:
 	DECLARE_FRAME_WND_CLASS(nullptr, IDR_MAINFRAME)
 
 	void SetLogHighLight(unsigned id);
+	void FindNext(const std::wstring& text);
+	void FindPrevious(const std::wstring& text);
 
 	void AddLogMessage(const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg);
 	void SelectItem(unsigned id);
@@ -136,6 +139,7 @@ public:
 	void OnLogClear(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnLogTime(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnLogCopy(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnLogFind(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestRandomize(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestRepeat(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestDebugger(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -189,6 +193,7 @@ private:
 	CProgressBarCtrl m_progressBar;
 	CLogView m_logView;
 	CRecentDocumentList m_mru;
+	CFindDlg m_findDlg;
 	std::unique_ptr<TestRunner> m_pRunner;
 	CategoryList m_categories;
 	UnitTestType::type m_helpType;
