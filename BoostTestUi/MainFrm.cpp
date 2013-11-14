@@ -423,20 +423,23 @@ private:
 void CMainFrame::EnQueue(const std::function<void ()>& fn)
 {
 	boost::mutex::scoped_lock lock(m_mtx);
+	bool notify = m_q.empty();
 	m_q.push(fn);
-	PostMessage(UM_DEQUEUE);
+	if (notify)
+		PostMessage(UM_DEQUEUE);
 }
 
 LRESULT CMainFrame::OnDeQueue(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
-	boost::mutex::scoped_lock lock(m_mtx);
-	while (!m_q.empty())
+	std::queue<std::function<void ()>> fnq;
 	{
-		auto fn = m_q.front();
-		m_q.pop();
-		lock.unlock();
-		fn();
-		lock.lock();
+		boost::mutex::scoped_lock lock(m_mtx);
+		std::swap(m_q, fnq);
+	}
+	while (!fnq.empty())
+	{
+		fnq.front()();
+		fnq.pop();
 	}
 	return 0;
 }
