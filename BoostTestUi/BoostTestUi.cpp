@@ -1,9 +1,9 @@
-//  (C) Copyright Gert-Jan de Vos 2012.
-//  Distributed under the Boost Software License, Version 1.0.
-//  (See accompanying file LICENSE_1_0.txt or copy at 
-//  http://www.boost.org/LICENSE_1_0.txt)
+// (C) Copyright Gert-Jan de Vos 2012.
+// Distributed under the Boost Software License, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or copy at 
+// http://www.boost.org/LICENSE_1_0.txt)
 
-//  See http://boosttestui.wordpress.com/ for the boosttestui home page.
+// See http://boosttestui.wordpress.com/ for the boosttestui home page.
 
 #include "stdafx.h"
 
@@ -19,7 +19,11 @@ int Run(LPTSTR lpstrCmdLine, int nCmdShow)
 	CMessageLoop theLoop;
 	_Module.AddMessageLoop(&theLoop);
 
-	gj::CMainFrame wndMain(lpstrCmdLine);
+	int argc;
+	auto argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+	gj::CMainFrame wndMain(argc > 1 ? argv[1] : L"");
+	LocalFree(argv);
+
 	if (wndMain.CreateEx() == nullptr)
 	{
 		ATLTRACE(_T("Main window creation failed!\n"));

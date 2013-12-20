@@ -1,9 +1,9 @@
-//  (C) Copyright Gert-Jan de Vos 2012.
-//  Distributed under the Boost Software License, Version 1.0.
-//  (See accompanying file LICENSE_1_0.txt or copy at 
-//  http://www.boost.org/LICENSE_1_0.txt)
+// (C) Copyright Gert-Jan de Vos 2012.
+// Distributed under the Boost Software License, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or copy at 
+// http://www.boost.org/LICENSE_1_0.txt)
 
-//  See http://boosttestui.wordpress.com/ for the boosttestui home page.
+// See http://boosttestui.wordpress.com/ for the boosttestui home page.
 
 #include "stdafx.h"
 #include <iomanip>
@@ -34,8 +34,7 @@ CLogView::CLogView(CMainFrame& mainFrame) :
 	m_pMainFrame(&mainFrame),
 	m_clockTime(false),
 	m_logHighLightBegin(0),
-	m_logHighLightEnd(0),
-	m_findHighLight(-1)
+	m_logHighLightEnd(0)
 {
 }
 
@@ -145,9 +144,8 @@ void CLogView::SetHighLight(int begin, int end)
 	InvalidateLines(m_logHighLightBegin, m_logHighLightEnd);
 }
 
-void CLogView::Find(const std::string& text, int direction)
+bool CLogView::Find(const std::string& text, int direction)
 {
-	InvalidateLine(m_findHighLight);
 	int begin = std::max(GetNextItem(-1, LVNI_FOCUSED), 0);
 	int line = begin + direction;
 	while (line != begin)
@@ -159,24 +157,24 @@ void CLogView::Find(const std::string& text, int direction)
 
 		if (m_logLines[line].message.find(text) != std::string::npos)
 		{
-			m_findHighLight = line;
 			EnsureVisible(line, true);
 			SetItemState(line, LVIS_FOCUSED, LVIS_FOCUSED);
-			InvalidateLine(m_findHighLight);
-			return;
+			SelectItem(line);
+			return true;
 		}
 		line += direction;
 	}
+	return false;
 }
 
-void CLogView::FindNext(const std::wstring& text)
+bool CLogView::FindNext(const std::wstring& text)
 {
-	Find(Str(text).str(), +1);
+	return Find(Str(text).str(), +1);
 }
 
-void CLogView::FindPrevious(const std::wstring& text)
+bool CLogView::FindPrevious(const std::wstring& text)
 {
-	Find(Str(text).str(), -1);
+	return Find(Str(text).str(), -1);
 }
 
 void CLogView::Add(unsigned id, const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg)
@@ -304,9 +302,6 @@ int to_int(const std::string& s)
 
 COLORREF CLogView::GetHighLightBkColor(Severity::type sev, int item) const
 {
-	if (item == m_findHighLight)
-		return RGB(255, 255, 128);
-
 	bool highLight = item >= m_logHighLightBegin && item < m_logHighLightEnd;
 
 	switch (sev)
