@@ -19,6 +19,7 @@
 #include "BoostHelpDlg.h"
 #include "GoogleHelpDlg.h"
 #include "AboutDlg.h"
+#include "ArgumentsDlg.h"
 #include "ExeRunner.h"
 #include "MainFrm.h"
 
@@ -64,9 +65,11 @@ BEGIN_MSG_MAP_TRY(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_LOG_CLEAR, OnLogClear)
 	COMMAND_ID_HANDLER_EX(ID_LOG_TIME, OnLogTime)
 	COMMAND_ID_HANDLER_EX(ID_LOG_COPY, OnLogCopy)
+	COMMAND_ID_HANDLER_EX(ID_LOG_FIND, OnLogFind)
 	COMMAND_ID_HANDLER_EX(ID_TEST_RANDOMIZE, OnTestRandomize)
 	COMMAND_ID_HANDLER_EX(ID_TEST_REPEAT, OnTestRepeat)
 	COMMAND_ID_HANDLER_EX(ID_TEST_DEBUGGER, OnTestDebugger)
+	COMMAND_ID_HANDLER_EX(ID_TEST_RUNNERARGS, OnTestRunnerArgs)
 	COMMAND_ID_HANDLER_EX(ID_TEST_ABORT, OnTestAbort)
 	COMMAND_ID_HANDLER_EX(ID_TEST_CATEGORIES, OnTestCategories)
 	COMMAND_ID_HANDLER_EX(ID_HELP_BOOST, OnHelpBoost)
@@ -88,6 +91,7 @@ CMainFrame::CMainFrame(const std::wstring& fileName) :
 	m_pathName(fileName),
 	m_treeView(*this),
 	m_logView(*this),
+	m_findDlg(*this),
 	m_autoRun(false),
 	m_logAutoClear(true),
 	m_randomize(false),
@@ -125,6 +129,7 @@ void CMainFrame::UpdateUI()
 	UIEnable(ID_TEST_RANDOMIZE, (enabled & TestRunner::Randomize) != 0);
 	UIEnable(ID_TEST_REPEAT, isLoaded);
 	UIEnable(ID_TEST_DEBUGGER, (enabled & TestRunner::WaitForDebugger) != 0);
+	UIEnable(ID_TEST_RUNNERARGS, isLoaded);
 	UIEnable(ID_TREE_RUN, isRunnable);
 	UIEnable(ID_TREE_RUN_CHECKED, isRunnable);
 	UIEnable(ID_TREE_RUN_ALL, isRunnable);
@@ -153,12 +158,12 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 	AddSimpleReBarBand(hWndToolBar, nullptr, true);
 
 	m_combo.Create(m_hWnd, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBS_HASSTRINGS | CBS_DROPDOWNLIST | CBS_AUTOHSCROLL, 0, ID_LOGLEVEL);
+	m_combo.SetFont(AtlGetDefaultGuiFont());
 	m_combo.AddString(L"Minimal");
 	m_combo.AddString(L"Medium");
 	m_combo.AddString(L"All");
 	m_combo.SetCurSel(2);
 	AddSimpleReBarBand(m_combo, L"Log Level: ", false, 60);
-	m_combo.SetFont(AtlGetDefaultGuiFont());
 	SizeSimpleReBarBands();
 
 	CStatic stCtrl;
@@ -200,6 +205,8 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 
 	m_hSplit.SetSplitterPanes(m_progressBar, m_logView);
 	m_vSplit.SetSplitterPanes(m_treeView, m_hSplit);
+
+	m_findDlg.Create(*this, 0);
 
 	UIAddToolBar(hWndToolBar);
 
@@ -513,7 +520,12 @@ void CMainFrame::LoadNew(const std::wstring& fileName)
 
 void CMainFrame::Reload()
 {
+	std::wstring argments;
+	if (m_pRunner)
+		argments = m_pRunner->GetArguments();
+
 	Load(m_pathName);
+	m_pRunner->SetArguments(argments);
 }
 
 void CMainFrame::OnTimer(UINT_PTR /*nIDEvent*/)
@@ -741,6 +753,11 @@ void CMainFrame::OnLogCopy(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/
 {
 	ScopedCursor cursor(::LoadCursor(nullptr, IDC_WAIT));
 	m_logView.Copy();
+}
+
+void CMainFrame::OnLogFind(UINT uNotifyCode, int nID, CWindow wndCtl)
+{
+	m_findDlg.ShowWindow(SW_SHOW);
 }
 
 void CMainFrame::test_message(Severity::type severity, const std::string& msg)
@@ -987,6 +1004,13 @@ void CMainFrame::OnTestDebugger(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wnd
 	UpdateUI();
 }
 
+void CMainFrame::OnTestRunnerArgs(UINT uNotifyCode, int nID, CWindow wndCtl)
+{
+	CArgumentsDlg dlg(m_pRunner->GetArguments());
+	if (dlg.DoModal() == IDOK)
+		m_pRunner->SetArguments(dlg.GetArguments());
+}
+
 unsigned CMainFrame::GetOptions() const
 {
 	unsigned options = 0;
@@ -1092,6 +1116,16 @@ void CMainFrame::OnMruMenuItem(UINT /*uCode*/, int nID, HWND /*hwndCtrl*/)
 void CMainFrame::SetLogHighLight(unsigned id)
 {
 	m_logView.SetHighLight(id);
+}
+
+void CMainFrame::FindNext(const std::wstring& text)
+{
+	m_logView.FindNext(text);
+}
+
+void CMainFrame::FindPrevious(const std::wstring& text)
+{
+	m_logView.FindPrevious(text);
 }
 
 void CMainFrame::OnClose()

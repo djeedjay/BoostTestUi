@@ -176,7 +176,7 @@ LRESULT CTreeView::OnCustomDraw(NMHDR* pnmh)
 LRESULT CTreeView::OnGetInfoTip(NMHDR* pnmh)
 {
 	NMTVGETINFOTIP* pNmGetInfoTip = reinterpret_cast<NMTVGETINFOTIP*>(pnmh);
-	std::wstring tooltip = WStr(m_pMainFrame->GetTestItem(GetItemData(pNmGetInfoTip->hItem)).fullName);
+	std::wstring tooltip = WStr(m_pMainFrame->GetTestItem(GetItemData(pNmGetInfoTip->hItem)).fullName).str();
 	size_t maxSize = pNmGetInfoTip->cchTextMax;
 	if (tooltip.size() + 1 > maxSize)
 		tooltip = tooltip.substr(maxSize - 4) + L"...";

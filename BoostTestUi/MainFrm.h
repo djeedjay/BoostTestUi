@@ -22,6 +22,7 @@
 #include "Utilities.h"
 #include "TreeView.h"
 #include "LogView.h"
+#include "FindDlg.h"
 #include "CategoryList.h"
 #include "ExeRunner.h"
 
@@ -54,6 +55,8 @@ public:
 	DECLARE_FRAME_WND_CLASS(nullptr, IDR_MAINFRAME)
 
 	void SetLogHighLight(unsigned id);
+	void FindNext(const std::wstring& text);
+	void FindPrevious(const std::wstring& text);
 
 	void AddLogMessage(const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg);
 	void SelectItem(unsigned id);
@@ -96,6 +99,7 @@ public:
 	    UPDATE_ELEMENT(ID_TEST_RANDOMIZE, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
 	    UPDATE_ELEMENT(ID_TEST_REPEAT, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
 	    UPDATE_ELEMENT(ID_TEST_DEBUGGER, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
+		UPDATE_ELEMENT(ID_TEST_RUNNERARGS, UPDUI_MENUPOPUP)
 	    UPDATE_ELEMENT(ID_TREE_RUN, UPDUI_MENUPOPUP)
 	    UPDATE_ELEMENT(ID_TREE_RUN_CHECKED, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
 	    UPDATE_ELEMENT(ID_TREE_RUN_ALL, UPDUI_MENUPOPUP)
@@ -136,9 +140,11 @@ public:
 	void OnLogClear(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnLogTime(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnLogCopy(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnLogFind(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestRandomize(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestRepeat(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestDebugger(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnTestRunnerArgs(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestAbort(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestCategories(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnHelpBoost(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -188,6 +194,7 @@ private:
 	CProgressBarCtrl m_progressBar;
 	CLogView m_logView;
 	CRecentDocumentList m_mru;
+	CFindDlg m_findDlg;
 	std::unique_ptr<TestRunner> m_pRunner;
 	CategoryList m_categories;
 	UnitTestType::type m_helpType;

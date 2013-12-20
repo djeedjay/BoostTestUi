@@ -185,4 +185,11 @@ DWORD SetRichEditData(CRichEditCtrl& ctrl, DWORD format, LPWSTR resourcedId)
 	return SetRichEditData(ctrl, SF_RTF, static_cast<const BYTE*>(resource.Lock()), resource.GetSize());
 }
 
+std::wstring GetDlgItemText(const CWindow& wnd, int idc)
+{
+	CString str;
+	wnd.GetDlgItemText(idc, str);
+	return std::wstring(str, str.GetLength());
+}
+
 } // namespace gj

@@ -18,9 +18,10 @@
 #define IDR_LOGLEVEL_MENU               208
 #define IDR_TREE_CONTEXTMENU            209
 #define IDD_AUTORUN                     210
-#define IDI_ICON1                       211
 #define IDI_TICKG                       211
 #define IDD_CATEGORIES                  212
+#define IDD_ARGUMENTS                   213
+#define IDD_FIND                        214
 #define IDC_TREEVIEW                    1000
 #define IDC_PROGRESSBAR                 1001
 #define IDC_LOGVIEW                     1002
@@ -45,6 +46,11 @@
 #define IDC_INCLUDE_LABEL               1025
 #define IDC_EXCLUDE_LABEL               1026
 #define IDC_INVISIBLE                   1027
+#define IDC_EDIT1                       1028
+#define IDC_ARGUMENTS                   1028
+#define IDC_TEXT                        1028
+#define IDC_PREVIOUS                    1029
+#define IDC_NEXT                        1030
 #define IDPANE_TESTCASE_ITERATIONS      2000
 #define IDPANE_TESTCASE_TOTAL           2001
 #define IDPANE_TESTCASE_RUN             2002
@@ -56,7 +62,6 @@
 #define ID_LOG_CLEARDISPLAY             32779
 #define ID_LOG_CLEAR                    32780
 #define ID_TEST_RANDOMIZE               32785
-#define ID_TEST_RANDOMIZE32786          32786
 #define ID_TEST_DEBUGGER                32787
 #define ID_TEST_WAITFORDEBUGGER         32788
 #define ID_LOG_AUTO_CLEAR               32789
@@ -78,19 +83,21 @@
 #define ID_TEST_REPEAT                  32805
 #define ID_HELP_BOOST                   32806
 #define ID_HELP_GOOGLE                  32807
-#define ID_BUTTON32809                  32809
 #define ID_LOG_TIME                     32809
 #define ID_LOG_SHOWCLOCKTIME            32810
 #define ID_RESET_SELECTION              32813
 #define ID_TEST_CATEGORIES              32814
+#define ID_TEST_COMMANDLINEARGS         32815
+#define ID_TEST_RUNNERARGS              32816
+#define ID_LOG_FIND                     32817
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        213
-#define _APS_NEXT_COMMAND_VALUE         32815
-#define _APS_NEXT_CONTROL_VALUE         1028
+#define _APS_NEXT_RESOURCE_VALUE        215
+#define _APS_NEXT_COMMAND_VALUE         32820
+#define _APS_NEXT_CONTROL_VALUE         1031
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

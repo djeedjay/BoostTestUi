@@ -34,7 +34,8 @@ CLogView::CLogView(CMainFrame& mainFrame) :
 	m_pMainFrame(&mainFrame),
 	m_clockTime(false),
 	m_logHighLightBegin(0),
-	m_logHighLightEnd(0)
+	m_logHighLightEnd(0),
+	m_findHighLight(-1)
 {
 }
 
@@ -100,6 +101,11 @@ void CLogView::Clear()
 	SetHighLight(0, 0);
 }
 
+void CLogView::InvalidateLine(int line)
+{
+	InvalidateLines(line, line + 1);
+}
+
 void CLogView::InvalidateLines(int begin, int end)
 {
 	if (begin >= end)
@@ -137,6 +143,40 @@ void CLogView::SetHighLight(int begin, int end)
 	m_logHighLightBegin = begin;
 	m_logHighLightEnd = end;
 	InvalidateLines(m_logHighLightBegin, m_logHighLightEnd);
+}
+
+void CLogView::Find(const std::string& text, int direction)
+{
+	InvalidateLine(m_findHighLight);
+	int begin = std::max(GetNextItem(-1, LVNI_FOCUSED), 0);
+	int line = begin + direction;
+	while (line != begin)
+	{
+		if (line < 0)
+			line += m_logLines.size();
+		if (line == m_logLines.size())
+			line = 0;
+
+		if (m_logLines[line].message.find(text) != std::string::npos)
+		{
+			m_findHighLight = line;
+			EnsureVisible(line, true);
+			SetItemState(line, LVIS_FOCUSED, LVIS_FOCUSED);
+			InvalidateLine(m_findHighLight);
+			return;
+		}
+		line += direction;
+	}
+}
+
+void CLogView::FindNext(const std::wstring& text)
+{
+	Find(Str(text).str(), +1);
+}
+
+void CLogView::FindPrevious(const std::wstring& text)
+{
+	Find(Str(text).str(), -1);
 }
 
 void CLogView::Add(unsigned id, const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg)
@@ -262,11 +302,16 @@ int to_int(const std::string& s)
 	return i;
 }
 
-COLORREF GetHighLightBkColor(Severity::type sev, bool highLight)
+COLORREF CLogView::GetHighLightBkColor(Severity::type sev, int item) const
 {
+	if (item == m_findHighLight)
+		return RGB(255, 255, 128);
+
+	bool highLight = item >= m_logHighLightBegin && item < m_logHighLightEnd;
+
 	switch (sev)
 	{
-	case Severity::Info: return highLight? RGB(224, 224, 224): CLR_DEFAULT;
+	case Severity::Info: return highLight ? RGB(224, 224, 224) : CLR_DEFAULT;
 	case Severity::Error: return RGB(255, 188, 0);
 	case Severity::Fatal: return RGB(255, 64, 64);
 	case Severity::Assertion: return RGB(200, 0, 224);
@@ -274,9 +319,9 @@ COLORREF GetHighLightBkColor(Severity::type sev, bool highLight)
 	return CLR_DEFAULT;
 }
 
-LRESULT CLogView::OnCustomDraw(LPNMHDR pnmh)
+LRESULT CLogView::OnCustomDraw(NMHDR* pnmh)
 {
-	NMLVCUSTOMDRAW* pCustomDraw = reinterpret_cast<NMLVCUSTOMDRAW*>(pnmh);
+	auto pCustomDraw = reinterpret_cast<NMLVCUSTOMDRAW*>(pnmh);
 
 	int item = pCustomDraw->nmcd.dwItemSpec;
 	switch (pCustomDraw->nmcd.dwDrawStage)
@@ -288,16 +333,16 @@ LRESULT CLogView::OnCustomDraw(LPNMHDR pnmh)
 		return CDRF_NOTIFYSUBITEMDRAW;
 
 	case CDDS_ITEMPREPAINT | CDDS_SUBITEM:
-		pCustomDraw->clrTextBk = GetHighLightBkColor(m_logLines[item].severity, item >= m_logHighLightBegin && item < m_logHighLightEnd);
+		pCustomDraw->clrTextBk = GetHighLightBkColor(m_logLines[item].severity, item);
 		return CDRF_DODEFAULT;
 	}
 
 	return CDRF_DODEFAULT;
 }
 
-LRESULT CLogView::OnDblClick(LPNMHDR pnmh)
+LRESULT CLogView::OnDblClick(NMHDR* pnmh)
 {
-	NMITEMACTIVATE* pItemActivate = reinterpret_cast<NMITEMACTIVATE*>(pnmh);
+	auto pItemActivate = reinterpret_cast<NMITEMACTIVATE*>(pnmh);
 
 	std::string line = GetItemText(pItemActivate->iItem, 1);
 	static const std::regex re1("(.+)\\((\\d+)\\): .*");
@@ -313,9 +358,9 @@ LRESULT CLogView::OnDblClick(LPNMHDR pnmh)
 	return 0;
 }
 
-LRESULT CLogView::OnItemChanged(LPNMHDR pnmh)
+LRESULT CLogView::OnItemChanged(NMHDR* pnmh)
 {
-	NMLISTVIEW* pListView = reinterpret_cast<NMLISTVIEW*>(pnmh);
+	auto pListView = reinterpret_cast<NMLISTVIEW*>(pnmh);
 
 	if ((pListView->uNewState & LVIS_FOCUSED) == 0 ||
 		pListView->iItem < 0  ||
@@ -327,9 +372,9 @@ LRESULT CLogView::OnItemChanged(LPNMHDR pnmh)
 	return 0;
 }
 
-LRESULT CLogView::OnGetInfoTip(LPNMHDR pnmh)
+LRESULT CLogView::OnGetInfoTip(NMHDR* pnmh)
 {
-	NMLVGETINFOTIP* pGetInfoTip = reinterpret_cast<NMLVGETINFOTIP*>(pnmh);
+	auto pGetInfoTip = reinterpret_cast<NMLVGETINFOTIP*>(pnmh);
 
 	return 0;
 }
@@ -355,12 +400,12 @@ std::string CLogView::GetTimeText(const SYSTEMTIME& t)
 
 std::string CLogView::GetTimeText(const LogLine& log) const
 {
-	return m_clockTime? GetTimeText(log.localTime): GetTimeText(log.time);
+	return m_clockTime ? GetTimeText(log.localTime) : GetTimeText(log.time);
 }
 
-LRESULT CLogView::OnGetDispInfo(LPNMHDR pnmh)
+LRESULT CLogView::OnGetDispInfo(NMHDR* pnmh)
 {
-	NMLVDISPINFO* pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pnmh);
+	auto pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pnmh);
 	LVITEM& item = pDispInfo->item;
 	if ((item.mask & LVIF_TEXT) == 0 || item.iItem >= static_cast<int>(m_logLines.size()))
 		return 0;

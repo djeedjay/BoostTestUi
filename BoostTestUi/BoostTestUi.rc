@@ -107,6 +107,7 @@ BEGIN
         MENUITEM "Randomize",                   ID_TEST_RANDOMIZE
         MENUITEM "Repeat",                      ID_TEST_REPEAT
         MENUITEM "&Wait for Debugger",          ID_TEST_DEBUGGER
+        MENUITEM "TestRunner Arguments...",     ID_TEST_RUNNERARGS
         MENUITEM SEPARATOR
         MENUITEM "&Run Checked\tF5",            ID_TREE_RUN_CHECKED
         MENUITEM "Run &All\tF6",                ID_TREE_RUN_ALL
@@ -121,6 +122,7 @@ BEGIN
         MENUITEM "Auto Clear Log",              ID_LOG_AUTO_CLEAR
         MENUITEM "Clock Time\tCtrl+T",          ID_LOG_TIME
         MENUITEM "&Copy\tCtrl+C",               ID_LOG_COPY
+        MENUITEM "&Find\tCtrl+F",               ID_LOG_FIND
     END
     POPUP "&Help"
     BEGIN
@@ -156,7 +158,7 @@ CAPTION "How To Create a Boost Unit Test"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,187,202,50,14
-    CONTROL         "",IDC_SAMPLE,"RichEdit20W",ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_BORDER | WS_TABSTOP,7,59,230,118
+    CONTROL         "",IDC_SAMPLE,"RichEdit20W",WS_BORDER | WS_TABSTOP | 0x884,7,59,230,118
     LTEXT           "Select File -> Create Header -> Boost Test...\r\nto create the unit_test_gui.hpp file somewhere in your include path.\r\n\r\nCopy the code template below into a Win32 Console Application project. Then extend the assertions, test cases and suites.",IDC_DESCRIPTION,7,12,230,40
     LTEXT           "See also",IDC_SEEALSO,7,185,28,8
     LTEXT           "http://www.boost.org/libs/test",IDC_URL,37,185,97,8
@@ -206,6 +208,29 @@ BEGIN
     LTEXT           " ",IDC_INVISIBLE,105,104,8,8
 END
 
+IDD_ARGUMENTS DIALOGEX 0, 0, 317, 50
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "TestRunner Command Line Arguments"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Arguments:",IDC_STATIC,7,9,38,8
+    EDITTEXT        IDC_ARGUMENTS,48,7,262,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,205,29,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,260,29,50,14
+END
+
+IDD_FIND DIALOGEX 0, 0, 317, 47
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Find Text"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Find:",IDC_STATIC,7,9,17,8
+    EDITTEXT        IDC_TEXT,27,7,283,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Next",IDC_NEXT,153,26,50,14
+    PUSHBUTTON      "Previous",IDC_PREVIOUS,206,26,50,14
+    PUSHBUTTON      "Close",IDCLOSE,260,26,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -243,6 +268,22 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 143
     END
+
+    IDD_ARGUMENTS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 310
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 43
+    END
+
+    IDD_FIND, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 310
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 40
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -260,13 +301,14 @@ BEGIN
     "C",            ID_LOG_COPY,            VIRTKEY, CONTROL, NOINVERT
     VK_INSERT,      ID_LOG_COPY,            VIRTKEY, CONTROL, NOINVERT
     "A",            ID_LOG_SELECTALL,       VIRTKEY, CONTROL, NOINVERT
+    "T",            ID_LOG_TIME,            VIRTKEY, CONTROL, NOINVERT
     VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
     VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
     VK_PAUSE,       ID_TEST_ABORT,          VIRTKEY, CONTROL, NOINVERT
     VK_F6,          ID_TREE_RUN_ALL,        VIRTKEY, NOINVERT
     "R",            ID_TREE_RUN_CHECKED,    VIRTKEY, CONTROL, NOINVERT
     VK_F5,          ID_TREE_RUN_CHECKED,    VIRTKEY, NOINVERT
-    "T",            ID_LOG_TIME,            VIRTKEY, CONTROL, NOINVERT
+    "F",            ID_LOG_FIND,            VIRTKEY, CONTROL, NOINVERT
 END
 
 
@@ -349,6 +391,12 @@ END
 
 STRINGTABLE
 BEGIN
+    ID_TEST_RUNNERARGS      "Set testrunner command line arguments\nTestRunner Arguments"
+    ID_LOG_FIND             "Find log text\nFind"
+END
+
+STRINGTABLE
+BEGIN
     ID_TREE_CHECK_FAILED    "Check only failed tests\nCheck Failed"
     ID_TEST_REPEAT          "Repeat the selected test cases until a failure occurs\nRepeat"
     ID_HELP_BOOST           "Display how to build a boost unit test\nBoost Unit Test"
@@ -389,21 +437,15 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_VIEW_TOOLBAR         "Show or hide the toolbar\nToggle ToolBar"
-    ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
+    IDPANE_TESTCASE_ITERATIONS "Test iterations: #####"
+    IDPANE_TESTCASE_TOTAL   "Test cases: #####"
+    IDPANE_TESTCASE_RUN     "Tests run: #####"
+    IDPANE_TESTCASE_FAILED  "Failed tests: #####"
 END
 
 STRINGTABLE
 BEGIN
     ATL_IDS_IDLEMESSAGE     "Ready"
-END
-
-STRINGTABLE
-BEGIN
-    IDPANE_TESTCASE_ITERATIONS "Test iterations: #####"
-    IDPANE_TESTCASE_TOTAL   "Test cases: #####"
-    IDPANE_TESTCASE_RUN     "Tests run: #####"
-    IDPANE_TESTCASE_FAILED  "Failed tests: #####"
 END
 
 STRINGTABLE

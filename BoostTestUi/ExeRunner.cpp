@@ -56,7 +56,7 @@ void ExeRunner::Load()
 
 	hstream hs(proc.GetStdOut());
 	m_tree.children.clear();
-	m_pArgBuilder->LoadTestUnits(m_tree, hs, Str(proc.GetName()));
+	m_pArgBuilder->LoadTestUnits(m_tree, hs, Str(proc.GetName()).str());
 	if (m_tree.children.empty())
 		throw std::runtime_error("No test cases");
 
@@ -169,12 +169,22 @@ void ExeRunner::SetRepeat(bool repeat)
 	m_repeat = repeat;
 }
 
+void ExeRunner::SetArguments(const std::wstring& args)
+{
+	m_arguments = args;
+}
+
+std::wstring ExeRunner::GetArguments() const
+{
+	return m_arguments;
+}
+
 void ExeRunner::Run(int logLevel, unsigned options)
 {
 	if (m_pThread)
 		return;
 
-	m_testArgs = m_pArgBuilder->BuildArgs(*this, logLevel, options);
+	m_testArgs = m_pArgBuilder->BuildArgs(*this, logLevel, options) + L" " + m_arguments;
 	m_repeat = (options & ExeRunner::Repeat) != 0;
 	StartTestProcess();
 	m_pThread.reset(new boost::thread([this]() { RunTest(); }));
