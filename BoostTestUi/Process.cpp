@@ -116,7 +116,7 @@ void Process::Run(const std::wstring& pathName, const std::wstring& args)
 		commandLine += args;
 	}
 
-   	SECURITY_ATTRIBUTES saAttr; 
+	SECURITY_ATTRIBUTES saAttr; 
 	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
 	saAttr.bInheritHandle = true; 
 	saAttr.lpSecurityDescriptor = nullptr; 

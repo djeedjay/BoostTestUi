@@ -300,6 +300,7 @@ BEGIN
     "X",            ID_LOG_CLEAR,           VIRTKEY, CONTROL, NOINVERT
     "C",            ID_LOG_COPY,            VIRTKEY, CONTROL, NOINVERT
     VK_INSERT,      ID_LOG_COPY,            VIRTKEY, CONTROL, NOINVERT
+    "F",            ID_LOG_FIND,            VIRTKEY, CONTROL, NOINVERT
     "A",            ID_LOG_SELECTALL,       VIRTKEY, CONTROL, NOINVERT
     "T",            ID_LOG_TIME,            VIRTKEY, CONTROL, NOINVERT
     VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
@@ -308,7 +309,6 @@ BEGIN
     VK_F6,          ID_TREE_RUN_ALL,        VIRTKEY, NOINVERT
     "R",            ID_TREE_RUN_CHECKED,    VIRTKEY, CONTROL, NOINVERT
     VK_F5,          ID_TREE_RUN_CHECKED,    VIRTKEY, NOINVERT
-    "F",            ID_LOG_FIND,            VIRTKEY, CONTROL, NOINVERT
 END
 
 
@@ -437,10 +437,10 @@ END
 
 STRINGTABLE
 BEGIN
-    IDPANE_TESTCASE_ITERATIONS "Test iterations: #####"
-    IDPANE_TESTCASE_TOTAL   "Test cases: #####"
-    IDPANE_TESTCASE_RUN     "Tests run: #####"
-    IDPANE_TESTCASE_FAILED  "Failed tests: #####"
+    ID_ITERATIONS_PANE      "Test iterations: #####"
+    ID_TOTAL_PANE           "Test cases: #####"
+    ID_RUN_PANE             "Tests run: #####"
+    ID_FAILED_PANE          "Failed tests: #####"
 END
 
 STRINGTABLE

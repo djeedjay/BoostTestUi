@@ -60,6 +60,7 @@ public:
 
 	void AddLogMessage(const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg);
 	void SelectItem(unsigned id);
+	bool IsActiveItem(unsigned id) const;
 	TestUnit GetTestItem(unsigned id) const;
 
 	void EnQueue(const std::function<void ()>& fn);
@@ -161,6 +162,7 @@ public:
 private:
 	void UpdateUI();
 	void UpdateStatusBar();
+	void UpdateProgressBar();
 	void ClearTestSelection();
 	void SaveTestSelection();
 	void RestoreTestSelection();

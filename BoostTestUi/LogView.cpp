@@ -34,7 +34,8 @@ CLogView::CLogView(CMainFrame& mainFrame) :
 	m_pMainFrame(&mainFrame),
 	m_clockTime(false),
 	m_logHighLightBegin(0),
-	m_logHighLightEnd(0)
+	m_logHighLightEnd(0),
+	m_insidePaint(false)
 {
 }
 
@@ -306,30 +307,125 @@ COLORREF CLogView::GetHighLightBkColor(Severity::type sev, int item) const
 
 	switch (sev)
 	{
-	case Severity::Info: return highLight ? RGB(224, 224, 224) : CLR_DEFAULT;
+	case Severity::Info: return highLight ? RGB(224, 224, 224) : GetSysColor(COLOR_WINDOW);
 	case Severity::Error: return RGB(255, 188, 0);
 	case Severity::Fatal: return RGB(255, 64, 64);
 	case Severity::Assertion: return RGB(200, 0, 224);
 	}
-	return CLR_DEFAULT;
+	return GetSysColor(COLOR_WINDOW);
+}
+
+RECT CLogView::GetSubItemRect(int iItem, int iSubItem, unsigned code) const
+{
+	int subitemCount = GetHeader().GetItemCount();
+
+	RECT rect;
+	CListViewCtrl::GetSubItemRect(iItem, iSubItem, code, &rect);
+	if (iSubItem == 0 && subitemCount > 1)
+		rect.right = GetSubItemRect(iItem, 1, code).left;
+	return rect;
+}
+
+unsigned GetTextAlign(const HDITEM& item)
+{
+	switch (item.fmt & HDF_JUSTIFYMASK)
+	{
+	case HDF_LEFT: return DT_LEFT;
+	case HDF_CENTER: return DT_CENTER;
+	case HDF_RIGHT: return DT_RIGHT;
+	}
+	return HDF_LEFT;
+}
+
+class ScopedBkColor
+{
+public:
+	ScopedBkColor(HDC hdc, COLORREF col) :
+		m_hdc(hdc),
+		m_col(SetBkColor(hdc, col))
+	{
+	}
+
+	~ScopedBkColor()
+	{
+		SetBkColor(m_hdc, m_col);
+	}
+
+private:
+	HDC m_hdc;
+	COLORREF m_col;
+};
+
+class ScopedTextColor
+{
+public:
+	ScopedTextColor(HDC hdc, COLORREF col) :
+		m_hdc(hdc),
+		m_col(SetTextColor(hdc, col))
+	{
+	}
+
+	~ScopedTextColor()
+	{
+		SetTextColor(m_hdc, m_col);
+	}
+
+private:
+	HDC m_hdc;
+	COLORREF m_col;
+};
+
+void CLogView::DrawSubItem(CDCHandle dc, int iItem, int iSubItem) const
+{
+	auto text = GetSubItemText(iItem, iSubItem);
+	RECT rect = GetSubItemRect(iItem, iSubItem, LVIR_BOUNDS);
+	int margin = GetHeader().GetBitmapMargin();
+	rect.left += margin;
+	rect.right -= margin;
+
+	HDITEM item;
+	item.mask = HDI_FORMAT;
+	unsigned align = (GetHeader().GetItem(iSubItem, &item)) ? GetTextAlign(item) : HDF_LEFT;
+	::DrawTextA(dc, text.c_str(), text.size(), &rect, align | DT_NOCLIP | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+}
+
+void CLogView::DrawItem(CDCHandle dc, int iItem, unsigned /*iItemState*/) const
+{
+	RECT rect;
+	CListViewCtrl::GetItemRect(iItem, &rect, LVIR_BOUNDS);
+
+	bool selected = GetItemState(iItem, LVIS_SELECTED) == LVIS_SELECTED;
+	bool focused = GetItemState(iItem, LVIS_FOCUSED) == LVIS_FOCUSED;
+	auto bkColor = selected ? GetSysColor(COLOR_HIGHLIGHT) : GetHighLightBkColor(m_logLines[iItem].severity, iItem);
+	auto txColor = selected ? GetSysColor(COLOR_HIGHLIGHTTEXT) : GetSysColor(COLOR_WINDOWTEXT);
+	dc.FillSolidRect(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, bkColor);
+	ScopedBkColor bcol(dc, bkColor);
+	ScopedTextColor tcol(dc, txColor);
+
+	int subitemCount = GetHeader().GetItemCount();
+	for (int i = 0; i < subitemCount; ++i)
+		DrawSubItem(dc, iItem, i);
+	if (focused)
+		dc.DrawFocusRect(&rect);
 }
 
 LRESULT CLogView::OnCustomDraw(NMHDR* pnmh)
 {
-	auto pCustomDraw = reinterpret_cast<NMLVCUSTOMDRAW*>(pnmh);
+	// See: http://stackoverflow.com/questions/938896/flickering-in-listview-with-ownerdraw-and-virtualmode
+	if (!m_insidePaint)
+		return CDRF_SKIPDEFAULT;
 
-	int item = pCustomDraw->nmcd.dwItemSpec;
-	switch (pCustomDraw->nmcd.dwDrawStage)
+	auto& nmhdr = *reinterpret_cast<NMLVCUSTOMDRAW*>(pnmh);
+
+	int item = nmhdr.nmcd.dwItemSpec;
+	switch (nmhdr.nmcd.dwDrawStage)
 	{
 	case CDDS_PREPAINT:
 		return CDRF_NOTIFYITEMDRAW;
 
 	case CDDS_ITEMPREPAINT:
-		return CDRF_NOTIFYSUBITEMDRAW;
-
-	case CDDS_ITEMPREPAINT | CDDS_SUBITEM:
-		pCustomDraw->clrTextBk = GetHighLightBkColor(m_logLines[item].severity, item);
-		return CDRF_DODEFAULT;
+		DrawItem(nmhdr.nmcd.hdc, nmhdr.nmcd.dwItemSpec, nmhdr.nmcd.uItemState);
+		return CDRF_SKIPDEFAULT;
 	}
 
 	return CDRF_DODEFAULT;
@@ -337,9 +433,9 @@ LRESULT CLogView::OnCustomDraw(NMHDR* pnmh)
 
 LRESULT CLogView::OnDblClick(NMHDR* pnmh)
 {
-	auto pItemActivate = reinterpret_cast<NMITEMACTIVATE*>(pnmh);
+	auto& nmhdr = *reinterpret_cast<NMITEMACTIVATE*>(pnmh);
 
-	std::string line = GetItemText(pItemActivate->iItem, 1);
+	std::string line = GetItemText(nmhdr.iItem, 1);
 	static const std::regex re1("(.+)\\((\\d+)\\): .*");
 	static const std::regex re2("file (.+), line (\\d+)");
 	static const std::regex re3(" in (.+):line (\\d+)");
@@ -355,21 +451,21 @@ LRESULT CLogView::OnDblClick(NMHDR* pnmh)
 
 LRESULT CLogView::OnItemChanged(NMHDR* pnmh)
 {
-	auto pListView = reinterpret_cast<NMLISTVIEW*>(pnmh);
+	auto& nmhdr = *reinterpret_cast<NMLISTVIEW*>(pnmh);
 
-	if ((pListView->uNewState & LVIS_FOCUSED) == 0 ||
-		pListView->iItem < 0  ||
-		static_cast<size_t>(pListView->iItem) >= m_logLines.size())
+	if ((nmhdr.uNewState & LVIS_FOCUSED) == 0 ||
+		nmhdr.iItem < 0  ||
+		static_cast<size_t>(nmhdr.iItem) >= m_logLines.size())
 		return 0;
 
-	m_pMainFrame->SelectItem(m_logLines[pListView->iItem].id);
+	m_pMainFrame->SelectItem(m_logLines[nmhdr.iItem].id);
 
 	return 0;
 }
 
 LRESULT CLogView::OnGetInfoTip(NMHDR* pnmh)
 {
-	auto pGetInfoTip = reinterpret_cast<NMLVGETINFOTIP*>(pnmh);
+	auto& nmhdr = *reinterpret_cast<NMLVGETINFOTIP*>(pnmh);
 
 	return 0;
 }
@@ -398,27 +494,35 @@ std::string CLogView::GetTimeText(const LogLine& log) const
 	return m_clockTime ? GetTimeText(log.localTime) : GetTimeText(log.time);
 }
 
+std::string CLogView::GetSubItemText(int iItem, int iSubItem) const
+{
+	switch (iSubItem)
+	{
+	case 0: return GetTimeText(m_logLines[iItem]);
+	case 1: return m_logLines[iItem].message;
+	}
+	return std::string();
+}
+
 LRESULT CLogView::OnGetDispInfo(NMHDR* pnmh)
 {
-	auto pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pnmh);
-	LVITEM& item = pDispInfo->item;
+	auto& nmhdr = *reinterpret_cast<NMLVDISPINFO*>(pnmh);
+	LVITEM& item = nmhdr.item;
 	if ((item.mask & LVIF_TEXT) == 0 || item.iItem >= static_cast<int>(m_logLines.size()))
 		return 0;
 
-	switch (item.iSubItem)
-	{
-	case 0: CopyItemText(GetTimeText(m_logLines[item.iItem]), item.pszText, item.cchTextMax); break;
-	case 1: CopyItemText(m_logLines[item.iItem].message, item.pszText, item.cchTextMax); break;
-	}
-
+	CopyItemText(GetSubItemText(item.iItem, item.iSubItem), item.pszText, item.cchTextMax);
 	return 0;
 }
 
 void CLogView::DoPaint(CDCHandle dc, const RECT& rcClip)
 {
-	dc.FillSolidRect(&rcClip, GetSysColor(COLOR_WINDOW));
- 
+	m_insidePaint = true;
+
+	dc.FillSolidRect(&rcClip, GetSysColor(COLOR_WINDOW)); 
 	DefWindowProc(WM_PAINT, reinterpret_cast<WPARAM>(dc.m_hDC), 0);
+
+	m_insidePaint = false;
 }
 
 } // namespace gj

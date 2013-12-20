@@ -157,12 +157,22 @@ namespace BoostTestUI
 		}
 	}
 
+	public class TestFixtureSetUpBase
+	{
+		[TestFixtureSetUp]
+		public void TestFixtureSetUp2()
+		{
+			System.Console.WriteLine("TestFixtureSetUp.TestFixtureSetUp");
+		}
+	}
+
 	[TestFixture]
-	public class ErrorInTestFixtureSetUp
+	public class ErrorInTestFixtureSetUp : TestFixtureSetUpBase
 	{
 		[TestFixtureSetUp]
 		public void TestFixtureSetUp()
 		{
+			System.Console.WriteLine("TestFixtureSetUp");
 			Assert.AreEqual(1 + 1, 3);
 		}
 
@@ -179,12 +189,22 @@ namespace BoostTestUI
 		}
 	}
 
+	public class SetUpBase
+	{
+		[SetUp]
+		public void SetUp2()
+		{
+			System.Console.WriteLine("SetUpBase.SetUp");
+		}
+	}
+
 	[TestFixture]
-	public class ErrorInSetUp
+	public class ErrorInSetUp : SetUpBase
 	{
 		[SetUp]
 		public void SetUp()
 		{
+			System.Console.WriteLine("SetUp");
 			Assert.AreEqual(1 + 1, 3);
 		}
 

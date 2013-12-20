@@ -50,19 +50,6 @@ public:
 	BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
 	void ExceptionHandler();
 	BOOL PreTranslateMessage(MSG* pMsg);
-
-// Handler prototypes (uncomment arguments if needed):
-//	LRESULT MessageHandler(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-//	LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
-
-	LRESULT OnCreate(const CREATESTRUCT* pCreate);
-	void OnContextMenu(HWND hWnd, CPoint pt);
-	LRESULT OnCustomDraw(LPNMHDR pnmh);
-	LRESULT OnDblClick(LPNMHDR pnmh);
-	LRESULT OnItemChanged(LPNMHDR pnmh);
-	LRESULT OnGetInfoTip(LPNMHDR pnmh);
-	LRESULT OnGetDispInfo(LPNMHDR pnmh);
 	void DoPaint(CDCHandle dc, const RECT& rcClip);
 
 private:
@@ -86,6 +73,23 @@ private:
 		int endLine;
 	};
 
+// Handler prototypes (uncomment arguments if needed):
+//	LRESULT MessageHandler(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+//	LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
+
+	LRESULT OnCreate(const CREATESTRUCT* pCreate);
+	void OnContextMenu(HWND hWnd, CPoint pt);
+	LRESULT OnCustomDraw(LPNMHDR pnmh);
+	LRESULT OnDblClick(LPNMHDR pnmh);
+	LRESULT OnItemChanged(LPNMHDR pnmh);
+	LRESULT OnGetInfoTip(LPNMHDR pnmh);
+	LRESULT OnGetDispInfo(LPNMHDR pnmh);
+	void DrawSubItem(CDCHandle dc, int iItem, int iSubItem) const;
+	void DrawItem(CDCHandle dc, int iItem, unsigned iItemState) const;
+	RECT GetSubItemRect(int iItem, int iSubItem, unsigned code) const;
+	std::string GetSubItemText(int iItem, int iSubItem) const;
+
 	bool Find(const std::string& text, int direction);
 	COLORREF GetHighLightBkColor(Severity::type sev, int item) const;
 	void InvalidateLine(int line);
@@ -100,6 +104,7 @@ private:
 	bool m_clockTime;
 	int m_logHighLightBegin;
 	int m_logHighLightEnd;
+	bool m_insidePaint;
 };
 
 } // namespace gj

@@ -21,7 +21,7 @@ struct TestUnit
 	enum Type { TestSuite, TestCase };
 
 	TestUnit(unsigned id, Type type, const std::string& name, bool enabled = true) :
-		id(id), type(type), name(name), enabled(enabled)//, active(true)
+		id(id), type(type), name(name), enabled(enabled), active(true)
 	{
 	}
 
@@ -31,7 +31,7 @@ struct TestUnit
 	std::string fullName;
 	bool enabled;
 	std::vector<std::string> categories;
-//	bool active;
+	bool active;
 };
 
 struct TestUnitNode

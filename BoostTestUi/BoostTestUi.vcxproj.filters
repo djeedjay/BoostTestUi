@@ -146,9 +146,6 @@
     <ClInclude Include="version.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="boost\test\unit_test_gui.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BoostHelpDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -156,9 +153,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NUnitTest.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gtest\gtest-gui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CategoryDlg.h">

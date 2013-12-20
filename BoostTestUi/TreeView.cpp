@@ -22,6 +22,7 @@ BEGIN_MSG_MAP_TRY(CTreeView)
 	MSG_WM_TIMER(OnTimer)
 	MSG_WM_CONTEXTMENU(OnContextMenu);
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(TVN_SELCHANGED, OnSelChanged)
+	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CUSTOMDRAW, OnCustomDraw)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(TVN_GETINFOTIP, OnGetInfoTip)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CLICK, OnClick)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_RCLICK, OnRClick)
@@ -146,6 +147,30 @@ LRESULT CTreeView::OnSelChanged(NMHDR* pnmh)
 	if (pNmTreeView->action != TVC_UNKNOWN)
 		m_pMainFrame->SetLogHighLight(GetItemData(pNmTreeView->itemNew.hItem));
 	return 0;
+}
+
+LRESULT CTreeView::OnCustomDraw(NMHDR* pnmh)
+{
+	NMTVCUSTOMDRAW* pCustomDraw = reinterpret_cast<NMTVCUSTOMDRAW*>(pnmh);
+
+	switch (pCustomDraw->nmcd.dwDrawStage)
+	{
+	case CDDS_PREPAINT:
+		return CDRF_NOTIFYITEMDRAW;
+
+	case CDDS_ITEMPREPAINT:
+		{
+		HTREEITEM hItem = reinterpret_cast<HTREEITEM>(pCustomDraw->nmcd.dwItemSpec);
+		if (!m_pMainFrame->IsActiveItem(GetItemData(hItem)))
+		{
+			pCustomDraw->clrText = GetSysColor(COLOR_GRAYTEXT);
+			pCustomDraw->clrTextBk = GetSysColor(COLOR_3DLIGHT);
+		}
+		return CDRF_DODEFAULT;
+		}
+	}
+
+	return CDRF_DODEFAULT;
 }
 
 LRESULT CTreeView::OnGetInfoTip(NMHDR* pnmh)
@@ -380,7 +405,11 @@ void CTreeView::Expand(unsigned id, bool expand)
 bool CTreeView::IsChecked(unsigned id) const
 {
 	auto it = m_items.find(id);
-	return it != m_items.end() && IsTreeViewItemEnabled(*this, it->second) && IsTreeViewItemChecked(*this, it->second);
+	return
+		it != m_items.end() &&
+		m_pMainFrame->IsActiveItem(id) &&
+		IsTreeViewItemEnabled(*this, it->second) &&
+		IsTreeViewItemChecked(*this, it->second);
 }
 
 void CTreeView::Check(unsigned id, bool check)
@@ -402,9 +431,9 @@ BOOL CTreeView::SetExtendedState(HTREEITEM hItem, UINT stateEx)
 
 void CTreeView::EnableItem(unsigned id, bool enable)
 {
-	auto it = m_items.find(id);
-	if (it != m_items.end())
-		SetExtendedState(it->second, enable ? 0 : TVIS_EX_DISABLED);
+//	auto it = m_items.find(id);
+//	if (it != m_items.end())
+//		SetExtendedState(it->second, enable ? 0 : TVIS_EX_DISABLED);
 }
 
 void CTreeView::SelectTestItem(unsigned id)
