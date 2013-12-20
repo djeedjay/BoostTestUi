@@ -1,9 +1,9 @@
-//  (C) Copyright Gert-Jan de Vos 2012.
-//  Distributed under the Boost Software License, Version 1.0.
-//  (See accompanying file LICENSE_1_0.txt or copy at 
-//  http://www.boost.org/LICENSE_1_0.txt)
+// (C) Copyright Gert-Jan de Vos 2012.
+// Distributed under the Boost Software License, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or copy at 
+// http://www.boost.org/LICENSE_1_0.txt)
 
-//  See http://boosttestui.wordpress.com/ for the boosttestui home page.
+// See http://boosttestui.wordpress.com/ for the boosttestui home page.
 
 #ifndef BOOST_TESTUI_FINDDLG_H
 #define BOOST_TESTUI_FINDDLG_H
@@ -29,8 +29,10 @@ public:
 		MSG_WM_INITDIALOG(OnInitDialog)
 		MSG_WM_GETMINMAXINFO(OnGetMinMaxInfo)
 		COMMAND_HANDLER_EX(IDC_TEXT, EN_CHANGE, OnTextChange);
+		COMMAND_ID_HANDLER_EX(IDOK, OnNext)
 		COMMAND_ID_HANDLER_EX(IDC_NEXT, OnNext)
 		COMMAND_ID_HANDLER_EX(IDC_PREVIOUS, OnPrevious)
+		COMMAND_ID_HANDLER_EX(IDCANCEL, OnClose)
 		COMMAND_ID_HANDLER_EX(IDCLOSE, OnClose)
 		CHAIN_MSG_MAP(CDialogResize<CFindDlg>)
 	END_MSG_MAP()

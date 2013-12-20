@@ -499,6 +499,7 @@ namespace TestRunner
 		System.Collections.Generic.List<System.Reflection.MethodInfo> setUp = new System.Collections.Generic.List<System.Reflection.MethodInfo>();
 		System.Collections.Generic.List<System.Reflection.MethodInfo> tearDown = new System.Collections.Generic.List<System.Reflection.MethodInfo>();
 		System.Collections.Generic.List<System.Reflection.MethodInfo> testFixtureTearDown = new System.Collections.Generic.List<System.Reflection.MethodInfo>();
+		TestFixtureClass baseClass;
 
 		public bool HasExplicitAttribute { get; private set; }
 
@@ -509,6 +510,11 @@ namespace TestRunner
 
 		public TestFixtureClass(string name, System.Type type) : base(name)
 		{
+			if (type.BaseType == null)
+				baseClass = null;
+			else
+				baseClass = new TestFixtureClass(name, type.BaseType);
+
 			fullName = type.FullName;
 			HasExplicitAttribute = Reflection.HasAttribute(type, typeof(NUnit.Framework.ExplicitAttribute), false);
 			Tests = new System.Collections.Generic.List<Test>();
@@ -541,12 +547,16 @@ namespace TestRunner
 
 		public void TestFixtureSetUp(object fixture)
 		{
+			if (baseClass != null)
+				baseClass.TestFixtureSetUp(fixture);
 			foreach (var method in testFixtureSetUp)
 				method.Invoke(fixture, null);
 		}
 
 		public void SetUp(object fixture)
 		{
+			if (baseClass != null)
+				baseClass.SetUp(fixture);
 			foreach (var method in setUp)
 				method.Invoke(fixture, null);
 		}
@@ -555,12 +565,16 @@ namespace TestRunner
 		{
 			foreach (var method in tearDown)
 				method.Invoke(fixture, null);
+			if (baseClass != null)
+				baseClass.TearDown(fixture);
 		}
 
 		public void TestFixtureTearDown(object fixture)
 		{
 			foreach (var method in testFixtureTearDown)
 				method.Invoke(fixture, null);
+			if (baseClass != null)
+				baseClass.TestFixtureTearDown(fixture);
 		}
 	}
 

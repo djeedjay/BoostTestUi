@@ -1,9 +1,9 @@
-//  (C) Copyright Gert-Jan de Vos 2012.
-//  Distributed under the Boost Software License, Version 1.0.
-//  (See accompanying file LICENSE_1_0.txt or copy at 
-//  http://www.boost.org/LICENSE_1_0.txt)
+// (C) Copyright Gert-Jan de Vos 2012.
+// Distributed under the Boost Software License, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or copy at 
+// http://www.boost.org/LICENSE_1_0.txt)
 
-//  See http://boosttestui.wordpress.com/ for the boosttestui home page.
+// See http://boosttestui.wordpress.com/ for the boosttestui home page.
 
 #include "stdafx.h"
 
@@ -108,6 +108,12 @@ void CMainFrame::ExceptionHandler()
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
+	if (GetActiveWindow() == m_findDlg)
+	{
+		if (m_findDlg.IsDialogMessage(pMsg))
+			return TRUE;
+	}
+
 	return CFrameWindowImpl<CMainFrame>::PreTranslateMessage(pMsg);
 }
 
@@ -179,7 +185,7 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 	UIAddStatusBar(m_hWndStatusBar);
 //	CreateSimpleStatusBar();
 
-	int paneIds[] = { ID_DEFAULT_PANE, IDPANE_TESTCASE_ITERATIONS, IDPANE_TESTCASE_TOTAL, IDPANE_TESTCASE_RUN, IDPANE_TESTCASE_FAILED };
+	int paneIds[] = { ID_DEFAULT_PANE, ID_ITERATIONS_PANE, ID_TOTAL_PANE, ID_RUN_PANE, ID_FAILED_PANE };
 	m_statusBar.SetPanes(paneIds, 5, false);
 
 	// client rect for vertical splitter
@@ -530,6 +536,8 @@ void CMainFrame::Reload()
 
 void CMainFrame::OnTimer(UINT_PTR /*nIDEvent*/)
 {
+	UpdateProgressBar();
+
 	if (!m_pRunner || m_pRunner->IsRunning())
 		return;
 
@@ -548,7 +556,6 @@ void CMainFrame::OnTimer(UINT_PTR /*nIDEvent*/)
 	Reload();
 	if (m_autoRun)
 		RunChecked();
-
 }
 
 void CMainFrame::OnDropFiles(HDROP hDropInfo)
@@ -829,10 +836,7 @@ void CMainFrame::test_iteration_start(unsigned test_cases_amount)
 	{
 		m_currentId = m_pRunner->RootTestSuite().id;
 		m_progressBar.SetPos(0);
-
-		// m_progressBar.SetState(PBST_NORMAL);
-		m_progressBar.SendMessage(PBM_SETSTATE, PBST_NORMAL, 0L);
-		m_progressBar.SetBarColor(SuccessColor);
+		UpdateProgressBar();
 		m_treeView.ResetTreeImages();
 	});
 }
@@ -883,23 +887,26 @@ void CMainFrame::test_case_finish(unsigned id, unsigned long elapsed, bool succe
 	});
 }
 
+void CMainFrame::UpdateProgressBar()
+{
+	bool ok = m_failedTestCount == 0 && !m_testCaseFailed;
+	m_progressBar.SendMessage(PBM_SETSTATE, ok ? PBST_NORMAL : PBST_ERROR);
+	m_progressBar.SetBarColor(ok ? SuccessColor : FailColor);
+	m_progressBar.SetPos(m_progressBar.GetPos()); // Win7 progress bar is one off when calling SetPos() just once ?!
+}
+
 void CMainFrame::EndTestCase(unsigned id, unsigned long /*elapsed*/, bool succeeded)
 {
 	m_treeView.EndTestCase(id, succeeded);
 	m_logView.EndTestUnit(id);
 
 	if (!succeeded)
-	{
-//		m_progressBar.SetState(PBST_ERROR);
-		m_progressBar.SendMessage(PBM_SETSTATE, PBST_ERROR, 0L);
-		m_progressBar.SetBarColor(FailColor);
 		++m_failedTestCount;
-	}
 
 	++m_testsRunCount;
-	UpdateStatusBar();
 	m_progressBar.OffsetPos(1);
-	m_progressBar.SetPos(m_progressBar.GetPos()); // Win7 progress bar is one off when calling SetPos() just once ?!
+	UpdateStatusBar();
+	UpdateProgressBar();
 }
 
 void CMainFrame::test_suite_finish(unsigned id, unsigned long /*elapsed*/)
@@ -908,6 +915,7 @@ void CMainFrame::test_suite_finish(unsigned id, unsigned long /*elapsed*/)
 	{
 		m_treeView.EndTestSuite(id);
 		m_logView.EndTestUnit(id);
+		UpdateProgressBar();
 	});
 }
 
@@ -918,6 +926,7 @@ void CMainFrame::test_unit_skipped(unsigned id)
 		CountTestCases ctc;
 		m_pRunner->TraverseTestTree(id, ctc);
 		m_progressBar.OffsetPos(ctc.count());
+		UpdateProgressBar();
 	});
 }
 
@@ -929,11 +938,12 @@ void CMainFrame::UpdateStatusBar()
 {
 	bool isLoaded = m_pRunner.get() != nullptr;
 	bool isRunning = isLoaded && m_pRunner->IsRunning();
-	UISetText(0, isRunning? L"Running...": L"Ready");
-	UISetText(1, isLoaded? WStr(wstringbuilder() << L"Test iterations: " << m_testIterationCount): L"");
-	UISetText(2, isLoaded? WStr(wstringbuilder() << L"Test cases: " << m_testCaseCount): L"");
-	UISetText(3, isLoaded? WStr(wstringbuilder() << L"Tests run: " << m_testsRunCount): L"");
-	UISetText(4, isLoaded? WStr(wstringbuilder() << L"Failed tests: " << m_failedTestCount): L"");
+
+	UISetText(ID_DEFAULT_PANE, isRunning ? L"Running..." : L"Ready");
+	UISetText(ID_ITERATIONS_PANE, isLoaded ? WStr(wstringbuilder() << L"Test iterations: " << m_testIterationCount) : L"");
+	UISetText(ID_TOTAL_PANE, isLoaded ? WStr(wstringbuilder() << L"Test cases: " << m_testCaseCount) : L"");
+	UISetText(ID_RUN_PANE, isLoaded ? WStr(wstringbuilder() << L"Tests run: " << m_testsRunCount) : L"");
+	UISetText(ID_FAILED_PANE, isLoaded ? WStr(wstringbuilder() << L"Failed tests: " << m_failedTestCount) : L"");
 }
 
 void CMainFrame::assertion_result(bool passed)
@@ -945,10 +955,7 @@ void CMainFrame::assertion_result(bool passed)
 	EnQueue([this]()
 	{
 		m_testCaseFailed = true;
-//		m_progressBar.SetState(PBST_ERROR);
-		m_progressBar.SendMessage(PBM_SETSTATE, PBST_ERROR, 0L);
-		m_progressBar.SetBarColor(FailColor);
-		m_progressBar.SetPos(m_progressBar.GetPos()); // Win7 progress bar is one off when calling SetPos() just once ?!
+		UpdateProgressBar();
 	});
 }
 
@@ -958,10 +965,7 @@ void CMainFrame::exception_caught(const std::string& /*what*/)
 	EnQueue([this, id]()
 	{
 		m_testCaseFailed = true;
-//		m_progressBar.SetState(PBST_ERROR);
-		m_progressBar.SendMessage(PBM_SETSTATE, PBST_ERROR, 0L);
-		m_progressBar.SetBarColor(FailColor);
-		m_progressBar.SetPos(m_progressBar.GetPos()); // Win7 progress bar is one off when calling SetPos() just once ?!
+		UpdateProgressBar();
 		UpdateStatusBar();
 	});
 }

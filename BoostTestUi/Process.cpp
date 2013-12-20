@@ -1,9 +1,9 @@
-//  (C) Copyright Gert-Jan de Vos 2012.
-//  Distributed under the Boost Software License, Version 1.0.
-//  (See accompanying file LICENSE_1_0.txt or copy at 
-//  http://www.boost.org/LICENSE_1_0.txt)
+// (C) Copyright Gert-Jan de Vos 2012.
+// Distributed under the Boost Software License, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or copy at 
+// http://www.boost.org/LICENSE_1_0.txt)
 
-//  See http://boosttestui.wordpress.com/ for the boosttestui home page.
+// See http://boosttestui.wordpress.com/ for the boosttestui home page.
 
 #include "stdafx.h"
 #include <string>
@@ -116,7 +116,7 @@ void Process::Run(const std::wstring& pathName, const std::wstring& args)
 		commandLine += args;
 	}
 
-   	SECURITY_ATTRIBUTES saAttr; 
+	SECURITY_ATTRIBUTES saAttr; 
 	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
 	saAttr.bInheritHandle = true; 
 	saAttr.lpSecurityDescriptor = nullptr; 
