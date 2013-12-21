@@ -103,7 +103,6 @@ CMainFrame::CMainFrame(const std::wstring& fileName) :
 void CMainFrame::ExceptionHandler()
 {
 	MessageBox(WStr(GetExceptionMessage()), LoadString(IDR_APPNAME).c_str(), MB_ICONERROR | MB_OK);
-	UpdateUI();
 }
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
@@ -119,6 +118,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 
 BOOL CMainFrame::OnIdle()
 {
+	UpdateUI();
 	UIUpdateToolBar();
 	UIUpdateStatusBar();
 	return FALSE;
@@ -129,7 +129,7 @@ void CMainFrame::UpdateUI()
 	bool isLoaded = m_pRunner.get() != nullptr;
 	bool isRunning = isLoaded && m_pRunner->IsRunning();
 	bool isRunnable = IsRunnable();
-	unsigned enabled = isLoaded? m_pRunner->GetEnabledOptions(GetOptions()): 0;
+	unsigned enabled = isLoaded ? m_pRunner->GetEnabledOptions(GetOptions()) : 0;
 	UIEnable(ID_FILE_SAVE, isLoaded);
 	UIEnable(ID_FILE_SAVE_AS, isLoaded);
 	UIEnable(ID_TEST_RANDOMIZE, (enabled & TestRunner::Randomize) != 0);
@@ -220,7 +220,6 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 	m_mru.SetMenuHandle(m_CmdBar.GetMenu().GetSubMenu(0).GetSubMenu(7));
 
 	LoadSettings();
-	UpdateUI();
 
 	// register object for message filtering and idle updates
 	CMessageLoop* pLoop = _Module.GetMessageLoop();
@@ -617,7 +616,6 @@ try
 	ClearTestSelection();
 
 	m_progressBar.SetPos(0);
-	UpdateUI();
 
 	SetWindowText(WStr(wstringbuilder() << fullPath.filename().wstring() << L" - Boost Test Runner"));
 	m_pathName = fullPath.wstring();
@@ -701,7 +699,6 @@ void CMainFrame::OnFileSaveAs(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCt
 void CMainFrame::OnFileAutoRun(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_autoRun = !m_autoRun;
-	UpdateUI();
 }
 
 void CMainFrame::OnFileCreateBoostHpp(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
@@ -731,7 +728,6 @@ void CMainFrame::OnFileCreateGoogleHpp(UINT /*uNotifyCode*/, int /*nID*/, CWindo
 void CMainFrame::OnLogAutoClear(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_logAutoClear = !m_logAutoClear;
-	UpdateUI();
 }
 
 void CMainFrame::OnResetSelection(UINT uNotifyCode, int nID, CWindow wndCtl)
@@ -753,7 +749,6 @@ void CMainFrame::OnLogClear(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*
 void CMainFrame::OnLogTime(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_logView.SetClockTime(!m_logView.GetClockTime());
-	UpdateUI();
 }
 
 void CMainFrame::OnLogCopy(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
@@ -975,7 +970,6 @@ void CMainFrame::TestStarted()
 	EnQueue([this]()
 	{
 		m_treeView.OnTestStart();
-		UpdateUI();
 	});
 }
 
@@ -985,27 +979,23 @@ void CMainFrame::TestFinished()
 	{
 		m_pRunner->Wait();
 		m_treeView.OnTestFinish();
-		UpdateUI();
 	});
 }
 
 void CMainFrame::OnTestRandomize(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_randomize = !m_randomize;
-	UpdateUI();
 }
 
 void CMainFrame::OnTestRepeat(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_repeat = !m_repeat;
 	m_pRunner->SetRepeat(m_repeat);
-	UpdateUI();
 }
 
 void CMainFrame::OnTestDebugger(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_debugger = !m_debugger;
-	UpdateUI();
 }
 
 void CMainFrame::OnTestRunnerArgs(UINT uNotifyCode, int nID, CWindow wndCtl)
@@ -1343,7 +1333,6 @@ void CMainFrame::Run()
 		m_logView.Clear();
 	m_resetTimer = m_logView.Empty();
 	m_pRunner->Run(m_combo.GetCurSel(), GetOptions());
-	UpdateUI();
 }
 
 void TreeViewStateStorage::Clear()
