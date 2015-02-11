@@ -264,4 +264,66 @@ namespace BoostTestUI
 			Assert.AreEqual(1 + 1, 2);
 		}
 	}
+
+	public enum MotionDevice
+	{
+		Autoloader,
+		Apertures,
+		Compustage,
+		Piezostage,
+		ActiveFlootIsolation,
+		SmartStage
+	};
+
+	[TestFixture(MotionDevice.Autoloader)]
+	[TestFixture(MotionDevice.Apertures)]
+	[TestFixture(MotionDevice.Compustage)]
+	[TestFixture(MotionDevice.ActiveFlootIsolation)]
+	[TestFixture(MotionDevice.SmartStage)]
+	public class MotionTest
+	{
+		public static MotionDevice Device { get; set; }
+
+		[TestFixtureSetUp]
+		public void TestFixtureSetUp()
+		{
+			System.Console.WriteLine("C# TestFixtureSetUp enter");
+		}
+
+		public MotionTest(MotionDevice device)
+		{
+			Device = device;
+			System.Console.WriteLine("Starting '" + device + "' testcases");
+		}
+
+		[TestFixtureTearDown]
+		public void TestFixtureTearDown()
+		{
+			System.Console.WriteLine("Nunit TestFixtureTearDown");
+		}
+
+		[SetUp]
+		public void Setup()
+		{
+			System.Console.WriteLine("Nunit Setup");
+		}
+
+		[TearDown]
+		public void TearDown()
+		{
+			System.Console.WriteLine("Nunit TearDown");
+		}
+
+		[Test]
+		[Category("Static")]
+		public void Test1()
+		{
+		}
+
+		[Test]
+		[Category("Moving")]
+		public void MovingTest1()
+		{
+		}
+	}
 }

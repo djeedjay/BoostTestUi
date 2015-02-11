@@ -500,27 +500,40 @@ namespace TestRunner
 		System.Collections.Generic.List<System.Reflection.MethodInfo> tearDown = new System.Collections.Generic.List<System.Reflection.MethodInfo>();
 		System.Collections.Generic.List<System.Reflection.MethodInfo> testFixtureTearDown = new System.Collections.Generic.List<System.Reflection.MethodInfo>();
 		TestFixtureClass baseClass;
+		object[] parameters;
 
 		public bool HasExplicitAttribute { get; private set; }
 
 		public TestFixture CreateInstance()
 		{
-			return new TestFixture(this, ctorInfo.Invoke(null));
+			return new TestFixture(this, ctorInfo.Invoke(parameters));
 		}
 
-		public TestFixtureClass(string name, System.Type type) : base(name)
+		private System.Type[] GetConstructorArgumentTypes(object[] parameters)
+		{
+			if (parameters == null)
+				return System.Type.EmptyTypes;
+
+			System.Type[] types = new System.Type[parameters.Length];
+			for (int i = 0; i < parameters.Length; ++i)
+				types[i] = parameters[i].GetType();
+			return types;
+		}
+
+		public TestFixtureClass(string name, System.Type type, object[] parameters) : base(name)
 		{
 			if (type.BaseType == null)
 				baseClass = null;
 			else
-				baseClass = new TestFixtureClass(name, type.BaseType);
+				baseClass = new TestFixtureClass(name, type.BaseType, null);
+			this.parameters = parameters;
 
 			fullName = type.FullName;
 			HasExplicitAttribute = Reflection.HasAttribute(type, typeof(NUnit.Framework.ExplicitAttribute), false);
 			Tests = new System.Collections.Generic.List<Test>();
 			Categories = CategoryUtils.GetCategories(type);
 
-			ctorInfo = type.GetConstructor(System.Type.EmptyTypes);
+			ctorInfo = type.GetConstructor(GetConstructorArgumentTypes(parameters));
 			if (ctorInfo == null)
 				throw new System.Exception("No default constructor");
 
@@ -587,12 +600,12 @@ namespace TestRunner
 			Items = new System.Collections.Generic.List<TestItem>();
 		}
 
-		public void Add(string path, System.Type type)
+		public void Add(string path, System.Type type, object[] arguments)
 		{
 			int index = path.IndexOf('.');
 			if (index < 0)
 			{
-				Items.Add(new TestFixtureClass(path, type));
+				Items.Add(new TestFixtureClass(path, type, arguments));
 				return;
 			}
 
@@ -601,12 +614,12 @@ namespace TestRunner
 			TestNamespace ns = Items.Find(item => item.Name == name) as TestNamespace;
 			if (ns != null)
 			{
-				ns.Add(tail, type);
+				ns.Add(tail, type, arguments);
 				return;
 			}
 
 			TestNamespace newNs = new TestNamespace(name);
-			newNs.Add(tail, type);
+			newNs.Add(tail, type, arguments);
 			Items.Add(newNs);
 		}
 	}
@@ -615,6 +628,25 @@ namespace TestRunner
 	{
 		TestNamespace global;
 		System.Random random = null;
+
+		private string ArgumentString(object arg)
+		{
+			if (arg.GetType() == typeof(string))
+				return "\"" + arg.ToString() + "\"";
+			return arg.ToString();
+		}
+
+		private string ArgumentString(object[] arguments)
+		{
+			string s = "";
+			foreach (var arg in arguments)
+			{
+				if (s.Length > 0)
+					s += ", ";
+				s += ArgumentString(arg);
+			}
+			return s;
+		}
 
 		public TestLib(string name, int randomSeed)
 		{
@@ -627,8 +659,22 @@ namespace TestRunner
 			System.Type[] classes = lib.GetTypes();
 			foreach (System.Type type in classes)
 			{
-				if (type.IsClass && Reflection.HasAttribute(type, typeof(NUnit.Framework.TestFixtureAttribute), false))
-					global.Add(type.FullName, type);
+				if (type.IsClass)
+				{
+					var attrs = Reflection.GetAttributes(type, typeof(NUnit.Framework.TestFixtureAttribute), false);
+					foreach (var attr in attrs)
+					{
+						var arguments = Reflection.GetProperty(attr, "Arguments") as object[];
+						if (arguments.Count() == 0)
+						{
+							global.Add(type.FullName, type, null);
+						}
+						else
+						{
+							global.Add(type.FullName + "." + type.Name + "(" + ArgumentString(arguments) + ")", type, arguments);
+						}
+					}
+				}
 			}
 		}
 
