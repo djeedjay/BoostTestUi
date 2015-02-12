@@ -265,24 +265,21 @@ namespace BoostTestUI
 		}
 	}
 
-	public enum MotionDevice
+	public enum Enumeration
 	{
-		Autoloader,
-		Apertures,
-		Compustage,
-		Piezostage,
-		ActiveFlootIsolation,
-		SmartStage
+		Enum1,
+		Enum2,
+		Enum3
 	};
 
-	[TestFixture(MotionDevice.Autoloader)]
-	[TestFixture(MotionDevice.Apertures)]
-	[TestFixture(MotionDevice.Compustage)]
-	[TestFixture(MotionDevice.ActiveFlootIsolation)]
-	[TestFixture(MotionDevice.SmartStage)]
+	[TestFixture(Enumeration.Enum1)]
+	[TestFixture(Enumeration.Enum2)]
+	[TestFixture(Enumeration.Enum3)]
+	[TestFixture()]
+	[TestFixture("Text", 12)]
 	public class MotionTest
 	{
-		public static MotionDevice Device { get; set; }
+		public static Enumeration Value { get; set; }
 
 		[TestFixtureSetUp]
 		public void TestFixtureSetUp()
@@ -290,10 +287,20 @@ namespace BoostTestUI
 			System.Console.WriteLine("C# TestFixtureSetUp enter");
 		}
 
-		public MotionTest(MotionDevice device)
+		public MotionTest()
 		{
-			Device = device;
-			System.Console.WriteLine("Starting '" + device + "' testcases");
+			System.Console.WriteLine("Starting Default testcases");
+		}
+
+		public MotionTest(Enumeration value)
+		{
+			Value = value;
+			System.Console.WriteLine("Starting '" + value + "' testcases");
+		}
+
+		public MotionTest(string text, int i)
+		{
+			System.Console.WriteLine("Starting Text, int testcases");
 		}
 
 		[TestFixtureTearDown]

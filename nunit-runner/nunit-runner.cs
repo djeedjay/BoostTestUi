@@ -520,6 +520,11 @@ namespace TestRunner
 			return types;
 		}
 
+		private static int CompareMethodInfoByName(System.Reflection.MethodInfo x, System.Reflection.MethodInfo y)
+		{
+			return x.Name.CompareTo(y.Name);
+		}
+
 		public TestFixtureClass(string name, System.Type type, object[] parameters) : base(name)
 		{
 			if (type.BaseType == null)
@@ -538,6 +543,7 @@ namespace TestRunner
 				throw new System.Exception("No default constructor");
 
 			var methods = type.GetMethods();
+			System.Array.Sort(methods, CompareMethodInfoByName);
 			foreach (var methodInfo in methods)
 			{
 				if (Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestAttribute), false) &&
@@ -648,6 +654,11 @@ namespace TestRunner
 			return s;
 		}
 
+		private static int CompareTypesByName(System.Type x, System.Type y)
+		{
+			return x.Name.CompareTo(y.Name);
+		}
+
 		public TestLib(string name, int randomSeed)
 		{
 			global = new TestNamespace("Global");
@@ -657,20 +668,21 @@ namespace TestRunner
 
 			var lib = System.Reflection.Assembly.LoadFile(name);
 			System.Type[] classes = lib.GetTypes();
+			System.Array.Sort(classes, CompareTypesByName);
 			foreach (System.Type type in classes)
 			{
 				if (type.IsClass)
 				{
 					var attrs = Reflection.GetAttributes(type, typeof(NUnit.Framework.TestFixtureAttribute), false);
-					foreach (var attr in attrs)
+					if (attrs.Count() == 1)
 					{
-						var arguments = Reflection.GetProperty(attr, "Arguments") as object[];
-						if (arguments.Count() == 0)
+						global.Add(type.FullName, type, null);
+					}
+					else
+					{
+						foreach (var attr in attrs)
 						{
-							global.Add(type.FullName, type, null);
-						}
-						else
-						{
+							var arguments = Reflection.GetProperty(attr, "Arguments") as object[];
 							global.Add(type.FullName + "." + type.Name + "(" + ArgumentString(arguments) + ")", type, arguments);
 						}
 					}
