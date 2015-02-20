@@ -12,6 +12,7 @@
 
 #include <string>
 #include <vector>
+#include "TestCaseState.h"
 #include "Severity.h"
 
 namespace gj {
@@ -85,11 +86,12 @@ public:
 	virtual void test_suite_start(unsigned id) = 0;
 	virtual void test_case_start(unsigned id) = 0;
 	virtual void test_case_finish(unsigned id, unsigned long elapsed) = 0;
-	virtual void test_case_finish(unsigned id, unsigned long /*elapsed*/, bool succeeded) = 0;
+	virtual void test_case_finish(unsigned id, unsigned long /*elapsed*/, TestCaseState::type state) = 0;
 	virtual void test_suite_finish(unsigned id, unsigned long elapsed) = 0;
 	virtual void test_unit_skipped(unsigned id) = 0;
 	virtual void test_unit_aborted(unsigned id) = 0;
 
+	virtual void test_unit_ignored(const std::string& msg) = 0;
 	virtual void assertion_result(bool passed) = 0;
 	virtual void exception_caught(const std::string& what) = 0;
 

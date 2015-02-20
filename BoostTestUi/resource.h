@@ -26,6 +26,7 @@
 #define IDD_CATEGORIES                  212
 #define IDD_ARGUMENTS                   213
 #define IDD_FIND                        214
+#define IDI_WARN                        215
 #define IDC_TREEVIEW                    1000
 #define IDC_PROGRESSBAR                 1001
 #define IDC_LOGVIEW                     1002
@@ -96,7 +97,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        215
+#define _APS_NEXT_RESOURCE_VALUE        216
 #define _APS_NEXT_COMMAND_VALUE         32822
 #define _APS_NEXT_CONTROL_VALUE         1031
 #define _APS_NEXT_SYMED_VALUE           104

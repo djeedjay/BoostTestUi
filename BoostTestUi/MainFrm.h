@@ -76,11 +76,12 @@ public:
 	virtual void test_suite_start(unsigned id) override;
 	virtual void test_case_start(unsigned id) override;
 	virtual void test_case_finish(unsigned id, unsigned long elapsed) override;
-	virtual void test_case_finish(unsigned id, unsigned long /*elapsed*/, bool succeeded) override;
+	virtual void test_case_finish(unsigned id, unsigned long /*elapsed*/, TestCaseState::type state) override;
 	virtual void test_suite_finish(unsigned id, unsigned long elapsed) override;
 	virtual void test_unit_skipped(unsigned id) override;
 	virtual void test_unit_aborted(unsigned id) override;
 
+	virtual void test_unit_ignored(const std::string& msg) override;
 	virtual void assertion_result(bool passed) override;
 	virtual void exception_caught(const std::string& what) override;
 
@@ -180,7 +181,7 @@ private:
 	void RunChecked();
 	void RunAll();
 	void Run();
-	void EndTestCase(unsigned id, unsigned long /*elapsed*/, bool succeeded);
+	void EndTestCase(unsigned id, unsigned long /*elapsed*/, TestCaseState::type state);
 
 	std::wstring m_pathName;
 	std::wstring m_logFileName;
@@ -212,7 +213,7 @@ private:
 	int m_testCaseCount;
 	int m_testsRunCount;
 	int m_failedTestCount;
-	bool m_testCaseFailed;
+	TestCaseState::type m_testCaseState;
 
 	boost::mutex m_mtx;
 	std::queue<std::function<void ()>> m_q;

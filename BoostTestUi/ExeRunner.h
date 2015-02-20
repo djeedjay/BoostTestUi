@@ -67,7 +67,7 @@ public:
 	void OnTestAssertion(bool result);
 	void OnTestExceptionCaught(const std::string& what);
 	void OnTestCaseFinish(unsigned id, unsigned elapsed);
-	void OnTestCaseFinish(unsigned id, unsigned elapsed, bool succeeded);
+	void OnTestCaseFinish(unsigned id, unsigned elapsed, TestCaseState::type state);
 	void OnTestSuiteFinish(unsigned id, unsigned elapsed);
 	void OnTestUnitSkipped(unsigned id);
 	void OnTestUnitAborted(unsigned id);

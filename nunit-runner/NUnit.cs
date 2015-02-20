@@ -22,6 +22,7 @@ namespace NUnit.Framework
 	public static class TestFixtureTearDownAttribute { }
 	public static class RepeatAttribute { }
 	public static class SuccessException { }
+	public static class IgnoreException { }
 
 	public class NoExpectedException : System.Exception
 	{

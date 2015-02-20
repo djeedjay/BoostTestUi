@@ -52,11 +52,12 @@ LRESULT CTreeView::OnCreate(const CREATESTRUCT* /*pCreate*/)
 	DefWindowProc();
 
 	SetWindowLong(GWL_STYLE, GetWindowLong(GWL_STYLE) | TVS_CHECKBOXES);
-	m_treeImg.Create(16, 16, ILC_COLOR24 | ILC_MASK, 16, 0);
+	m_treeImg.Create(16, 16, ILC_COLOR24 | ILC_MASK, 17, 0);
 	m_iEmpty = m_treeImg.AddIcon(AtlLoadIcon(IDI_EMPTY));
 	m_iTick = m_treeImg.AddIcon(AtlLoadIcon(IDI_TICK));
 	m_iTickG = m_treeImg.AddIcon(AtlLoadIcon(IDI_TICKG));
 	m_iCross = m_treeImg.AddIcon(AtlLoadIcon(IDI_CROSS));
+	m_iWarn = m_treeImg.AddIcon(AtlLoadIcon(IDI_WARN));
 	m_iRun = m_treeImg.Add(AtlLoadBitmap(IDI_RUN), RGB(255,255,255));
 	SetImageList(m_treeImg, LVSIL_NORMAL);
 
@@ -159,7 +160,7 @@ LRESULT CTreeView::OnCustomDraw(NMHDR* pnmh)
 		return CDRF_NOTIFYITEMDRAW;
 
 	case CDDS_ITEMPREPAINT:
-		{
+	{
 		HTREEITEM hItem = reinterpret_cast<HTREEITEM>(pCustomDraw->nmcd.dwItemSpec);
 		if (!m_pMainFrame->IsActiveItem(GetItemData(hItem)))
 		{
@@ -167,7 +168,7 @@ LRESULT CTreeView::OnCustomDraw(NMHDR* pnmh)
 			pCustomDraw->clrTextBk = GetSysColor(COLOR_3DLIGHT);
 		}
 		return CDRF_DODEFAULT;
-		}
+	}
 	}
 
 	return CDRF_DODEFAULT;
@@ -476,6 +477,11 @@ void CTreeView::BeginTestCase(unsigned id)
 	}
 }
 
+void CTreeView::SetTestIgnore(HTREEITEM hItem)
+{
+	SetItemImage(hItem, m_iWarn);
+}
+
 void CTreeView::SetTestFail(HTREEITEM hItem)
 {
 	SetItemImage(hItem, m_iCross);
@@ -486,7 +492,7 @@ void CTreeView::SetTestOk(HTREEITEM hItem)
 	SetItemImage(hItem, m_iTick);
 }
 
-void CTreeView::EndTestCase(unsigned id, bool succeeded)
+void CTreeView::EndTestCase(unsigned id, TestCaseState::type state)
 {
 	m_hCurrentItem = nullptr;
 
@@ -494,10 +500,21 @@ void CTreeView::EndTestCase(unsigned id, bool succeeded)
 	if (it == m_items.end())
 		return;
 
-	if (succeeded)
+	switch (state)
+	{
+	case TestCaseState::Ignored:
+		SetTestIgnore(it->second);
+		break;
+
+	case TestCaseState::Success:
 		SetTestOk(it->second);
-	else
+		break;
+
+	case TestCaseState::Failed:
+	default:
 		SetTestFail(it->second);
+		break;
+	}
 }
 
 void CTreeView::EndTestSuite(unsigned id)
@@ -516,8 +533,10 @@ void CTreeView::EndTestSuite(unsigned id)
 			suiteImg = m_iCross;
 			break;
 		}
-		if (img == m_iEmpty)
+		if (suiteImg == m_iTick && img == m_iEmpty)
 			suiteImg = m_iTickG;
+		if (img == m_iWarn)
+			suiteImg = m_iWarn;
 
 		hChild = GetNextSiblingItem(hChild);
 	}

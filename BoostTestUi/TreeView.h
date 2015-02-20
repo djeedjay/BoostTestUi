@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "TestCaseState.h"
 #include "OffscreenPaint.h"
 
 namespace gj {
@@ -65,7 +66,7 @@ public:
 
 	void BeginTestSuite(unsigned id);
 	void BeginTestCase(unsigned id);
-	void EndTestCase(unsigned id, bool succeeded);
+	void EndTestCase(unsigned id, TestCaseState::type state);
 	void EndTestSuite(unsigned id);
 
 	void OnTestStart();
@@ -96,6 +97,7 @@ private:
 	void SetTreeImages(HTREEITEM hItem, int image);
 	void SetItemImage(HTREEITEM hItem, int img);
 	void SetTestItemImage(unsigned id, int img);
+	void SetTestIgnore(HTREEITEM hItem);
 	void SetTestFail(HTREEITEM hItem);
 	void SetTestOk(HTREEITEM hItem);
 	void UpdateIndicator();
@@ -108,6 +110,7 @@ private:
 	int m_iTick;
 	int m_iTickG;
 	int m_iCross;
+	int m_iWarn;
 	int m_iRun;
 	int m_runIndex;
 	HTREEITEM m_hCurrentItem;

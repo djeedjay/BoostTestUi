@@ -167,6 +167,9 @@
     <ClInclude Include="FindDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TestCaseState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\BoostTestUi.ico">
@@ -195,6 +198,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\tickg.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\warn.ico">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

@@ -243,6 +243,20 @@ std::vector<std::string> GetCategories(const std::string& s)
 	return categories;
 }
 
+TestCaseState::type GetTestCaseState(std::istream& is)
+{
+	std::string state;
+	is >> state;
+	if (state == "0")
+		return TestCaseState::Failed;
+	if (state == "1")
+		return TestCaseState::Success;
+	if (state == "-")
+		return TestCaseState::Ignored;
+
+	return TestCaseState::Failed;
+}
+
 std::string LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pObserver, int indent = 0)
 {
 	static const std::regex re("(\\s*)([cCsS])(\\d+):\\[(.*)\\](.+)");
@@ -333,16 +347,16 @@ void ArgumentBuilder::HandleClientNotification(const std::string& line)
 	}
 	else if (command == "TestFinished")
 	{
-		unsigned id = GetArg<unsigned>(ss);
-		unsigned elapsed = GetArg<unsigned>(ss);
-		bool succeeded = GetArg<bool>(ss);
+		auto id = GetArg<unsigned>(ss);
+		auto elapsed = GetArg<unsigned>(ss);
+		auto state = GetTestCaseState(ss);
 		if (auto p = m_pRunner->GetTestUnitPtr(id))
-			m_pRunner->OnTestCaseFinish(p->id, elapsed, succeeded);
+			m_pRunner->OnTestCaseFinish(p->id, elapsed, state);
 	}
 	else if (command == "SuiteFinished")
 	{
-		unsigned id = GetArg<unsigned>(ss);
-		unsigned elapsed = GetArg<unsigned>(ss);
+		auto id = GetArg<unsigned>(ss);
+		auto elapsed = GetArg<unsigned>(ss);
 		if (auto p = m_pRunner->GetTestUnitPtr(id))
 			m_pRunner->OnTestSuiteFinish(p->id, elapsed);
 	}

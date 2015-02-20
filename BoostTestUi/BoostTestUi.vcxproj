@@ -185,6 +185,7 @@
     <ClInclude Include="ShowSourceLine.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="streamredirector.h" />
+    <ClInclude Include="TestCaseState.h" />
     <ClInclude Include="TestRunner.h" />
     <ClInclude Include="TreeView.h" />
     <ClInclude Include="Utilities.h" />
@@ -201,6 +202,7 @@
     <None Include="res\cross.ico" />
     <None Include="res\tickg.ico" />
     <None Include="res\toolbar.bmp" />
+    <None Include="res\warn.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BoostTestUi.rc" />

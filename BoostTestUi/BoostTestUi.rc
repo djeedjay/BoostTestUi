@@ -146,6 +146,7 @@ IDI_EMPTY               ICON                    "res\\empty.ico"
 IDI_TICK                ICON                    "res\\tick.ico"
 IDI_CROSS               ICON                    "res\\cross.ico"
 IDI_TICKG               ICON                    "res\\tickg.ico"
+IDI_WARN                ICON                    "res\\warn.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

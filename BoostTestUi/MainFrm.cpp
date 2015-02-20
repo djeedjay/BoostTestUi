@@ -860,7 +860,7 @@ void CMainFrame::test_case_start(unsigned id)
 	EnQueue([this, id]()
 	{
 		m_currentId = id;
-		m_testCaseFailed = false;
+		m_testCaseState = TestCaseState::Success;
 		m_treeView.BeginTestCase(id);
 		m_logView.BeginTestUnit(id);
 	});
@@ -870,32 +870,32 @@ void CMainFrame::test_case_finish(unsigned id, unsigned long elapsed)
 {
 	EnQueue([this, id, elapsed]()
 	{
-		EndTestCase(id, elapsed, !m_testCaseFailed);
+		EndTestCase(id, elapsed, m_testCaseState);
 	});
 }
 
-void CMainFrame::test_case_finish(unsigned id, unsigned long elapsed, bool succeeded)
+void CMainFrame::test_case_finish(unsigned id, unsigned long elapsed, TestCaseState::type state)
 {
-	EnQueue([this, id, elapsed, succeeded]()
+	EnQueue([this, id, elapsed, state]()
 	{
-		EndTestCase(id, elapsed, succeeded);
+		EndTestCase(id, elapsed, state);
 	});
 }
 
 void CMainFrame::UpdateProgressBar()
 {
-	bool ok = m_failedTestCount == 0 && !m_testCaseFailed;
+	bool ok = m_failedTestCount == 0 && m_testCaseState != TestCaseState::Failed;
 	m_progressBar.SendMessage(PBM_SETSTATE, ok ? PBST_NORMAL : PBST_ERROR);
 	m_progressBar.SetBarColor(ok ? SuccessColor : FailColor);
 	m_progressBar.SetPos(m_progressBar.GetPos()); // Win7 progress bar is one off when calling SetPos() just once ?!
 }
 
-void CMainFrame::EndTestCase(unsigned id, unsigned long /*elapsed*/, bool succeeded)
+void CMainFrame::EndTestCase(unsigned id, unsigned long /*elapsed*/, TestCaseState::type state)
 {
-	m_treeView.EndTestCase(id, succeeded);
+	m_treeView.EndTestCase(id, state);
 	m_logView.EndTestUnit(id);
 
-	if (!succeeded)
+	if (state == TestCaseState::Failed)
 		++m_failedTestCount;
 
 	++m_testsRunCount;
@@ -941,25 +941,32 @@ void CMainFrame::UpdateStatusBar()
 	UISetText(ID_FAILED_PANE, isLoaded ? WStr(wstringbuilder() << L"Failed tests: " << m_failedTestCount) : L"");
 }
 
+void CMainFrame::test_unit_ignored(const std::string& msg)
+{
+	EnQueue([this]()
+	{
+		m_testCaseState = TestCaseState::Ignored;
+		UpdateProgressBar();
+	});
+}
+
 void CMainFrame::assertion_result(bool passed)
 {
 	if (passed)
 		return;
 
-	unsigned id = m_currentId;
 	EnQueue([this]()
 	{
-		m_testCaseFailed = true;
+		m_testCaseState = TestCaseState::Failed;
 		UpdateProgressBar();
 	});
 }
 
 void CMainFrame::exception_caught(const std::string& /*what*/)
 {
-	unsigned id = m_currentId;
-	EnQueue([this, id]()
+	EnQueue([this]()
 	{
-		m_testCaseFailed = true;
+		m_testCaseState = TestCaseState::Failed;
 		UpdateProgressBar();
 		UpdateStatusBar();
 	});

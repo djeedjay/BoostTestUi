@@ -279,9 +279,9 @@ void ExeRunner::OnTestCaseFinish(unsigned id, unsigned elapsed)
 	m_pObserver->test_case_finish(id, elapsed);
 }
 
-void ExeRunner::OnTestCaseFinish(unsigned id, unsigned elapsed, bool succeeded)
+void ExeRunner::OnTestCaseFinish(unsigned id, unsigned elapsed, TestCaseState::type state)
 {
-	m_pObserver->test_case_finish(id, elapsed, succeeded);
+	m_pObserver->test_case_finish(id, elapsed, state);
 }
 
 void ExeRunner::OnTestSuiteFinish(unsigned id, unsigned elapsed)

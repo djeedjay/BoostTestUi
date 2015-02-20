@@ -11,6 +11,8 @@ namespace TestRunner
 
 	enum LogLevel { Minimal, Medium, All };
 
+	enum TestCaseState { Ignored, Failed, Success };
+
 	class TestReporter
 	{
 		LogLevel logLevel;
@@ -23,6 +25,17 @@ namespace TestRunner
 		private static int BoolAsInt(bool b)
 		{
 			return b ? 1 : 0;
+		}
+
+		private static string TestCaseStateToString(TestCaseState state)
+		{
+			switch (state)
+			{
+			case TestCaseState.Ignored: return "-";
+			case TestCaseState.Failed: return "0";
+			case TestCaseState.Success: return "1";
+			}
+			return "";
 		}
 
 		public void BeginRun()
@@ -44,6 +57,12 @@ namespace TestRunner
 				System.Console.WriteLine("Entering test case {0}", test.Name);
 		}
 
+		public void Ignore(string message)
+		{
+			if (logLevel != LogLevel.Minimal)
+				System.Console.WriteLine("Ignored: \"{0}\"", message);
+		}
+
 		public void Exception(string message)
 		{
 			System.Console.WriteLine("#BeginException");
@@ -51,11 +70,11 @@ namespace TestRunner
 			System.Console.WriteLine("#EndException");
 		}
 
-		public void EndTest(TestItem test, int ms, bool success)
+		public void EndTest(TestItem test, int ms, TestCaseState state)
 		{
 			if (logLevel == LogLevel.All)
 				System.Console.WriteLine("Leaving test case {0}", test.Name);
-			System.Console.WriteLine("#TestFinished {0} {1} {2}", test.Id, ms, BoolAsInt(success));
+			System.Console.WriteLine("#TestFinished {0} {1} {2}", test.Id, ms, TestCaseStateToString(state));
 		}
 
 		public void EndSuite(TestItem suite, int ms)
@@ -233,12 +252,24 @@ namespace TestRunner
 			reporter.Exception(e.Message + "\n" + GetClientStackTrace(e));
 		}
 
+		public static string GetMessage(System.Reflection.TargetInvocationException e)
+		{
+			return GetMessage(e.InnerException);
+		}
+
+		public static string GetMessage(System.Exception e)
+		{
+			if (e is System.Reflection.TargetInvocationException)
+				return GetMessage(e as System.Reflection.TargetInvocationException);
+
+			return e.Message;
+		}
+
 		public static void Handle(System.Exception e, string expectedExceptionName)
 		{
 			if (expectedExceptionName != "" && !Exception.IsExpected(e, expectedExceptionName))
 				throw e;
 			return;
-
 		}
 	}
 
@@ -277,40 +308,11 @@ namespace TestRunner
 			return arg.ToString();
 		}
 
-		static private string FormatMethod(ref System.Reflection.MethodInfo methodInfo, object[] args)
+		public TestCase(System.Reflection.MethodInfo methodInfo, object[] args) : base(MethodHelper.GetDisplayName(methodInfo, args))
 		{
-			string s = methodInfo.Name;
-			if (methodInfo.IsGenericMethod)
-			{
-				s += "<";
-				bool first = true;
-				System.Type[] argTypes = args.Select(arg => arg.GetType()).ToArray();
-				methodInfo = methodInfo.MakeGenericMethod(argTypes);
-				foreach (var type in methodInfo.GetGenericArguments())
-				{
-					if (first)
-						first = false;
-					else
-						s += ",";
-					s += type.Name;
-				}
-				s += ">";
-			}
-
-			s += "(";
-			for (int i = 0; i < args.GetLength(0); ++i)
-			{
-				if (i > 0)
-					s += ",";
-				s += FormatArg(args[i]);
-			}
-			s += ")";
-			return s;
-		}
-
-		public TestCase(System.Reflection.MethodInfo methodInfo, object[] args) : base(FormatMethod(ref methodInfo, args))
-		{
-			this.methodInfo = methodInfo;
+			this.methodInfo = methodInfo.IsGenericMethod ?
+				methodInfo.MakeGenericMethod(args.Select(arg => arg.GetType()).ToArray()) :
+				methodInfo;
 			this.arguments = args;
 		}
 
@@ -509,17 +511,6 @@ namespace TestRunner
 			return new TestFixture(this, ctorInfo.Invoke(parameters));
 		}
 
-		private System.Type[] GetConstructorArgumentTypes(object[] parameters)
-		{
-			if (parameters == null)
-				return System.Type.EmptyTypes;
-
-			System.Type[] types = new System.Type[parameters.Length];
-			for (int i = 0; i < parameters.Length; ++i)
-				types[i] = parameters[i].GetType();
-			return types;
-		}
-
 		private static int CompareMethodInfoByName(System.Reflection.MethodInfo x, System.Reflection.MethodInfo y)
 		{
 			return x.Name.CompareTo(y.Name);
@@ -538,7 +529,7 @@ namespace TestRunner
 			Tests = new System.Collections.Generic.List<Test>();
 			Categories = CategoryUtils.GetCategories(type);
 
-			ctorInfo = type.GetConstructor(GetConstructorArgumentTypes(parameters));
+			ctorInfo = type.GetConstructor(MethodHelper.GetArgumentTypes(parameters));
 			if (ctorInfo == null)
 				throw new System.Exception("No default constructor");
 
@@ -546,7 +537,7 @@ namespace TestRunner
 			System.Array.Sort(methods, CompareMethodInfoByName);
 			foreach (var methodInfo in methods)
 			{
-				if (Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestAttribute), false) &&
+				if ((Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestAttribute), false) || methodInfo.Name.Substring(0, 4).ToLower() == "test") &&
 					!Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.IgnoreAttribute), false))
 					Tests.Add(new Test(methodInfo));
 
@@ -683,7 +674,7 @@ namespace TestRunner
 						foreach (var attr in attrs)
 						{
 							var arguments = Reflection.GetProperty(attr, "Arguments") as object[];
-							global.Add(type.FullName + "." + type.Name + "(" + ArgumentString(arguments) + ")", type, arguments);
+							global.Add(type.FullName + "." + MethodHelper.GetDisplayName(type.GetConstructor(MethodHelper.GetArgumentTypes(arguments)), arguments), type, arguments);
 						}
 					}
 				}
@@ -872,38 +863,44 @@ namespace TestRunner
 			reporter.BeginTest(test);
 			if (!ok)
 			{
-				reporter.EndTest(test, 0, false);
+				reporter.EndTest(test, 0, TestCaseState.Failed);
 				return;
 			}
 
 			bool setUpDone = false;
-			bool runOk = false;
+			TestCaseState runState = TestCaseState.Failed;
 			try
 			{
 				fixture.SetUp();
 				setUpDone = true;
 				test.Run(fixture);
-				runOk = true;
+				runState = TestCaseState.Success;
 			}
 			catch (System.Exception e)
 			{
-				Exception.Report(e, reporter);
+				if (Exception.IsExpected(e, typeof(NUnit.Framework.IgnoreException).FullName))
+				{
+					runState = TestCaseState.Ignored;
+					reporter.Ignore(Exception.GetMessage(e));
+				}
+				else
+					Exception.Report(e, reporter);
 			}
 
-			bool success = false;
+			TestCaseState state = TestCaseState.Failed;
 			if (setUpDone)
 			{
 				try
 				{
 					fixture.TearDown();
-					success = runOk;
+					state = runState;
 				}
 				catch (System.Exception e)
 				{
 					Exception.Report(e, reporter);
 				}
 			}
-			reporter.EndTest(test, 0, success);
+			reporter.EndTest(test, 0, state);
 		}
 
 		private void Run(bool ok, TestFixture fixture, Test test, TestCase testCase, TestReporter reporter)
@@ -911,38 +908,38 @@ namespace TestRunner
 			reporter.BeginTest(testCase);
 			if (!ok)
 			{
-				reporter.EndTest(testCase, 0, false);
+				reporter.EndTest(testCase, 0, TestCaseState.Failed);
 				return;
 			}
 
 			bool setUpDone = false;
-			bool runOk = false;
+			TestCaseState runState = TestCaseState.Failed;
 			try
 			{
 				fixture.SetUp();
 				setUpDone = true;
 				testCase.Run(fixture);
-				runOk = true;
+				runState = TestCaseState.Success;
 			}
 			catch (System.Exception e)
 			{
 				Exception.Report(e, reporter);
 			}
 
-			bool success = false;
+			TestCaseState state = TestCaseState.Failed;
 			if (setUpDone)
 			{
 				try
 				{
 					fixture.TearDown();
-					success = runOk;
+					state = runState;
 				}
 				catch (System.Exception e)
 				{
 					Exception.Report(e, reporter);
 				}
 			}
-			reporter.EndTest(testCase, 0, success);
+			reporter.EndTest(testCase, 0, state);
 		}
 	}
 

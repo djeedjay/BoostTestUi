@@ -276,7 +276,7 @@ namespace BoostTestUI
 	[TestFixture(Enumeration.Enum2)]
 	[TestFixture(Enumeration.Enum3)]
 	[TestFixture()]
-	[TestFixture("Text", 12)]
+	[TestFixture("Text\n", 12)]
 	public class MotionTest
 	{
 		public static Enumeration Value { get; set; }
@@ -331,6 +331,12 @@ namespace BoostTestUI
 		[Category("Moving")]
 		public void MovingTest1()
 		{
+		}
+
+		[Test]
+		public void IgnoreTest1()
+		{
+			Assert.Ignore("Ignored Test");
 		}
 	}
 }

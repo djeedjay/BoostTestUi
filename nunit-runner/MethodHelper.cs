@@ -5,25 +5,43 @@
 
 //  See http://boosttestui.wordpress.com/ for the boosttestui home page.
 
-using System;
-using System.Reflection;
-using System.Text;
-
 namespace TestRunner
 {
     public class MethodHelper
     {
-        public static string GetDisplayName(MethodInfo method, object[] arglist)
+		public static System.Type[] GetArgumentTypes(object[] parameters)
+		{
+			if (parameters == null)
+				return System.Type.EmptyTypes;
+
+			System.Type[] types = new System.Type[parameters.Length];
+			for (int i = 0; i < parameters.Length; ++i)
+				types[i] = parameters[i].GetType();
+			return types;
+		}
+
+		public static string GetDisplayName(System.Reflection.ConstructorInfo ctor, object[] arglist)
+		{
+			return GetDisplayName(ctor, ctor.DeclaringType.Name, arglist);
+		}
+
+		public static string GetDisplayName(System.Reflection.MethodInfo method, object[] arglist)
+		{
+			return GetDisplayName(method, method.Name, arglist);
+		}
+
+        private static string GetDisplayName(System.Reflection.MethodBase method, string name, object[] arglist)
         {
-            StringBuilder sb = new StringBuilder(method.Name);
+            System.Text.StringBuilder sb = new System.Text.StringBuilder(name);
 
             if (method.IsGenericMethod)
             {
                 sb.Append("<");
                 int cnt = 0;
-                foreach (Type t in method.GetGenericArguments())
+                foreach (var t in method.GetGenericArguments())
                 {
-                    if (cnt++ > 0) sb.Append(",");
+                    if (cnt++ > 0)
+						sb.Append(",");
                     sb.Append(t.Name);
                 }
                 sb.Append(">");
@@ -33,9 +51,10 @@ namespace TestRunner
             {
                 sb.Append("(");
 
-                for (int i = 0; i < arglist.Length; i++)
+                for (int i = 0; i < arglist.Length; ++i)
                 {
-                    if (i > 0) sb.Append(",");
+                    if (i > 0) 
+						sb.Append(",");
                     sb.Append(GetDisplayString(arglist[i]));
                 }
 
@@ -49,7 +68,7 @@ namespace TestRunner
         {
             string display = arg == null 
                 ? "null" 
-                : Convert.ToString( arg, System.Globalization.CultureInfo.InvariantCulture);
+                : System.Convert.ToString(arg, System.Globalization.CultureInfo.InvariantCulture);
 
             if (arg is double)
             {
@@ -125,7 +144,7 @@ namespace TestRunner
             }
             else if (arg is string)
             {
-                StringBuilder sb = new StringBuilder();
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 sb.Append("\"");
                 foreach (char c in (string)arg)
                     sb.Append(EscapeControlChar(c));
@@ -152,38 +171,24 @@ namespace TestRunner
         {
             switch (c)
             {
-                case '\'':
-                    return "\\\'";
-                case '\"':
-                    return "\\\"";
-                case '\\':
-                    return "\\\\";
-                case '\0':
-                    return "\\0";
-                case '\a':
-                    return "\\a";
-                case '\b':
-                    return "\\b";
-                case '\f':
-                    return "\\f";
-                case '\n':
-                    return "\\n";
-                case '\r':
-                    return "\\r";
-                case '\t':
-                    return "\\t";
-                case '\v':
-                    return "\\v";
+            case '\'': return "\\\'";
+            case '\"': return "\\\"";
+            case '\\': return "\\\\";
+            case '\0': return "\\0";
+            case '\a': return "\\a";
+            case '\b': return "\\b";
+            case '\f': return "\\f";
+            case '\n': return "\\n";
+            case '\r': return "\\r";
+            case '\t': return "\\t";
+            case '\v': return "\\v";
+			case '\x0085':
+            case '\x2028':
+            case '\x2029':
+                return string.Format("\\x{0:X4}", (int)c);
 
-                case '\x0085':
-                case '\x2028':
-                case '\x2029':
-                    return string.Format("\\x{0:X4}", (int)c);
-
-                default:
-                    return char.IsControl(c) || (int)c > 128
-                        ? string.Format("\\x{0:X4}", (int)c)
-                        : c.ToString();
+            default:
+                return char.IsControl(c) || (int)c > 128 ? string.Format("\\x{0:X4}", (int)c) : c.ToString();
             }
         }
     }
