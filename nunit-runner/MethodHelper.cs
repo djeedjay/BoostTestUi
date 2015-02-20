@@ -27,6 +27,8 @@ namespace TestRunner
 
 		public static string GetDisplayName(System.Reflection.MethodInfo method, object[] arglist)
 		{
+			if (method.IsGenericMethod)
+				method = method.MakeGenericMethod(GetArgumentTypes(arglist));
 			return GetDisplayName(method, method.Name, arglist);
 		}
 
