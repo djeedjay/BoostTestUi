@@ -150,6 +150,7 @@ public:
 	void OnTestCategories(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnHelpBoost(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnHelpGoogle(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnHelpNUnit(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnAppAbout(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTreeRun(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTreeRunChecked(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -212,6 +213,7 @@ private:
 	int m_testIterationCount;
 	int m_testCaseCount;
 	int m_testsRunCount;
+	int m_ignoredTestCount;
 	int m_failedTestCount;
 	TestCaseState::type m_testCaseState;
 

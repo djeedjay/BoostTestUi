@@ -18,6 +18,7 @@
 #include "CategoryDlg.h"
 #include "BoostHelpDlg.h"
 #include "GoogleHelpDlg.h"
+#include "NUnitHelpDlg.h"
 #include "AboutDlg.h"
 #include "ArgumentsDlg.h"
 #include "ExeRunner.h"
@@ -25,7 +26,7 @@
 
 // ComCtrl.h
 // Needs _WIN32_WINNT >= 0x0600 which breaks XP compatibility..
-#define PBM_SETSTATE            (WM_USER+16) // wParam = PBST_[State] (NORMAL, ERROR, PAUSED)
+#define PBM_SETSTATE            (WM_USER + 16) // wParam = PBST_[State] (NORMAL, ERROR, PAUSED)
 #define PBST_NORMAL             0x0001
 #define PBST_ERROR              0x0002
 #define PBST_PAUSED             0x0003
@@ -33,6 +34,7 @@
 namespace gj {
 
 const COLORREF FailColor = RGB(255, 64, 64);
+const COLORREF WarnColor = RGB(255, 224, 0);
 const COLORREF SuccessColor = RGB(20, 180, 20);
 
 struct Options
@@ -74,6 +76,7 @@ BEGIN_MSG_MAP_TRY(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_TEST_CATEGORIES, OnTestCategories)
 	COMMAND_ID_HANDLER_EX(ID_HELP_BOOST, OnHelpBoost)
 	COMMAND_ID_HANDLER_EX(ID_HELP_GOOGLE, OnHelpGoogle)
+	COMMAND_ID_HANDLER_EX(ID_HELP_NUNIT, OnHelpNUnit)
 	COMMAND_ID_HANDLER_EX(ID_APP_ABOUT, OnAppAbout)
 	COMMAND_ID_HANDLER_EX(ID_TREE_RUN, OnTreeRun)
 	COMMAND_ID_HANDLER_EX(ID_TREE_RUN_CHECKED, OnTreeRunChecked)
@@ -575,6 +578,7 @@ void CMainFrame::OnHelp(LPHELPINFO lpHelpInfo)
 	{
 	case UnitTestType::Boost: return OnHelpBoost(0, 0, *this);
 	case UnitTestType::Google: return OnHelpGoogle(0, 0, *this); 
+	case UnitTestType::NUnit: return OnHelpNUnit(0, 0, *this); 
 	}
 }
 
@@ -604,6 +608,7 @@ try
 	m_testIterationCount = 0;
 	m_testCaseCount = 0;
 	m_testsRunCount = 0;
+	m_ignoredTestCount = 0;
 	m_failedTestCount = 0;
 	m_treeView.Clear();
 	m_logView.Clear();
@@ -884,9 +889,14 @@ void CMainFrame::test_case_finish(unsigned id, unsigned long elapsed, TestCaseSt
 
 void CMainFrame::UpdateProgressBar()
 {
-	bool ok = m_failedTestCount == 0 && m_testCaseState != TestCaseState::Failed;
-	m_progressBar.SendMessage(PBM_SETSTATE, ok ? PBST_NORMAL : PBST_ERROR);
-	m_progressBar.SetBarColor(ok ? SuccessColor : FailColor);
+	int pbst =
+		m_failedTestCount > 0 || m_testCaseState == TestCaseState::Failed ? PBST_ERROR :
+		m_ignoredTestCount > 0 || m_testCaseState == TestCaseState::Ignored ? PBST_PAUSED : PBST_NORMAL;
+	m_progressBar.SendMessage(PBM_SETSTATE, pbst);
+	COLORREF color =
+		pbst == PBST_ERROR ? FailColor : 
+		pbst == PBST_PAUSED ? WarnColor : SuccessColor;
+	m_progressBar.SetBarColor(color);
 	m_progressBar.SetPos(m_progressBar.GetPos()); // Win7 progress bar is one off when calling SetPos() just once ?!
 }
 
@@ -895,6 +905,8 @@ void CMainFrame::EndTestCase(unsigned id, unsigned long /*elapsed*/, TestCaseSta
 	m_treeView.EndTestCase(id, state);
 	m_logView.EndTestUnit(id);
 
+	if (state == TestCaseState::Ignored)
+		++m_ignoredTestCount;
 	if (state == TestCaseState::Failed)
 		++m_failedTestCount;
 
@@ -1067,6 +1079,12 @@ void CMainFrame::OnHelpGoogle(UINT uNotifyCode, int nID, CWindow wndCtl)
 	dlg.DoModal();
 }
 
+void CMainFrame::OnHelpNUnit(UINT uNotifyCode, int nID, CWindow wndCtl)
+{
+	LoadRichEditLibrary();
+	CNUnitHelpDlg dlg;
+	dlg.DoModal();
+}
 
 void CMainFrame::OnAppAbout(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
@@ -1333,6 +1351,7 @@ void CMainFrame::Run()
 
 	m_testIterationCount = 0;
 	m_testsRunCount = 0;
+	m_ignoredTestCount = 0;
 	m_failedTestCount = 0;
 	m_progressBar.SetRange(0, counter.count());
 	m_progressBar.SetPos(0);

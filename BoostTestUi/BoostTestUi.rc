@@ -128,6 +128,7 @@ BEGIN
     BEGIN
         MENUITEM "Using Boost Test...",         ID_HELP_BOOST
         MENUITEM "Using Google Test...",        ID_HELP_GOOGLE
+        MENUITEM "Using NUnit Test...",         ID_HELP_NUNIT
         MENUITEM SEPARATOR
         MENUITEM "&About Boost Test Runner...", ID_APP_ABOUT
     END
@@ -175,6 +176,18 @@ BEGIN
     LTEXT           "Select File -> Create Header -> Google Test...\r\nto create the gtest-gui.h file somewhere in your include path.\r\n\r\nCopy the code template below into a Win32 Console Application project. Then extend the assertions, tests and test cases.",IDC_DESCRIPTION,7,12,229,40
     LTEXT           "See also",IDC_SEEALSO,7,207,28,8
     LTEXT           "http://code.google.com/p/googletest/",IDC_URL,37,207,123,8
+END
+
+IDD_NUNITHELP DIALOGEX 0, 0, 243, 220
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "How To Create an NUnit Unit Test"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,186,202,50,14
+    CONTROL         "",IDC_SAMPLE,"RichEdit20W",ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_BORDER | WS_TABSTOP,7,36,229,148
+    LTEXT           "Copy the code template below into a C# Class Libary project. Then extend the assertions, tests and test fixture.",IDC_DESCRIPTION,7,12,229,21
+    LTEXT           "See also",IDC_SEEALSO,7,186,28,8
+    LTEXT           "http://www.nunit.org/",IDC_URL,37,186,123,8
 END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 187, 127
@@ -252,6 +265,11 @@ BEGIN
     IDD_GOOGLEHELP, DIALOG
     BEGIN
         BOTTOMMARGIN, 221
+    END
+
+    IDD_NUNITHELP, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 210
     END
 
     IDD_ABOUTBOX, DIALOG
@@ -402,6 +420,7 @@ BEGIN
     ID_TEST_REPEAT          "Repeat the selected test cases until a failure occurs\nRepeat"
     ID_HELP_BOOST           "Display how to build a boost unit test\nBoost Unit Test"
     ID_HELP_GOOGLE          "Display how to build a google unit test\nGoogle Unit Test"
+    ID_HELP_NUNIT           "Display how to build an NUnit unit test\nNUnit Unit Test"
     ID_LOG_TIME             "Show clock time\nClock Time"
     ID_RESET_SELECTION      "Reset Test Case Selection\nReset Selection"
     ID_TEST_CATEGORIES      "Select active test categories\nCategories"
@@ -515,6 +534,7 @@ IDR_UNIT_TEST_GUI_HPP   RCDATA                  "boost/test/unit_test_gui.hpp"
 IDR_GTEST_GUI_H         RCDATA                  "gtest/gtest-gui.h"
 IDR_BOOSTTESTSAMPLE_RTF RCDATA                  "BoostTestSample.rtf"
 IDR_GOOGLETESTSAMPLE_RTF RCDATA                  "GoogleTestSample.rtf"
+IDR_NUNITSAMPLE_RTF     RCDATA                  "NUnitSample.rtf"
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 

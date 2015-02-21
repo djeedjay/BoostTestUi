@@ -336,6 +336,10 @@ namespace TestRunner
 
 		public bool HasExplicitAttribute { get; private set; }
 
+		public bool HasIgnoreAttribute { get; private set; }
+
+		public string IgnoreMessage { get; private set; }
+
 		public System.Collections.Generic.List<string> Categories { get; private set; }
 
 		public System.Collections.Generic.List<TestCase> TestCases { get; private set; }
@@ -346,6 +350,10 @@ namespace TestRunner
 			Categories = CategoryUtils.GetCategories(methodInfo);
 			TestCases = new System.Collections.Generic.List<TestCase>();
 			HasExplicitAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.ExplicitAttribute), false);
+			var ignoreAttribute = Reflection.GetAttribute(methodInfo, typeof(NUnit.Framework.IgnoreAttribute), false);
+			HasIgnoreAttribute = ignoreAttribute != null;
+			if (HasIgnoreAttribute)
+				IgnoreMessage = Reflection.GetProperty(ignoreAttribute, "Reason") as string;
 
 			var parameterData = new System.Collections.Generic.List<System.Collections.IEnumerable>();
 			foreach (var paramInfo in methodInfo.GetParameters())
@@ -506,6 +514,10 @@ namespace TestRunner
 
 		public bool HasExplicitAttribute { get; private set; }
 
+		public bool HasIgnoreAttribute { get; private set; }
+
+		public string IgnoreMessage { get; private set; }
+
 		public TestFixture CreateInstance()
 		{
 			return new TestFixture(this, ctorInfo.Invoke(parameters));
@@ -526,6 +538,10 @@ namespace TestRunner
 
 			fullName = type.FullName;
 			HasExplicitAttribute = Reflection.HasAttribute(type, typeof(NUnit.Framework.ExplicitAttribute), false);
+			var ignoreAttribute = Reflection.GetAttribute(type, typeof(NUnit.Framework.IgnoreAttribute), false);
+			HasIgnoreAttribute = ignoreAttribute != null;
+			if (HasIgnoreAttribute)
+				IgnoreMessage = Reflection.GetProperty(ignoreAttribute, "Reason") as string;
 			Tests = new System.Collections.Generic.List<Test>();
 			Categories = CategoryUtils.GetCategories(type);
 
@@ -537,8 +553,7 @@ namespace TestRunner
 			System.Array.Sort(methods, CompareMethodInfoByName);
 			foreach (var methodInfo in methods)
 			{
-				if ((Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestAttribute), false) || methodInfo.Name.Substring(0, 4).ToLower() == "test") &&
-					!Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.IgnoreAttribute), false))
+				if (Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestAttribute), false) || methodInfo.Name.Substring(0, 4).ToLower() == "test")
 					Tests.Add(new Test(methodInfo));
 
 				if (Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestFixtureSetUpAttribute), false))
@@ -683,7 +698,7 @@ namespace TestRunner
 
 		private static string Label(Test test, TestCase testCase)
 		{
-			char type = test.HasExplicitAttribute ? 'c' : 'C';
+			char type = test.HasExplicitAttribute || test.HasIgnoreAttribute ? 'c' : 'C';
 			return string.Format("{0}{1}:[]{2}", type, testCase.Id, testCase.Name);
 		}
 
@@ -691,7 +706,7 @@ namespace TestRunner
 		{
 			var categories = string.Join(",", test.Categories);
 			string type = test.TestCases.Count == 0 ? "C" : "S";
-			if (test.HasExplicitAttribute)
+			if (test.HasExplicitAttribute || test.HasIgnoreAttribute)
 				type = type.ToLower();
 			return string.Format("{0}{1}:[{2}]{3}", type, test.Id, categories, test.Name);
 		}
@@ -699,7 +714,7 @@ namespace TestRunner
 		private static string Label(TestFixtureClass fixture)
 		{
 			var categories = string.Join(",", fixture.Categories);
-			char type = fixture.HasExplicitAttribute ? 's' : 'S';
+			char type = fixture.HasExplicitAttribute || fixture.HasIgnoreAttribute ? 's' : 'S';
 			return string.Format("{0}{1}:[{2}]{3}", type, fixture.Id, categories, fixture.Name);
 		}
 
@@ -819,6 +834,12 @@ namespace TestRunner
 		private void Run(string path, TestFixtureClass fixtureClass, TestCaseFilter filter, TestReporter reporter)
 		{
 			reporter.BeginSuite(fixtureClass);
+			if (fixtureClass.HasIgnoreAttribute)
+			{
+				reporter.Ignore(fixtureClass.IgnoreMessage);
+				reporter.EndSuite(fixtureClass, 0);
+				return;
+			}
 
 			TestFixture fixture = null;
 			bool setupDone = false;
@@ -866,6 +887,12 @@ namespace TestRunner
 				reporter.EndTest(test, 0, TestCaseState.Failed);
 				return;
 			}
+			if (test.HasIgnoreAttribute)
+			{
+				reporter.Ignore(test.IgnoreMessage);
+				reporter.EndTest(test, 0, TestCaseState.Ignored);
+				return;
+			}
 
 			bool setUpDone = false;
 			TestCaseState runState = TestCaseState.Failed;
@@ -884,7 +911,9 @@ namespace TestRunner
 					reporter.Ignore(Exception.GetMessage(e));
 				}
 				else
+				{
 					Exception.Report(e, reporter);
+				}
 			}
 
 			TestCaseState state = TestCaseState.Failed;

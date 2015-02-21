@@ -9,24 +9,26 @@
 #define IDD_ABOUTBOX                    100
 #define IDD_BOOSTHELP                   101
 #define IDD_GOOGLEHELP                  102
+#define IDD_NUNITHELP                   103
 #define IDR_MAINFRAME                   128
 #define IDR_APPNAME                     129
 #define IDR_UNIT_TEST_GUI_HPP           200
 #define IDR_GTEST_GUI_H                 201
 #define IDR_BOOSTTESTSAMPLE_RTF         202
 #define IDR_GOOGLETESTSAMPLE_RTF        203
-#define IDI_EMPTY                       204
-#define IDI_RUN                         205
-#define IDI_TICK                        206
-#define IDI_CROSS                       207
-#define IDR_LOGLEVEL_MENU               208
-#define IDR_TREE_CONTEXTMENU            209
-#define IDD_AUTORUN                     210
-#define IDI_TICKG                       211
-#define IDD_CATEGORIES                  212
-#define IDD_ARGUMENTS                   213
-#define IDD_FIND                        214
-#define IDI_WARN                        215
+#define IDR_NUNITSAMPLE_RTF             204
+#define IDI_EMPTY                       205
+#define IDI_RUN                         206
+#define IDI_TICK                        207
+#define IDI_CROSS                       208
+#define IDR_LOGLEVEL_MENU               209
+#define IDR_TREE_CONTEXTMENU            210
+#define IDD_AUTORUN                     211
+#define IDI_TICKG                       212
+#define IDD_CATEGORIES                  213
+#define IDD_ARGUMENTS                   214
+#define IDD_FIND                        215
+#define IDI_WARN                        216
 #define IDC_TREEVIEW                    1000
 #define IDC_PROGRESSBAR                 1001
 #define IDC_LOGVIEW                     1002
@@ -84,6 +86,7 @@
 #define ID_TEST_REPEAT                  32805
 #define ID_HELP_BOOST                   32806
 #define ID_HELP_GOOGLE                  32807
+#define ID_HELP_NUNIT                   32808
 #define ID_LOG_TIME                     32809
 #define ID_LOG_SHOWCLOCKTIME            32810
 #define ID_RESET_SELECTION              32813
@@ -97,7 +100,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        216
+#define _APS_NEXT_RESOURCE_VALUE        217
 #define _APS_NEXT_COMMAND_VALUE         32822
 #define _APS_NEXT_CONTROL_VALUE         1031
 #define _APS_NEXT_SYMED_VALUE           104
