@@ -119,8 +119,15 @@ namespace BoostTestUI
 		}
 
 		[Test]
-		[Ignore("ignored test")]
+		[Ignore]
 		public void IgnoredTest()
+		{
+			throw new System.Exception();
+		}
+
+		[Test]
+		[Ignore("ignored test")]
+		public void IgnoredTestMessage()
 		{
 			throw new System.Exception();
 		}
