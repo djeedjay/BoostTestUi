@@ -147,6 +147,9 @@ void CLogView::SetHighLight(int begin, int end)
 
 bool CLogView::Find(const std::string& text, int direction)
 {
+	if (GetItemCount() == 0)
+		return false;
+
 	int begin = std::max(GetNextItem(-1, LVNI_FOCUSED), 0);
 	int line = begin + direction;
 	while (line != begin)

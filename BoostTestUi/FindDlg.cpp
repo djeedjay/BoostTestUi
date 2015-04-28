@@ -18,11 +18,29 @@ CFindDlg::CFindDlg(CMainFrame& mainFrame) :
 {
 }
 
+BOOL CFindDlg::PreTranslateMessage(MSG* pMsg)
+{
+	return IsDialogMessage(pMsg);
+}
+
 BOOL CFindDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 {
-	CenterWindow(GetParent());
 	DlgResize_Init();
+
+	// register object for message filtering and idle updates
+	CMessageLoop* pLoop = _Module.GetMessageLoop();
+	ATLASSERT(pLoop != nullptr);
+	pLoop->AddMessageFilter(this);
+
 	return TRUE;
+}
+
+void CFindDlg::OnDestroy()
+{
+	// register object for message filtering and idle updates
+	CMessageLoop* pLoop = _Module.GetMessageLoop();
+	ATLASSERT(pLoop != nullptr);
+	pLoop->RemoveMessageFilter(this);
 }
 
 void CFindDlg::OnGetMinMaxInfo(MINMAXINFO* pInfo)

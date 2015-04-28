@@ -161,10 +161,13 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 	m_CmdBar.LoadImages(IDR_MAINFRAME);
 	SetMenu(nullptr);
 
-	HWND hWndToolBar = CreateSimpleToolBarCtrl(m_hWnd, IDR_MAINFRAME, FALSE, ATL_SIMPLE_TOOLBAR_PANE_STYLE);
 	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
+	CReBarCtrl rebar(m_hWndToolBar);
 	AddSimpleReBarBand(hWndCmdBar);
+
+	HWND hWndToolBar = CreateSimpleToolBarCtrl(rebar, IDR_MAINFRAME, FALSE, ATL_SIMPLE_TOOLBAR_PANE_STYLE);
 	AddSimpleReBarBand(hWndToolBar, nullptr, true);
+	UIAddToolBar(hWndToolBar);
 
 	m_combo.Create(m_hWnd, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBS_HASSTRINGS | CBS_DROPDOWNLIST | CBS_AUTOHSCROLL, 0, ID_LOGLEVEL);
 	m_combo.SetFont(AtlGetDefaultGuiFont());
@@ -175,10 +178,10 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 	AddSimpleReBarBand(m_combo, L"Log Level: ", false, 60);
 	SizeSimpleReBarBands();
 
-	CStatic stCtrl;
-	stCtrl.Create(m_hWnd, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
-	AddSimpleReBarBand(stCtrl, nullptr, false, 100);
-	CReBarCtrl rebar(m_hWndToolBar);
+	m_findDlg.Create(rebar);
+	AddSimpleReBarBand(m_findDlg, L"Find: ", false, 10000);
+	SizeSimpleReBarBands();
+
 	rebar.LockBands(true);
 	rebar.SetNotifyWnd(*this);
 
@@ -214,10 +217,6 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 
 	m_hSplit.SetSplitterPanes(m_progressBar, m_logView);
 	m_vSplit.SetSplitterPanes(m_treeView, m_hSplit);
-
-	m_findDlg.Create(*this, 0);
-
-	UIAddToolBar(hWndToolBar);
 
 	m_mru.SetMaxEntries(10);
 	m_mru.SetMenuHandle(m_CmdBar.GetMenu().GetSubMenu(0).GetSubMenu(7));
@@ -764,7 +763,7 @@ void CMainFrame::OnLogCopy(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/
 
 void CMainFrame::OnLogFind(UINT uNotifyCode, int nID, CWindow wndCtl)
 {
-	m_findDlg.ShowWindow(SW_SHOW);
+	m_findDlg.SetFocus();
 }
 
 void CMainFrame::test_message(Severity::type severity, const std::string& msg)

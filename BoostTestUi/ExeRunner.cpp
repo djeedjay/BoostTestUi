@@ -138,7 +138,8 @@ TestSuite& ExeRunner::RootTestSuite()
 
 void ExeRunner::TraverseTestTree(TestTreeVisitor& v)
 {
-	TraverseTestTreeNode(m_tree.children.front(), v);
+	for (auto it = m_tree.children.begin(); it != m_tree.children.end(); ++it)
+		TraverseTestTreeNode(*it, v);
 }
 
 void ExeRunner::TraverseTestTree(unsigned id, TestTreeVisitor& v)
