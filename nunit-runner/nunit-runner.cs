@@ -530,7 +530,7 @@ namespace TestRunner
 
 		public TestFixtureClass(string name, System.Type type, object[] parameters) : base(name)
 		{
-			if (type.BaseType == null)
+			if (type.BaseType == null || type.BaseType.GetConstructor(new System.Type[0]) == null)
 				baseClass = null;
 			else
 				baseClass = new TestFixtureClass(name, type.BaseType, null);
@@ -553,19 +553,26 @@ namespace TestRunner
 			System.Array.Sort(methods, CompareMethodInfoByName);
 			foreach (var methodInfo in methods)
 			{
-				if (Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestAttribute), false) || methodInfo.Name.Substring(0, 4).ToLower() == "test")
+				var hasTestAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestAttribute), false);
+				var hasTestFixtureSetUpAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestFixtureSetUpAttribute), false);
+				var hasSetUpAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.SetUpAttribute), false);
+				var hasTearDownAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TearDownAttribute), false);
+				var hasTestFixtureTearDownAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestFixtureTearDownAttribute), false);
+				var hasNUnitAttribute = hasTestAttribute || hasTestFixtureSetUpAttribute || hasSetUpAttribute || hasTearDownAttribute || hasTestFixtureTearDownAttribute;
+
+				if (hasTestAttribute || !hasNUnitAttribute && methodInfo.Name.Substring(0, 4).ToLower() == "test" && methodInfo.GetParameters().Length == 0)
 					Tests.Add(new Test(methodInfo));
 
-				if (Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestFixtureSetUpAttribute), false))
+				if (hasTestFixtureSetUpAttribute)
 					testFixtureSetUp.Add(methodInfo);
 
-				if (Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.SetUpAttribute), false))
+				if (hasSetUpAttribute)
 					setUp.Add(methodInfo);
 
-				if (Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TearDownAttribute), false))
+				if (hasTearDownAttribute)
 					tearDown.Add(methodInfo);
 
-				if (Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestFixtureTearDownAttribute), false))
+				if (hasTestFixtureTearDownAttribute)
 					testFixtureTearDown.Add(methodInfo);
 			}
 		}
