@@ -185,11 +185,8 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 	rebar.LockBands(true);
 	rebar.SetNotifyWnd(*this);
 
-//	CreateSimpleToolBar();
-
 	m_hWndStatusBar = m_statusBar.Create(*this);
 	UIAddStatusBar(m_hWndStatusBar);
-//	CreateSimpleStatusBar();
 
 	int paneIds[] = { ID_DEFAULT_PANE, ID_ITERATIONS_PANE, ID_TOTAL_PANE, ID_RUN_PANE, ID_FAILED_PANE };
 	m_statusBar.SetPanes(paneIds, 5, false);

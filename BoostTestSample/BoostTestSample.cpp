@@ -65,6 +65,10 @@ BOOST_AUTO_TEST_CASE(TestOk)
 {
 	int i = 0;
 	BOOST_CHECK_EQUAL(i, 0);
+	BOOST_MESSAGE(
+		"This is a very long line to demonstrate that BoostTestUI can display a line over two hundred and sixty characters in length, correctly. "
+		"The Win32 listview control can not store lines with this length and it needs special effort to display longer lines in such a listview. "
+		"This is beyond column two hundred seventy so if this is still visible, the view is ok.");
 }
 
 BOOST_AUTO_TEST_CASE(Test10Sec)

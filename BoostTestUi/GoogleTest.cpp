@@ -100,7 +100,7 @@ std::string FullName(const std::string& testCaseName, const std::string& testNam
 
 void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const std::string& testName)
 {
-	static const std::regex re("(\\w+)(\\.)?");
+	static const std::regex re("(\\w+.+[^\\.])(\\.)?$");
 
 	m_rootId = GetId(testName);
 	tree.children.push_back(TestSuite(m_rootId, testName));
@@ -108,6 +108,7 @@ void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const 
 	std::string line;
 	while (std::getline(is, line))
 	{
+		line = chomp(line);
 		std::smatch sm;
 		if (!std::regex_search(line, sm, re))
 			continue;
@@ -172,13 +173,13 @@ unsigned ArgumentBuilder::GetId(const std::string& name)
 void ArgumentBuilder::FilterMessage(const std::string& msg)
 {
 	static const std::regex reWaiting("^#waiting");
-	static const std::regex reStart("^\\[==========\\] Running (\\d+) tests ");
-	static const std::regex reTest("^\\[----------\\] \\d+ tests from ([\\w_]+)( \\((\\d+) ms total\\))?");
-	static const std::regex reBegin("^\\[ RUN      \\] ([\\w\\._]+)");
+	static const std::regex reStart("^\\[==========\\] Running (\\d+) tests? from \\d+ test cases?.");
+	static const std::regex reTest("^\\[----------\\] \\d+ tests? from ([\\w_/]+)( \\((\\d+) ms total\\))?");
+	static const std::regex reBegin("^\\[ RUN      \\] ([\\w\\._/]+)");
 	static const std::regex reError("\\(\\d+\\): error: ");
-//	static const std::regex reEnd("^\\[(       OK )|(  FAILED  )\\] ([\\w\\._]+) \\((\\d+) ms\\)"); // VC regex bug??
-	static const std::regex reEnd("^\\[(       OK |  FAILED  )\\] ([\\w\\._]+) \\((\\d+) ms\\)");
-	static const std::regex reFinish("^\\[==========\\] \\d+ tests? from ");
+//	static const std::regex reEnd("^\\[(       OK )|(  FAILED  )\\] ([\\w\\._/]+) \\((\\d+) ms\\)"); // VC regex bug??
+	static const std::regex reEnd("^\\[(       OK |  FAILED  )\\] ([\\w\\._/]+).*\\((\\d+) ms\\)");
+	static const std::regex reFinish("^\\[==========\\] \\d+ tests? from \\d+ test cases? ran. \\((\\d+) ms total\\)");
 	static const std::regex reAssertion("Assertion failed:");
 
 	Severity::type severity = Severity::Info;
@@ -190,35 +191,39 @@ void ArgumentBuilder::FilterMessage(const std::string& msg)
 		m_pRunner->OnTestIterationStart(get_arg<unsigned>(sm[1]));
 		m_pRunner->OnTestSuiteStart(m_rootId);
 	}
-	else if (std::regex_search(msg, sm, reTest))
+	else if (std::regex_search(msg, sm, reTest) && !sm[2].matched)
 	{
-		if (sm[2].matched)
-			m_pRunner->OnTestSuiteFinish(GetId(sm[1]), get_arg<unsigned>(sm[3]));
-		else
-			m_pRunner->OnTestSuiteStart(GetId(sm[1]));
+		m_pRunner->OnTestSuiteStart(GetId(sm[1]));
 	}
 	else if (std::regex_search(msg, sm, reBegin))
+	{
 		m_pRunner->OnTestCaseStart(GetId(sm[1]));
+	}
 	else if (std::regex_search(msg, reError))
 	{
 		severity = Severity::Error;
 		m_pRunner->OnTestAssertion(false);
 	}
-	else if (std::regex_search(msg, sm, reEnd))
+	else if (std::regex_search(msg, reAssertion))
+	{
+		severity = Severity::Assertion;
+	}
+
+	m_pObserver->test_message(severity, msg);
+
+	if (std::regex_search(msg, sm, reEnd))
 	{
 		m_pRunner->OnTestCaseFinish(GetId(sm[2]), get_arg<unsigned>(sm[3]));
-		if (sm[1] == "  FAILED  ")
-			severity = Severity::Error;
+	}
+	else if (std::regex_search(msg, sm, reTest) && sm[2].matched)
+	{
+		m_pRunner->OnTestSuiteFinish(GetId(sm[1]), get_arg<unsigned>(sm[3]));
 	}
 	else if (std::regex_search(msg, sm, reFinish))
 	{
-		m_pRunner->OnTestSuiteFinish(m_rootId, 0);
+		m_pRunner->OnTestSuiteFinish(m_rootId, get_arg<unsigned>(sm[1]));
 		m_pRunner->OnTestIterationFinish();
 	}
-	else if (std::regex_search(msg, reAssertion))
-		severity =  Severity::Assertion;
-
-	m_pObserver->test_message(severity, msg);
 }
 
 } // namespace GoogleTest

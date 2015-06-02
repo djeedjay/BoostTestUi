@@ -108,6 +108,7 @@ void CLogView::InvalidateLine(int line)
 
 void CLogView::InvalidateLines(int begin, int end)
 {
+	end = std::min(GetItemCount(), end);
 	if (begin >= end)
 		return;
 
@@ -514,7 +515,9 @@ LRESULT CLogView::OnGetDispInfo(NMHDR* pnmh)
 	if ((item.mask & LVIF_TEXT) == 0 || item.iItem >= static_cast<int>(m_logLines.size()))
 		return 0;
 
-	CopyItemText(GetSubItemText(item.iItem, item.iSubItem), item.pszText, item.cchTextMax);
+	m_dispInfoText = WStr(GetSubItemText(item.iItem, item.iSubItem)).str();
+	item.pszText = const_cast<wchar_t*>(m_dispInfoText.c_str());
+
 	return 0;
 }
 

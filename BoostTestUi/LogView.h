@@ -105,6 +105,7 @@ private:
 	int m_logHighLightBegin;
 	int m_logHighLightEnd;
 	bool m_insidePaint;
+	std::wstring m_dispInfoText;
 };
 
 } // namespace gj
