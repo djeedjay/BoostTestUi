@@ -10,10 +10,15 @@
 
 #define init_unit_test_suite init_unit_test_suite2
 
+// The boost.test version in the boost archive trunk has a slightly different api than all current releases
+#if BOOST_VERSION > 199999
+#	define BOOST_TEST_TRUNK_API
+#endif
+
 #include <iostream>
 #include <iomanip>
 #include <boost/test/unit_test.hpp>
-#if BOOST_VERSION > 105400
+#if BOOST_TEST_TRUNK_API
 #	include <boost/test/tree/visitor.hpp>
 #endif
 #include <boost/test/execution_monitor.hpp>
@@ -26,7 +31,7 @@ namespace boost {
 namespace unit_test {
 namespace gui {
 
-#if BOOST_VERSION <= 105400
+#if !BOOST_TEST_TRUNK_API
 
 const test_unit_type TUT_ANY = tut_any;
 const test_unit_type TUT_CASE = tut_case;

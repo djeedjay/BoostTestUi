@@ -22,7 +22,7 @@ std::wstring CArgumentsDlg::GetArguments() const
 	return m_arguments;
 }
 
-BOOL CArgumentsDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
+BOOL CArgumentsDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
 	CenterWindow(GetParent());
 	DlgResize_Init();

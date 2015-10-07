@@ -17,6 +17,7 @@ namespace gj {
 class CMainFrame;
 
 class CFindDlg :
+	boost::noncopyable,
 	public CDialogImpl<CFindDlg>,
 	public CMessageFilter,
 	public CDialogResize<CFindDlg>

@@ -237,7 +237,7 @@ void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const 
 	BoostTest::LoadTestUnits(tree, is, m_pObserver);
 }
 
-unsigned ArgumentBuilder::GetEnabledOptions(unsigned options) const
+unsigned ArgumentBuilder::GetEnabledOptions(unsigned /*options*/) const
 {
 	return ExeRunner::Randomize | ExeRunner::WaitForDebugger;
 }
