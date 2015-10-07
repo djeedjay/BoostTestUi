@@ -43,6 +43,9 @@
 //
 // Don't forget gtest.h, which declares the testing framework.
 
+#include <vector>
+#include <list>
+#include <string>
 #include <windows.h>
 #include <limits.h>
 #include <gtest/gtest-gui.h>
@@ -159,6 +162,37 @@ TEST(IsPrimeTest, Positive) {
 // Did you notice that we didn't register the tests?  The
 // RUN_ALL_TESTS() macro magically knows about all the tests we
 // defined.  Isn't this convenient?
+
+class ParamTest : public testing::TestWithParam<int>
+{
+};
+
+TEST_P(ParamTest, MustBeEven)
+{
+	EXPECT_TRUE(GetParam() % 2 == 0);
+}
+
+INSTANTIATE_TEST_CASE_P(InstantiationName, ParamTest, ::testing::Range(0, 6));
+
+template <typename T>
+struct ContainerTest : ::testing::Test
+{
+	T container;
+};
+
+typedef ::testing::Types<std::vector<int>, std::string, std::list<std::string>> TestTypes;
+TYPED_TEST_CASE(ContainerTest, TestTypes);
+
+TYPED_TEST(ContainerTest, TypedTest)
+{
+	this->container.resize(10);
+	EXPECT_EQ(10, this->container.size());
+
+	int count = 0;
+	for (auto it = this->container.begin(); it != this->container.end(); ++it)
+		++count;
+	EXPECT_EQ(10, count);
+}
 
 int main(int argc, char** argv)
 {

@@ -173,12 +173,6 @@
     <ClInclude Include="TestCaseState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="boost\test\unit_test_gui.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gtest\gtest-gui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\BoostTestUi.ico">
