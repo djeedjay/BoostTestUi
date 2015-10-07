@@ -57,7 +57,7 @@ class Str
 {
 public:
 	explicit Str(const std::string& s) :
-		m_str()
+		m_str(s)
 	{
 	}
 

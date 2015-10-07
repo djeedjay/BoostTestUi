@@ -18,6 +18,7 @@ namespace gj {
 class CategoryList;
 
 class CategoryDlg :
+	boost::noncopyable,
 	public CDialogImpl<CategoryDlg>,
 	public CDialogResize<CategoryDlg>
 {

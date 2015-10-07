@@ -14,7 +14,7 @@
 
 CAppModule _Module;
 
-int Run(LPTSTR lpstrCmdLine, int nCmdShow)
+int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
 {
 	CMessageLoop theLoop;
 	_Module.AddMessageLoop(&theLoop);

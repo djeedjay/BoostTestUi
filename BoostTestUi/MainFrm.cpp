@@ -282,7 +282,9 @@ private:
 	int m_count;
 };
 
-class TestCaseLoader : public TestTreeVisitor
+class TestCaseLoader :
+	boost::noncopyable,
+	public TestTreeVisitor
 {
 public:
 	TestCaseLoader(CTreeView& treeView, CategoryList& categories) :
@@ -327,7 +329,9 @@ private:
 	int m_testCaseCount;
 };
 
-class CategoryFilter : public TestTreeVisitor
+class CategoryFilter :
+	boost::noncopyable,
+	public TestTreeVisitor
 {
 public:
 	CategoryFilter(CTreeView& treeView, CategoryList& categories) :
@@ -376,7 +380,9 @@ private:
 	std::vector<bool> m_suites;
 };
 
-class TestCaseStateSaveVisitor : public TestTreeVisitor
+class TestCaseStateSaveVisitor :
+	boost::noncopyable,
+	public TestTreeVisitor
 {
 public:
 	TestCaseStateSaveVisitor(TreeViewStateStorage& testState, const CTreeView& treeView) :
@@ -400,7 +406,9 @@ private:
 	const CTreeView& m_treeView;
 };
 
-class TestCaseStateRestoreVisitor : public TestTreeVisitor
+class TestCaseStateRestoreVisitor :
+	boost::noncopyable,
+	public TestTreeVisitor
 {
 public:
 	TestCaseStateRestoreVisitor(const TreeViewStateStorage& testState, CTreeView& treeView) :
@@ -568,7 +576,7 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 	}
 }
 
-void CMainFrame::OnHelp(LPHELPINFO lpHelpInfo)
+void CMainFrame::OnHelp(LPHELPINFO /*lpHelpInfo*/)
 {
 	switch (m_helpType)
 	{
@@ -731,7 +739,7 @@ void CMainFrame::OnLogAutoClear(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wnd
 	m_logAutoClear = !m_logAutoClear;
 }
 
-void CMainFrame::OnResetSelection(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnResetSelection(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	ClearTestSelection();
 	Reload();
@@ -758,7 +766,7 @@ void CMainFrame::OnLogCopy(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/
 	m_logView.Copy();
 }
 
-void CMainFrame::OnLogFind(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnLogFind(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_findDlg.SetFocus();
 }
@@ -826,7 +834,7 @@ void CMainFrame::test_aborted()
 {
 }
 
-void CMainFrame::test_iteration_start(unsigned test_cases_amount)
+void CMainFrame::test_iteration_start(unsigned /*test_cases_amount*/)
 {
 	EnQueue([this]()
 	{
@@ -949,7 +957,7 @@ void CMainFrame::UpdateStatusBar()
 	UISetText(ID_FAILED_PANE, isLoaded ? WStr(wstringbuilder() << L"Failed tests: " << m_failedTestCount) : L"");
 }
 
-void CMainFrame::test_unit_ignored(const std::string& msg)
+void CMainFrame::test_unit_ignored(const std::string& /*msg*/)
 {
 	EnQueue([this]()
 	{
@@ -1013,7 +1021,7 @@ void CMainFrame::OnTestDebugger(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wnd
 	m_debugger = !m_debugger;
 }
 
-void CMainFrame::OnTestRunnerArgs(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnTestRunnerArgs(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	CArgumentsDlg dlg(m_pRunner->GetArguments());
 	if (dlg.DoModal() == IDOK)
@@ -1043,7 +1051,7 @@ void CMainFrame::OnTestAbort(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl
 	m_pRunner->Abort();
 }
 
-void CMainFrame::OnTestCategories(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnTestCategories(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	CategoryDlg dlg(m_categories);
 	if (dlg.DoModal() != IDOK)
@@ -1068,14 +1076,14 @@ void CMainFrame::OnHelpBoost(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl
 	dlg.DoModal();
 }
 
-void CMainFrame::OnHelpGoogle(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnHelpGoogle(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	LoadRichEditLibrary();
 	CGoogleHelpDlg dlg;
 	dlg.DoModal();
 }
 
-void CMainFrame::OnHelpNUnit(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CMainFrame::OnHelpNUnit(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	LoadRichEditLibrary();
 	CNUnitHelpDlg dlg;

@@ -12,7 +12,7 @@
 
 namespace gj {
 
-BOOL CBoostHelpDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
+BOOL CBoostHelpDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
 	CenterWindow(GetParent());
 	DlgResize_Init();
@@ -47,12 +47,12 @@ void SampleContextMenu(CWindow wnd, CRichEditCtrl& ctrl, CPoint pt)
 	menuPopup.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, wnd);
 }
 
-void CBoostHelpDlg::OnContextMenu(CWindow wnd, CPoint pt)
+void CBoostHelpDlg::OnContextMenu(CWindow /*wnd*/, CPoint pt)
 {
 	SampleContextMenu(*this, m_sample, pt);
 }
 
-void CBoostHelpDlg::OnCopy(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)
+void CBoostHelpDlg::OnCopy(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/)
 {
 	m_sample.Copy();
 }

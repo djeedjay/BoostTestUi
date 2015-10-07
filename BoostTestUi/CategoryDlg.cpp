@@ -87,7 +87,7 @@ void CategoryDlg::UpdateUiState()
 	GetDlgItem(IDC_NONE).EnableWindow(inBox.GetCount() > 0);
 }
 
-void CategoryDlg::OnSelChange(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CategoryDlg::OnSelChange(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	UpdateUiState();
 }
@@ -119,13 +119,13 @@ void CategoryDlg::UpdateSelectedItem(const CListBox& box, bool value)
 		m_categories[Str(GetListBoxText(box, i))] = value;
 }
 
-void CategoryDlg::OnIncludeDblClick(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CategoryDlg::OnIncludeDblClick(UINT /*uNotifyCode*/, int /*nID*/, CWindow wndCtl)
 {
 	UpdateSelectedItem(CListBox(wndCtl), false);
 	InitializeLists();
 }
 
-void CategoryDlg::OnExcludeDblClick(UINT uNotifyCode, int nID, CWindow wndCtl)
+void CategoryDlg::OnExcludeDblClick(UINT /*uNotifyCode*/, int /*nID*/, CWindow wndCtl)
 {
 	UpdateSelectedItem(CListBox(wndCtl), true);
 	InitializeLists();
@@ -141,26 +141,26 @@ void CategoryDlg::UpdateSelectedItems(const CListBox& box, bool value)
 	}
 }
 
-void CategoryDlg::OnBtnAll(UINT /*uNotifyCode*/, int nID, CWindow /*wndCtl*/)
+void CategoryDlg::OnBtnAll(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	for (auto it = m_categories.begin(); it != m_categories.end(); ++it)
 		it->second = true;
 	InitializeLists();
 }
 
-void CategoryDlg::OnBtnInclude(UINT /*uNotifyCode*/, int nID, CWindow /*wndCtl*/)
+void CategoryDlg::OnBtnInclude(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	UpdateSelectedItems(CListBox(GetDlgItem(IDC_EXCLUDE_LIST)), true);
 	InitializeLists();
 }
 
-void CategoryDlg::OnBtnExclude(UINT /*uNotifyCode*/, int nID, CWindow /*wndCtl*/)
+void CategoryDlg::OnBtnExclude(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	UpdateSelectedItems(CListBox(GetDlgItem(IDC_INCLUDE_LIST)), false);
 	InitializeLists();
 }
 
-void CategoryDlg::OnBtnNone(UINT /*uNotifyCode*/, int nID, CWindow /*wndCtl*/)
+void CategoryDlg::OnBtnNone(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	for (auto it = m_categories.begin(); it != m_categories.end(); ++it)
 		it->second = false;
