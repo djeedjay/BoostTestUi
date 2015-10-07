@@ -8,7 +8,6 @@
 #pragma once
 
 #include "TestCaseState.h"
-#include "OffscreenPaint.h"
 
 namespace gj {
 
@@ -29,7 +28,7 @@ typedef CWinTraitsOR<TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT | TVS_SHOWS
 
 class CTreeView :
 	public CWindowImpl<CTreeView, CTreeViewCtrl, CTreeViewTraits>,
-	public COffscreenPaint<CTreeView>
+	public CDoubleBufferImpl<CTreeView>
 {
 public:
 	DECLARE_WND_SUPERCLASS(nullptr, CTreeViewCtrl::GetWndClassName())
@@ -85,7 +84,7 @@ public:
 	LRESULT OnGetInfoTip(NMHDR* pnmh);
 	LRESULT OnClick(NMHDR* pnmh);
 	LRESULT OnRClick(NMHDR* pnmh);
-	void DoPaint(CDCHandle hdc, const RECT& rcClip);
+	void DoPaint(CDCHandle hdc);
 
 private:
 	void ExpandToDepth(HTREEITEM hItem, int depth);

@@ -10,7 +10,6 @@
 #include <vector>
 #include <map>
 #include "Severity.h"
-#include "OffscreenPaint.h"
 
 namespace gj {
 
@@ -20,7 +19,7 @@ class CMainFrame;
 
 class CLogView :
 	public CWindowImpl<CLogView, CListViewCtrl, CListViewTraits>,
-	public COffscreenPaint<CLogView>
+	public CDoubleBufferImpl<CLogView>
 {
 public:
 	explicit CLogView(CMainFrame& mainFrame);
@@ -50,7 +49,7 @@ public:
 	BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
 	void ExceptionHandler();
 	BOOL PreTranslateMessage(MSG* pMsg);
-	void DoPaint(CDCHandle dc, const RECT& rcClip);
+	void DoPaint(CDCHandle dc);
 
 private:
 	struct LogLine

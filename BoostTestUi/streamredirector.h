@@ -12,7 +12,6 @@
 
 #include <streambuf>
 #include <string>
-#include "windows.h"
 
 
 namespace gj {

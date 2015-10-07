@@ -143,9 +143,6 @@
     <ClInclude Include="..\include\gtest\gtest-gui.h">
       <Filter>Header Files\include</Filter>
     </ClInclude>
-    <ClInclude Include="OffscreenPaint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="version.h">
       <Filter>Resource Files</Filter>
     </ClInclude>

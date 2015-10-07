@@ -179,7 +179,6 @@
     <ClInclude Include="LogView.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="NUnitTest.h" />
-    <ClInclude Include="OffscreenPaint.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Severity.h" />

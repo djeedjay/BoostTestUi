@@ -124,7 +124,7 @@ public:
 //	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
 	LRESULT OnCreate(const CREATESTRUCT* pCreate);
-	LRESULT OnDeQueue(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnDeQueue(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/);
 	void OnTimer(UINT_PTR nIDEvent);
 	void OnDropFiles(HDROP hDropInfo);
 	void OnHelp(LPHELPINFO lpHelpInfo);

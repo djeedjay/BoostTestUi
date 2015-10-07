@@ -27,7 +27,7 @@ BEGIN_MSG_MAP_TRY(CLogView)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(LVN_GETINFOTIP, OnGetInfoTip)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(LVN_GETDISPINFO, OnGetDispInfo)
 	DEFAULT_REFLECTION_HANDLER()
-	CHAIN_MSG_MAP(COffscreenPaint<CLogView>)
+	CHAIN_MSG_MAP(CDoubleBufferImpl<CLogView>)
 END_MSG_MAP_CATCH(ExceptionHandler)
 
 CLogView::CLogView(CMainFrame& mainFrame) :
@@ -521,11 +521,13 @@ LRESULT CLogView::OnGetDispInfo(NMHDR* pnmh)
 	return 0;
 }
 
-void CLogView::DoPaint(CDCHandle dc, const RECT& rcClip)
+void CLogView::DoPaint(CDCHandle dc)
 {
 	m_insidePaint = true;
 
-	dc.FillSolidRect(&rcClip, GetSysColor(COLOR_WINDOW)); 
+	RECT rect;
+	dc.GetClipBox(&rect);
+	dc.FillSolidRect(&rect, GetSysColor(COLOR_WINDOW)); 
 	DefWindowProc(WM_PAINT, reinterpret_cast<WPARAM>(dc.m_hDC), 0);
 
 	m_insidePaint = false;

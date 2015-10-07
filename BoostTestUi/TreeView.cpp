@@ -26,7 +26,7 @@ BEGIN_MSG_MAP_TRY(CTreeView)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(TVN_GETINFOTIP, OnGetInfoTip)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CLICK, OnClick)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_RCLICK, OnRClick)
-	CHAIN_MSG_MAP(COffscreenPaint<CTreeView>)
+	CHAIN_MSG_MAP(CDoubleBufferImpl<CTreeView>)
 END_MSG_MAP_CATCH(ExceptionHandler)
 
 CTreeView::CTreeView(CMainFrame& mainFrame) :
@@ -210,9 +210,11 @@ LRESULT CTreeView::OnRClick(NMHDR* pnmh)
 	return 0;
 }
 
-void CTreeView::DoPaint(CDCHandle hdc, const RECT& rcClip)
+void CTreeView::DoPaint(CDCHandle hdc)
 {
-	hdc.FillSolidRect(&rcClip, GetSysColor(COLOR_WINDOW));
+	RECT rect;
+	GetClientRect(&rect);
+	hdc.FillSolidRect(&rect, GetSysColor(COLOR_WINDOW));
 
 	DefWindowProc(WM_PAINT, reinterpret_cast<WPARAM>(hdc.m_hDC), 0);
 }

@@ -50,7 +50,7 @@ struct Options
 BEGIN_MSG_MAP_TRY(CMainFrame)
 	MSG_WM_CREATE(OnCreate)
 	MSG_WM_CLOSE(OnClose)
-	MESSAGE_HANDLER(UM_DEQUEUE, OnDeQueue);
+	MESSAGE_HANDLER_EX(UM_DEQUEUE, OnDeQueue);
 	MSG_WM_TIMER(OnTimer)
 	MSG_WM_DROPFILES(OnDropFiles)
 	MSG_WM_HELP(OnHelp)
@@ -448,7 +448,7 @@ void CMainFrame::EnQueue(const std::function<void ()>& fn)
 		PostMessage(UM_DEQUEUE);
 }
 
-LRESULT CMainFrame::OnDeQueue(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+LRESULT CMainFrame::OnDeQueue(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/)
 {
 	std::queue<std::function<void ()>> fnq;
 	{
