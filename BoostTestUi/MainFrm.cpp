@@ -1352,6 +1352,8 @@ void CMainFrame::Run()
 
 	CountEnabledTestCases counter;
 	m_pRunner->TraverseTestTree(counter);
+	if (counter.count() == 0)
+		return;
 
 	m_testIterationCount = 0;
 	m_testsRunCount = 0;
