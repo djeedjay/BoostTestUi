@@ -38,17 +38,12 @@ public:
 		DLGRESIZE_CONTROL(IDOK, DLSZ_MOVE_X | DLSZ_MOVE_Y)
 	END_DLGRESIZE_MAP()
 
-// Handler prototypes (uncomment arguments if needed):
-//	LRESULT MessageHandler(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-//	LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
-
+private:
 	BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
 	void OnContextMenu(CWindow wnd, CPoint point);
 	void OnCopy(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/);
 	void OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/);
 
-private:
 	CRichEditCtrl m_sample;
 	CHyperLink m_link;
 };

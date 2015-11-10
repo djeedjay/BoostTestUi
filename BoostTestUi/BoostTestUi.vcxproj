@@ -166,6 +166,7 @@
     <ClInclude Include="..\include\gtest\gtest-gui.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="ArgumentsDlg.h" />
+    <ClInclude Include="AtlWinExt.h" />
     <ClInclude Include="BoostHelpDlg.h" />
     <ClInclude Include="BoostTest.h" />
     <ClInclude Include="CategoryDlg.h" />

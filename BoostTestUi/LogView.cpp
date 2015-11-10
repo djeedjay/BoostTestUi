@@ -18,7 +18,7 @@
 
 namespace gj {
 
-BEGIN_MSG_MAP_TRY(CLogView)
+BEGIN_MSG_MAP2(CLogView)
 	MSG_WM_CREATE(OnCreate)
 	MSG_WM_CONTEXTMENU(OnContextMenu);
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CUSTOMDRAW, OnCustomDraw)
@@ -28,7 +28,7 @@ BEGIN_MSG_MAP_TRY(CLogView)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(LVN_GETDISPINFO, OnGetDispInfo)
 	DEFAULT_REFLECTION_HANDLER()
 	CHAIN_MSG_MAP(CDoubleBufferImpl<CLogView>)
-END_MSG_MAP_CATCH(ExceptionHandler)
+END_MSG_MAP()
 
 CLogView::CLogView(CMainFrame& mainFrame) :
 	m_pMainFrame(&mainFrame),
@@ -39,9 +39,14 @@ CLogView::CLogView(CMainFrame& mainFrame) :
 {
 }
 
-void CLogView::ExceptionHandler()
+void CLogView::OnException()
 {
-	MessageBox(WStr(GetExceptionMessage()), LoadString(IDR_APPNAME).c_str(), MB_ICONERROR | MB_OK);
+	MessageBox(L"Unknown exception", LoadString(IDR_APPNAME).c_str(), MB_ICONERROR | MB_OK);
+}
+
+void CLogView::OnException(const std::exception& ex)
+{
+	MessageBox(WStr(ex.what()), LoadString(IDR_APPNAME).c_str(), MB_ICONERROR | MB_OK);
 }
 
 BOOL CLogView::PreTranslateMessage(MSG* pMsg)

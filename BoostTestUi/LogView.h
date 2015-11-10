@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <map>
+#include "AtlWinExt.h"
 #include "Severity.h"
 
 namespace gj {
@@ -19,7 +20,8 @@ class CMainFrame;
 
 class CLogView :
 	public CWindowImpl<CLogView, CListViewCtrl, CListViewTraits>,
-	public CDoubleBufferImpl<CLogView>
+	public CDoubleBufferImpl<CLogView>,
+	public ExceptionHandler<CLogView, std::exception>
 {
 public:
 	explicit CLogView(CMainFrame& mainFrame);
@@ -46,8 +48,6 @@ public:
 
 	DECLARE_WND_SUPERCLASS(nullptr, CListViewCtrl::GetWndClassName())
 
-	BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
-	void ExceptionHandler();
 	BOOL PreTranslateMessage(MSG* pMsg);
 	void DoPaint(CDCHandle dc);
 
@@ -72,10 +72,9 @@ private:
 		int endLine;
 	};
 
-// Handler prototypes (uncomment arguments if needed):
-//	LRESULT MessageHandler(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-//	LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
+	DECLARE_MSG_MAP()
+	void OnException();
+	void OnException(const std::exception& ex);
 
 	LRESULT OnCreate(const CREATESTRUCT* pCreate);
 	void OnContextMenu(HWND hWnd, CPoint pt);

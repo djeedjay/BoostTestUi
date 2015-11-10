@@ -170,22 +170,12 @@ void ExeRunner::SetRepeat(bool repeat)
 	m_repeat = repeat;
 }
 
-void ExeRunner::SetArguments(const std::wstring& args)
-{
-	m_arguments = args;
-}
-
-std::wstring ExeRunner::GetArguments() const
-{
-	return m_arguments;
-}
-
-void ExeRunner::Run(int logLevel, unsigned options)
+void ExeRunner::Run(int logLevel, unsigned options, const std::wstring& arguments)
 {
 	if (m_pThread)
 		return;
 
-	m_testArgs = m_pArgBuilder->BuildArgs(*this, logLevel, options) + L" " + m_arguments;
+	m_testArgs = m_pArgBuilder->BuildArgs(*this, logLevel, options) + L" " + arguments;
 	m_repeat = (options & ExeRunner::Repeat) != 0;
 	StartTestProcess();
 	m_pThread.reset(new boost::thread([this]() { RunTest(); }));

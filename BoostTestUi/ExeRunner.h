@@ -53,9 +53,7 @@ public:
 	virtual unsigned GetEnabledOptions(unsigned options);
 	virtual bool IsRunning() const override;
 	virtual void SetRepeat(bool repeat) override;
-	virtual void SetArguments(const std::wstring& args) override;
-	virtual std::wstring GetArguments() const override;
-	virtual void Run(int logLevel, unsigned options) override;
+	virtual void Run(int logLevel, unsigned options, const std::wstring& arguments) override;
 	virtual void Continue() override;
 	virtual void Abort() override;
 	virtual void Wait() override;
@@ -87,7 +85,6 @@ private:
 	void WaitForTestProcess();
 
 	std::wstring m_fileName;
-	std::wstring m_arguments;
 	std::wstring m_testArgs;
 	bool m_repeat;
 	TestObserver* m_pObserver;

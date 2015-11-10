@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "AtlWinExt.h"
 #include "TestCaseState.h"
 
 namespace gj {
@@ -28,16 +29,16 @@ typedef CWinTraitsOR<TVS_HASLINES | TVS_HASBUTTONS | TVS_LINESATROOT | TVS_SHOWS
 
 class CTreeView :
 	public CWindowImpl<CTreeView, CTreeViewCtrl, CTreeViewTraits>,
-	public CDoubleBufferImpl<CTreeView>
+	public CDoubleBufferImpl<CTreeView>,
+	public ExceptionHandler<CTreeView, std::exception>
 {
 public:
 	DECLARE_WND_SUPERCLASS(nullptr, CTreeViewCtrl::GetWndClassName())
 
 	explicit CTreeView(CMainFrame& mainFrame);
 
-	BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
-	void ExceptionHandler();
 	BOOL PreTranslateMessage(MSG* pMsg);
+	void DoPaint(CDCHandle hdc);
 
 	void ResetTreeImages();
 	void Clear();
@@ -71,11 +72,11 @@ public:
 	void OnTestStart();
 	void OnTestFinish();
 
-// Handler prototypes (uncomment arguments if needed):
-//	LRESULT MessageHandler(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-//	LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
+private:
+	DECLARE_MSG_MAP()
 
+	void OnException();
+	void OnException(const std::exception& ex);
 	LRESULT OnCreate(const CREATESTRUCT* pCreate);
 	void OnTimer(UINT_PTR /*nIDEvent*/);
 	void OnContextMenu(HWND hWnd, CPoint pt);
@@ -84,9 +85,7 @@ public:
 	LRESULT OnGetInfoTip(NMHDR* pnmh);
 	LRESULT OnClick(NMHDR* pnmh);
 	LRESULT OnRClick(NMHDR* pnmh);
-	void DoPaint(CDCHandle hdc);
 
-private:
 	void ExpandToDepth(HTREEITEM hItem, int depth);
 	void CheckSubTreeItems(HTREEITEM hItem, bool check);
 	void UncheckTreeItem(HTREEITEM hItem);

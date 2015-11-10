@@ -17,7 +17,7 @@
 
 namespace gj {
 
-BEGIN_MSG_MAP_TRY(CTreeView)
+BEGIN_MSG_MAP2(CTreeView)
 	MSG_WM_CREATE(OnCreate)
 	MSG_WM_TIMER(OnTimer)
 	MSG_WM_CONTEXTMENU(OnContextMenu);
@@ -27,7 +27,7 @@ BEGIN_MSG_MAP_TRY(CTreeView)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CLICK, OnClick)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_RCLICK, OnRClick)
 	CHAIN_MSG_MAP(CDoubleBufferImpl<CTreeView>)
-END_MSG_MAP_CATCH(ExceptionHandler)
+END_MSG_MAP()
 
 CTreeView::CTreeView(CMainFrame& mainFrame) :
 	m_pMainFrame(&mainFrame),
@@ -36,9 +36,14 @@ CTreeView::CTreeView(CMainFrame& mainFrame) :
 {
 }
 
-void CTreeView::ExceptionHandler()
+void CTreeView::OnException()
 {
-	MessageBox(WStr(GetExceptionMessage()), LoadString(IDR_APPNAME).c_str(), MB_ICONERROR | MB_OK);
+	MessageBox(L"Unknown exception", LoadString(IDR_APPNAME).c_str(), MB_ICONERROR | MB_OK);
+}
+
+void CTreeView::OnException(const std::exception& ex)
+{
+	MessageBox(WStr(ex.what()), LoadString(IDR_APPNAME).c_str(), MB_ICONERROR | MB_OK);
 }
 
 BOOL CTreeView::PreTranslateMessage(MSG* pMsg)

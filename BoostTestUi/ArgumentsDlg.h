@@ -38,17 +38,12 @@ public:
 		DLGRESIZE_CONTROL(IDCANCEL, DLSZ_MOVE_X)
 	END_DLGRESIZE_MAP()
 
-// Handler prototypes (uncomment arguments if needed):
-//	LRESULT MessageHandler(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-//	LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
-
+private:
 	BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
 	void OnGetMinMaxInfo(MINMAXINFO* pInfo);
 	void OnCancel(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/);
 	void OnOk(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/);
 
-private:
 	std::wstring m_arguments;
 };
 

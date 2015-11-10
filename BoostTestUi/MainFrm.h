@@ -19,6 +19,7 @@
 #pragma warning(push, 3) // conversion from 'int' to 'unsigned short', possible loss of data
 #include <boost/thread.hpp>
 #pragma warning(pop)
+#include "AtlWinExt.h"
 #include "Utilities.h"
 #include "TreeView.h"
 #include "LogView.h"
@@ -47,10 +48,11 @@ class CMainFrame :
 	public CUpdateUI<CMainFrame>,
 	public CMessageFilter,
 	public CIdleHandler,
+	public ExceptionHandler<CMainFrame, std::exception>,
 	public TestObserver
 {
 public:
-	explicit CMainFrame(const std::wstring& fileName);
+	CMainFrame(const std::wstring& fileName, const std::wstring& arguments);
 
 	DECLARE_FRAME_WND_CLASS(nullptr, IDR_MAINFRAME)
 
@@ -64,34 +66,6 @@ public:
 	TestUnit GetTestItem(unsigned id) const;
 
 	void EnQueue(const std::function<void ()>& fn);
-
-	virtual void test_message(Severity::type, const std::string& msg) override;
-
-	virtual void test_waiting(const std::wstring& processName, unsigned processId) override;
-	virtual void test_start() override;
-	virtual void test_finish() override;
-	virtual void test_aborted() override;
-	virtual void test_iteration_start(unsigned test_cases_amount) override;
-	virtual void test_iteration_finish() override;
-	virtual void test_suite_start(unsigned id) override;
-	virtual void test_case_start(unsigned id) override;
-	virtual void test_case_finish(unsigned id, unsigned long elapsed) override;
-	virtual void test_case_finish(unsigned id, unsigned long /*elapsed*/, TestCaseState::type state) override;
-	virtual void test_suite_finish(unsigned id, unsigned long elapsed) override;
-	virtual void test_unit_skipped(unsigned id) override;
-	virtual void test_unit_aborted(unsigned id) override;
-
-	virtual void test_unit_ignored(const std::string& msg) override;
-	virtual void assertion_result(bool passed) override;
-	virtual void exception_caught(const std::string& what) override;
-
-	virtual void TestStarted() override;
-	virtual void TestFinished() override;
-
-	BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
-	void ExceptionHandler();
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	virtual BOOL OnIdle();
 
 	BEGIN_UPDATE_UI_MAP(CMainFrame)
 	    UPDATE_ELEMENT(ID_FILE_AUTO_RUN, UPDUI_MENUPOPUP)
@@ -118,10 +92,37 @@ public:
 
 	enum { UM_DEQUEUE = WM_APP + 100 };
 
-// Handler prototypes (uncomment arguments if needed):
-//	LRESULT MessageHandler(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-//	LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
+private:
+	DECLARE_MSG_MAP()
+
+	void OnException();
+	void OnException(const std::exception& ex);
+
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	virtual BOOL OnIdle();
+
+	virtual void test_message(Severity::type, const std::string& msg) override;
+
+	virtual void test_waiting(const std::wstring& processName, unsigned processId) override;
+	virtual void test_start() override;
+	virtual void test_finish() override;
+	virtual void test_aborted() override;
+	virtual void test_iteration_start(unsigned test_cases_amount) override;
+	virtual void test_iteration_finish() override;
+	virtual void test_suite_start(unsigned id) override;
+	virtual void test_case_start(unsigned id) override;
+	virtual void test_case_finish(unsigned id, unsigned long elapsed) override;
+	virtual void test_case_finish(unsigned id, unsigned long /*elapsed*/, TestCaseState::type state) override;
+	virtual void test_suite_finish(unsigned id, unsigned long elapsed) override;
+	virtual void test_unit_skipped(unsigned id) override;
+	virtual void test_unit_aborted(unsigned id) override;
+
+	virtual void test_unit_ignored(const std::string& msg) override;
+	virtual void assertion_result(bool passed) override;
+	virtual void exception_caught(const std::string& what) override;
+
+	virtual void TestStarted() override;
+	virtual void TestFinished() override;
 
 	LRESULT OnCreate(const CREATESTRUCT* pCreate);
 	LRESULT OnDeQueue(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/);
@@ -161,7 +162,6 @@ public:
 	void OnMruMenuItem(UINT uCode, int nID, HWND hwndCtrl);
 	void OnClose();
 
-private:
 	void UpdateUI();
 	void UpdateStatusBar();
 	void UpdateProgressBar();
@@ -185,6 +185,7 @@ private:
 	void EndTestCase(unsigned id, unsigned long /*elapsed*/, TestCaseState::type state);
 
 	std::wstring m_pathName;
+	std::wstring m_arguments;
 	std::wstring m_logFileName;
 	FILETIME m_fileTime;
 

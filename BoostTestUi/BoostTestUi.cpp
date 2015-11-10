@@ -6,58 +6,111 @@
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
 
 #include "stdafx.h"
-
-#include "resource.h"
-
-#include "aboutdlg.h"
+#include "Utilities.h"
 #include "MainFrm.h"
 
 CAppModule _Module;
 
+namespace gj {
+
+struct ComInitialization
+{
+	static const DWORD ApartmentThreaded = COINIT_APARTMENTTHREADED;
+	static const DWORD Multithreaded = COINIT_MULTITHREADED;
+
+	ComInitialization(DWORD coinit)
+	{
+		CheckHr(::CoInitializeEx(nullptr, coinit));
+	}
+
+	~ComInitialization()
+	{
+		::CoUninitialize();
+	}
+};
+
+class CAppModuleInitialization
+{
+public:
+	CAppModuleInitialization(CAppModule& module, HINSTANCE hInstance) :
+		m_module(module)
+	{
+		CheckHr(m_module.Init(nullptr, hInstance));
+	}
+
+	~CAppModuleInitialization()
+	{
+		m_module.Term();
+	}
+
+private:
+	CAppModule& m_module;
+};
+
+class MessageLoop : public CMessageLoop
+{
+public:
+	explicit MessageLoop(CAppModule& module) :
+		m_module(module)
+	{
+		if (!m_module.AddMessageLoop(this))
+			throw std::runtime_error("MessageLoop initialization error");
+	}
+
+	~MessageLoop()
+	{
+		m_module.RemoveMessageLoop();
+	}
+
+private:
+	CAppModule& m_module;
+};
+
 int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
 {
-	CMessageLoop theLoop;
-	_Module.AddMessageLoop(&theLoop);
+	MessageLoop theLoop(_Module);
 
 	int argc;
-	auto argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-	gj::CMainFrame wndMain(argc > 1 ? argv[1] : L"");
+	std::wstring cmdLine = GetCommandLineW();
+	auto argv = CommandLineToArgvW(cmdLine.c_str(), &argc);
+	int args = argc;
+	std::wstring arguments;
+	int pos = cmdLine.find(L" --args ");
+	if (pos != cmdLine.npos)
+		arguments = cmdLine.substr(pos + 8);
+
+	CMainFrame wndMain(argc > 1 ? argv[1] : L"", arguments);
 	LocalFree(argv);
 
 	if (wndMain.CreateEx() == nullptr)
-	{
-		ATLTRACE(_T("Main window creation failed!\n"));
-		return 0;
-	}
+		ThrowLastError(L"Main window creation failed!");
 
 	wndMain.ShowWindow(nCmdShow);
-
-	int nRet = theLoop.Run();
-
-	_Module.RemoveMessageLoop();
-	return nRet;
+	return theLoop.Run();
 }
 
-int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int nCmdShow)
+int WINAPI Main(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int nCmdShow)
 {
-	HRESULT hRes = ::CoInitialize(nullptr);
-// If you are running on NT 4.0 or higher you can use the following call instead to 
-// make the EXE free threaded. This means that calls come in on a random RPC thread.
-//	HRESULT hRes = ::CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-	ATLASSERT(SUCCEEDED(hRes));
+	ComInitialization com(ComInitialization::ApartmentThreaded);
 
 	// this resolves ATL window thunking problem when Microsoft Layer for Unicode (MSLU) is used
 	::DefWindowProc(nullptr, 0, 0, 0L);
 
 	AtlInitCommonControls(ICC_BAR_CLASSES);	// add flags to support other controls
 
-	hRes = _Module.Init(nullptr, hInstance);
-	ATLASSERT(SUCCEEDED(hRes));
+	CAppModuleInitialization moduleInit(_Module, hInstance);
+	return Run(lpstrCmdLine, nCmdShow);
+}
 
-	int nRet = Run(lpstrCmdLine, nCmdShow);
+} // namespace gj
 
-	_Module.Term();
-	::CoUninitialize();
-
-	return nRet;
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpstrCmdLine, int nCmdShow)
+try
+{
+	return gj::Main(hInstance, hPrevInstance, lpstrCmdLine, nCmdShow);
+}
+catch (std::exception& ex)
+{
+	MessageBoxA(nullptr, ex.what(), "BoostTestUi Error", MB_OK | MB_ICONERROR);
+	return EXIT_FAILURE;
 }

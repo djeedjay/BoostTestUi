@@ -58,6 +58,7 @@ public:
 		DLGRESIZE_CONTROL(IDCANCEL, DLSZ_MOVE_X | DLSZ_MOVE_Y)
 	END_DLGRESIZE_MAP()
 
+private:
 	BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
 	void OnBtnAll(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnBtnInclude(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -69,7 +70,6 @@ public:
 	void OnExcludeDblClick(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnSelChange(UINT uNotifyCode, int nID, CWindow wndCtl);
 
-private:
 	void InitializeLists();
 	void UpdateUiState();
 	void UpdateSelectedItem(const CListBox& box, bool value);

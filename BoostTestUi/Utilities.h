@@ -13,37 +13,6 @@
 #include <sstream>
 #include <boost/noncopyable.hpp>
 
-// Alternative to ATL standard BEGIN_MSG_MAP() with try block:
-#define BEGIN_MSG_MAP_TRY(theClass) \
-	BOOL theClass::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID) \
-	try \
-	{ \
-		BOOL bHandled = TRUE; \
-		(hWnd); \
-		(uMsg); \
-		(wParam); \
-		(lParam); \
-		(lResult); \
-		(bHandled); \
-		switch(dwMsgMapID) \
-		{ \
-		case 0:
-
-#define END_MSG_MAP_CATCH(handler) \
-			break; \
-		default: \
-			ATLTRACE(ATL::atlTraceWindowing, 0, _T("Invalid message map ID (%i)\n"), dwMsgMapID); \
-			ATLASSERT(FALSE); \
-			break; \
-		} \
-		return FALSE; \
-		} \
-		catch (...) \
-		{ \
-			handler(); \
-			return FALSE; \
-		}
-
 namespace gj {
 
 std::string chomp(std::string s);
@@ -248,8 +217,6 @@ private:
 
 typedef basic_stringbuilder<char> stringbuilder;
 typedef basic_stringbuilder<wchar_t> wstringbuilder;
-
-std::wstring GetExceptionMessage();
 
 DWORD SetRichEditData(CRichEditCtrl& ctrl, DWORD format, const BYTE* pData, size_t len);
 DWORD SetRichEditData(CRichEditCtrl& ctrl, DWORD format, LPWSTR resourcedId);

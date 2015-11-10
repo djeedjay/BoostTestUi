@@ -121,22 +121,6 @@ long long Timer::GetTicks() const
 	return li.QuadPart;
 }
 
-std::wstring GetExceptionMessage()
-{
-	try
-	{
-		throw;
-	}
-	catch (std::exception& e)
-	{
-		return MultiByteToWideChar(e.what());
-	}
-	catch (...)
-	{
-		return L"Unknown exception";
-	}
-}
-
 class RichEditStream
 {
 public:

@@ -42,11 +42,7 @@ public:
 		DLGRESIZE_CONTROL(IDC_PREVIOUS, DLSZ_MOVE_X)
 	END_DLGRESIZE_MAP()
 
-//	Handler prototypes (uncomment arguments if needed):
-//	LRESULT MessageHandler(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-//	LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
-
+private:
 	BOOL PreTranslateMessage(MSG* pMsg);
 
 	BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
@@ -57,7 +53,6 @@ public:
 	void OnNext(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/);
 	void OnClose(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/);
 
-private:
 	CMainFrame& m_mainFrame;
 };
 

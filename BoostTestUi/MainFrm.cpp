@@ -47,7 +47,7 @@ struct Options
 	};
 };
 
-BEGIN_MSG_MAP_TRY(CMainFrame)
+BEGIN_MSG_MAP2(CMainFrame)
 	MSG_WM_CREATE(OnCreate)
 	MSG_WM_CLOSE(OnClose)
 	MESSAGE_HANDLER_EX(UM_DEQUEUE, OnDeQueue);
@@ -88,10 +88,11 @@ BEGIN_MSG_MAP_TRY(CMainFrame)
 	CHAIN_MSG_MAP(CUpdateUI<CMainFrame>)
 	CHAIN_MSG_MAP(CFrameWindowImpl<CMainFrame>)
 	REFLECT_NOTIFICATIONS()
-END_MSG_MAP_CATCH(ExceptionHandler)
+END_MSG_MAP()
 
-CMainFrame::CMainFrame(const std::wstring& fileName) :
+CMainFrame::CMainFrame(const std::wstring& fileName, const std::wstring& arguments) :
 	m_pathName(fileName),
+	m_arguments(arguments),
 	m_treeView(*this),
 	m_logView(*this),
 	m_findDlg(*this),
@@ -103,9 +104,14 @@ CMainFrame::CMainFrame(const std::wstring& fileName) :
 {
 }
 
-void CMainFrame::ExceptionHandler()
+void CMainFrame::OnException()
 {
-	MessageBox(WStr(GetExceptionMessage()), LoadString(IDR_APPNAME).c_str(), MB_ICONERROR | MB_OK);
+	MessageBox(L"Unknown exception", LoadString(IDR_APPNAME).c_str(), MB_ICONERROR | MB_OK);
+}
+
+void CMainFrame::OnException(const std::exception& ex)
+{
+	MessageBox(WStr(ex.what()), LoadString(IDR_APPNAME).c_str(), MB_ICONERROR | MB_OK);
 }
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
@@ -532,12 +538,7 @@ void CMainFrame::LoadNew(const std::wstring& fileName)
 
 void CMainFrame::Reload()
 {
-	std::wstring argments;
-	if (m_pRunner)
-		argments = m_pRunner->GetArguments();
-
 	Load(m_pathName);
-	m_pRunner->SetArguments(argments);
 }
 
 void CMainFrame::OnTimer(UINT_PTR /*nIDEvent*/)
@@ -1023,9 +1024,9 @@ void CMainFrame::OnTestDebugger(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wnd
 
 void CMainFrame::OnTestRunnerArgs(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
-	CArgumentsDlg dlg(m_pRunner->GetArguments());
+	CArgumentsDlg dlg(m_arguments);
 	if (dlg.DoModal() == IDOK)
-		m_pRunner->SetArguments(dlg.GetArguments());
+		m_arguments = dlg.GetArguments();
 }
 
 unsigned CMainFrame::GetOptions() const
@@ -1364,7 +1365,7 @@ void CMainFrame::Run()
 	if (m_logAutoClear)
 		m_logView.Clear();
 	m_resetTimer = m_logView.Empty();
-	m_pRunner->Run(m_combo.GetCurSel(), GetOptions());
+	m_pRunner->Run(m_combo.GetCurSel(), GetOptions(), m_arguments);
 }
 
 void TreeViewStateStorage::Clear()

@@ -170,6 +170,9 @@
     <ClInclude Include="TestCaseState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AtlWinExt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\BoostTestUi.ico">
