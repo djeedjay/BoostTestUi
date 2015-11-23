@@ -159,6 +159,7 @@ private:
 	void OnTreeCheckAll(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTreeUncheckAll(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTreeCheckFailed(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnTreeCopyName(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnMruMenuItem(UINT uCode, int nID, HWND hwndCtrl);
 	void OnClose();
 

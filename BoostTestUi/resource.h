@@ -53,7 +53,6 @@
 #define IDC_INCLUDE_LABEL               1025
 #define IDC_EXCLUDE_LABEL               1026
 #define IDC_INVISIBLE                   1027
-#define IDC_EDIT1                       1028
 #define IDC_ARGUMENTS                   1028
 #define IDC_TEXT                        1028
 #define IDC_PREVIOUS                    1029
@@ -79,22 +78,23 @@
 #define ID_TREE_CHECK_ALL               32798
 #define ID_TREE_UNCHECK_ALL             32799
 #define ID_TREE_CHECK_FAILED            32800
-#define IDR_LIST_CONTEXTMENU            32801
-#define IDR_SAMPLE_CONTEXTMENU          32802
-#define ID_SAMPLE_COPY                  32803
-#define ID_TREE_WAITFORDEBUGGER         32804
-#define ID_TEST_REPEAT                  32805
-#define ID_HELP_BOOST                   32806
-#define ID_HELP_GOOGLE                  32807
-#define ID_HELP_NUNIT                   32808
-#define ID_LOG_TIME                     32809
-#define ID_LOG_SHOWCLOCKTIME            32810
-#define ID_RESET_SELECTION              32813
-#define ID_TEST_CATEGORIES              32814
-#define ID_TEST_COMMANDLINEARGS         32815
-#define ID_TEST_RUNNERARGS              32816
-#define ID_LOG_FIND                     32817
-#define ID_PROGRESS                     32820
+#define ID_TREE_COPY_NAME               32801
+#define IDR_LIST_CONTEXTMENU            32802
+#define IDR_SAMPLE_CONTEXTMENU          32803
+#define ID_SAMPLE_COPY                  32804
+#define ID_TREE_WAITFORDEBUGGER         32805
+#define ID_TEST_REPEAT                  32806
+#define ID_HELP_BOOST                   32807
+#define ID_HELP_GOOGLE                  32808
+#define ID_HELP_NUNIT                   32809
+#define ID_LOG_TIME                     32810
+#define ID_LOG_SHOWCLOCKTIME            32811
+#define ID_RESET_SELECTION              32812
+#define ID_TEST_CATEGORIES              32813
+#define ID_TEST_COMMANDLINEARGS         32814
+#define ID_TEST_RUNNERARGS              32815
+#define ID_LOG_FIND                     32816
+#define ID_PROGRESS                     32817
 
 // Next default values for new objects
 // 

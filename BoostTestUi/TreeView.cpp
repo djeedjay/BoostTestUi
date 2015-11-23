@@ -20,13 +20,14 @@ namespace gj {
 BEGIN_MSG_MAP2(CTreeView)
 	MSG_WM_CREATE(OnCreate)
 	MSG_WM_TIMER(OnTimer)
-	MSG_WM_CONTEXTMENU(OnContextMenu);
+	MSG_WM_CONTEXTMENU(OnContextMenu)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(TVN_SELCHANGED, OnSelChanged)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CUSTOMDRAW, OnCustomDraw)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(TVN_GETINFOTIP, OnGetInfoTip)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_CLICK, OnClick)
 	REFLECTED_NOTIFY_CODE_HANDLER_EX(NM_RCLICK, OnRClick)
 	CHAIN_MSG_MAP(CDoubleBufferImpl<CTreeView>)
+	DEFAULT_REFLECTION_HANDLER()
 END_MSG_MAP()
 
 CTreeView::CTreeView(CMainFrame& mainFrame) :
@@ -132,13 +133,6 @@ void CTreeView::CheckAll()
 void CTreeView::UncheckAll()
 {
 	CheckSubTreeItems(GetRootItem(), false);
-}
-
-int CTreeView::GetTestItemImage(HTREEITEM hItem) const
-{
-	int image, selectedImage;
-	GetItemImage(hItem, image, selectedImage);
-	return image;
 }
 
 void CTreeView::CheckFailed()
@@ -270,6 +264,13 @@ void CTreeView::CheckTreeItem(HTREEITEM hItem, bool check)
 		UncheckTreeItem(hItem);
 
 	CheckSubTreeItems(hItem, check);
+}
+
+int CTreeView::GetTestItemImage(HTREEITEM hItem) const
+{
+	int image, selectedImage;
+	GetItemImage(hItem, image, selectedImage);
+	return image;
 }
 
 void CTreeView::SetTreeImages(HTREEITEM hItem, int image)

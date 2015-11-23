@@ -176,4 +176,64 @@ std::wstring GetDlgItemText(const CWindow& wnd, int idc)
 	return std::wstring(str, str.GetLength());
 }
 
+namespace Win32 {
+
+struct GlobalAllocDeleter
+{
+	typedef HGLOBAL pointer;
+
+	void operator()(pointer p)
+	{
+		GlobalFree(p);
+	}
+};
+
+typedef std::unique_ptr<void, GlobalAllocDeleter> HGlobal;
+
+class ScopedGlobalLock : boost::noncopyable
+{
+public:
+	explicit ScopedGlobalLock(HGlobal& hGlobal) :
+		m_hGlobal(hGlobal.get()),
+		m_ptr(::GlobalLock(hGlobal.get()))
+	{
+		if (!m_ptr)
+			ThrowLastError("GlobalLock");
+	}
+
+	~ScopedGlobalLock()
+	{
+		GlobalUnlock(m_hGlobal);
+	}
+
+	void* data()
+	{
+		return m_ptr;
+	}
+
+private:
+	HGLOBAL m_hGlobal;
+	void* m_ptr;
+};
+
+} // namespace Win32
+
+void CopyToClipboard(const std::string& text, HWND owner)
+{
+	Win32::HGlobal hdst(GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, text.size() + 1));
+	Win32::ScopedGlobalLock lock(hdst);
+	{
+		auto dst = static_cast<char*>(lock.data());
+		std::copy(text.begin(), text.end(), stdext::checked_array_iterator<char*>(dst, text.size()));
+		dst[text.size()] = '\0';
+	}
+	if (OpenClipboard(owner))
+	{
+		EmptyClipboard();
+		SetClipboardData(CF_TEXT, hdst.get());
+		hdst.release();
+		CloseClipboard();
+	}
+}
+
 } // namespace gj

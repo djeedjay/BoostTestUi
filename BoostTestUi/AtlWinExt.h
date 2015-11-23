@@ -46,7 +46,7 @@
 namespace gj {
 
 template <typename T, typename E1 = void, typename E2 = void, typename E3 = void, typename E4 = void, typename E5 = void, typename E6 = void, typename E7 = void, typename E8 = void, typename E9 = void, typename E10 = void>
-struct ExceptionHandler : ExceptionHandler<T, E2, E3, E4, E5, E6, E7, E8, E9, E10, void>
+struct ExceptionHandler : ExceptionHandler<T, E2, E3, E4, E5, E6, E7, E8, E9, E10>
 {
 	BOOL ProcessWindowMessageImpl(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID)
 	try

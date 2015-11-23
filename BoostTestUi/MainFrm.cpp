@@ -84,6 +84,7 @@ BEGIN_MSG_MAP2(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_TREE_CHECK_ALL, OnTreeCheckAll)
 	COMMAND_ID_HANDLER_EX(ID_TREE_UNCHECK_ALL, OnTreeUncheckAll)
 	COMMAND_ID_HANDLER_EX(ID_TREE_CHECK_FAILED, OnTreeCheckFailed)
+	COMMAND_ID_HANDLER_EX(ID_TREE_COPY_NAME, OnTreeCopyName)
 	COMMAND_RANGE_HANDLER_EX(ID_FILE_MRU_FIRST, ID_FILE_MRU_LAST, OnMruMenuItem)
 	CHAIN_MSG_MAP(CUpdateUI<CMainFrame>)
 	CHAIN_MSG_MAP(CFrameWindowImpl<CMainFrame>)
@@ -1125,6 +1126,11 @@ void CMainFrame::OnTreeUncheckAll(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*w
 void CMainFrame::OnTreeCheckFailed(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	m_treeView.CheckFailed();
+}
+
+void CMainFrame::OnTreeCopyName(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
+{
+	CopyToClipboard(GetTestItem(m_treeView.GetSelectedTestItem()).fullName, *this);
 }
 
 void CMainFrame::OnMruMenuItem(UINT /*uCode*/, int nID, HWND /*hwndCtrl*/)

@@ -286,19 +286,7 @@ void CLogView::Copy()
 	int item = -1;
 	while ((item = GetNextItem(item, LVNI_ALL | LVNI_SELECTED)) >= 0)
 		ss << GetItemText(item, 0) << "\t" << GetItemText(item, 1) << "\r\n";
-	const std::string& str = ss.str();
-
-	HGLOBAL hdst = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, str.size() + 1);
-	char* dst = static_cast<char*>(GlobalLock(hdst));
-	std::copy(str.begin(), str.end(), stdext::checked_array_iterator<char*>(dst, str.size()));
-	dst[str.size()] = '\0';
-	GlobalUnlock(hdst);
-	if (OpenClipboard())
-	{
-		EmptyClipboard();
-		SetClipboardData(CF_TEXT, hdst);
-		CloseClipboard();
-	}
+	CopyToClipboard(ss.str(), *this);
 }
 
 int to_int(const std::string& s)
