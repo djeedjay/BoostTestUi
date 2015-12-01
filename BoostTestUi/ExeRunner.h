@@ -53,6 +53,7 @@ public:
 	virtual unsigned GetEnabledOptions(unsigned options);
 	virtual bool IsRunning() const override;
 	virtual void SetRepeat(bool repeat) override;
+	virtual std::wstring GetCommand(int logLevel, unsigned options, const std::wstring& arguments) override;
 	virtual void Run(int logLevel, unsigned options, const std::wstring& arguments) override;
 	virtual void Continue() override;
 	virtual void Abort() override;

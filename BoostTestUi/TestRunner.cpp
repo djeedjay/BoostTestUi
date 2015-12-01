@@ -38,8 +38,14 @@ ArgumentBuilder::~ArgumentBuilder()
 {
 }
 
+std::wstring ArgumentBuilder::BuildPublicArgs(TestRunner& runner, int logLevel, unsigned options)
+{
+	return BuildArgs(runner, logLevel, options);
+}
+
 void ArgumentBuilder::FilterMessage(const std::string& /*msg*/)
 {
 }
 
 } // namespace gj
+

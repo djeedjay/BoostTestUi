@@ -236,4 +236,22 @@ void CopyToClipboard(const std::string& text, HWND owner)
 	}
 }
 
+void CopyToClipboard(const std::wstring& text, HWND owner)
+{
+	Win32::HGlobal hdst(GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, (text.size() + 1)*sizeof(wchar_t)));
+	Win32::ScopedGlobalLock lock(hdst);
+	{
+		auto dst = static_cast<wchar_t*>(lock.data());
+		std::copy(text.begin(), text.end(), stdext::checked_array_iterator<wchar_t*>(dst, text.size()));
+		dst[text.size()] = L'\0';
+	}
+	if (OpenClipboard(owner))
+	{
+		EmptyClipboard();
+		SetClipboardData(CF_UNICODETEXT, hdst.get());
+		hdst.release();
+		CloseClipboard();
+	}
+}
+
 } // namespace gj

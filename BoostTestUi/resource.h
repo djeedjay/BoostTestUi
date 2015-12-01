@@ -79,22 +79,23 @@
 #define ID_TREE_UNCHECK_ALL             32799
 #define ID_TREE_CHECK_FAILED            32800
 #define ID_TREE_COPY_NAME               32801
-#define IDR_LIST_CONTEXTMENU            32802
-#define IDR_SAMPLE_CONTEXTMENU          32803
-#define ID_SAMPLE_COPY                  32804
-#define ID_TREE_WAITFORDEBUGGER         32805
-#define ID_TEST_REPEAT                  32806
-#define ID_HELP_BOOST                   32807
-#define ID_HELP_GOOGLE                  32808
-#define ID_HELP_NUNIT                   32809
-#define ID_LOG_TIME                     32810
-#define ID_LOG_SHOWCLOCKTIME            32811
-#define ID_RESET_SELECTION              32812
-#define ID_TEST_CATEGORIES              32813
-#define ID_TEST_COMMANDLINEARGS         32814
-#define ID_TEST_RUNNERARGS              32815
-#define ID_LOG_FIND                     32816
-#define ID_PROGRESS                     32817
+#define ID_TREE_COPY_COMMAND            32802
+#define IDR_LIST_CONTEXTMENU            32803
+#define IDR_SAMPLE_CONTEXTMENU          32804
+#define ID_SAMPLE_COPY                  32805
+#define ID_TREE_WAITFORDEBUGGER         32806
+#define ID_TEST_REPEAT                  32807
+#define ID_HELP_BOOST                   32808
+#define ID_HELP_GOOGLE                  32809
+#define ID_HELP_NUNIT                   32810
+#define ID_LOG_TIME                     32811
+#define ID_LOG_SHOWCLOCKTIME            32812
+#define ID_RESET_SELECTION              32813
+#define ID_TEST_CATEGORIES              32814
+#define ID_TEST_COMMANDLINEARGS         32815
+#define ID_TEST_RUNNERARGS              32816
+#define ID_LOG_FIND                     32817
+#define ID_PROGRESS                     32818
 
 // Next default values for new objects
 // 

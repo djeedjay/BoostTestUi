@@ -170,6 +170,11 @@ void ExeRunner::SetRepeat(bool repeat)
 	m_repeat = repeat;
 }
 
+std::wstring ExeRunner::GetCommand(int logLevel, unsigned options, const std::wstring& arguments)
+{
+	return L"\"" + m_pArgBuilder->GetExePathName() + L"\" " + m_pArgBuilder->BuildPublicArgs(*this, logLevel, options) + L" " + arguments;
+}
+
 void ExeRunner::Run(int logLevel, unsigned options, const std::wstring& arguments)
 {
 	if (m_pThread)

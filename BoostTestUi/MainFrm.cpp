@@ -85,6 +85,7 @@ BEGIN_MSG_MAP2(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_TREE_UNCHECK_ALL, OnTreeUncheckAll)
 	COMMAND_ID_HANDLER_EX(ID_TREE_CHECK_FAILED, OnTreeCheckFailed)
 	COMMAND_ID_HANDLER_EX(ID_TREE_COPY_NAME, OnTreeCopyName)
+	COMMAND_ID_HANDLER_EX(ID_TREE_COPY_COMMAND, OnTreeCopyCommand)
 	COMMAND_RANGE_HANDLER_EX(ID_FILE_MRU_FIRST, ID_FILE_MRU_LAST, OnMruMenuItem)
 	CHAIN_MSG_MAP(CUpdateUI<CMainFrame>)
 	CHAIN_MSG_MAP(CFrameWindowImpl<CMainFrame>)
@@ -444,6 +445,59 @@ public:
 private:
 	const TreeViewStateStorage& m_testState;
 	CTreeView& m_treeView;
+};
+
+class SingleTestCaseSelector : public TestTreeVisitor
+{
+public:
+	SingleTestCaseSelector(const CTreeView& treeView, unsigned id) :
+		m_pTreeView(&treeView),
+		m_id(id),
+		m_enable(false)
+	{
+	}
+
+	virtual void VisitTestCase(TestCase& tc) override
+	{
+		if (tc.id == m_id)
+			EnableSuites();
+		tc.enabled = IsEnabled(tc.id);
+	}
+
+	virtual void EnterTestSuite(TestSuite& ts) override
+	{
+		if (ts.id == m_id)
+		{
+			EnableSuites();
+			m_enable = true;
+		}
+		ts.enabled = IsEnabled(ts.id);
+		m_suites.push_back(&ts);
+	}
+
+	virtual void LeaveTestSuite() override
+	{
+		if (m_suites.back()->id == m_id)
+			m_enable = false;
+		m_suites.pop_back();
+	}
+
+private:
+	bool IsEnabled(unsigned id) const
+	{
+		return m_enable && m_pTreeView->IsChecked(id) || id == m_id;
+	}
+
+	void EnableSuites()
+	{
+		for (auto it = m_suites.begin(); it != m_suites.end(); ++it)
+			(*it)->enabled = true;
+	}
+
+	const CTreeView* m_pTreeView;
+	unsigned m_id;
+	bool m_enable;
+	std::vector<TestSuite*> m_suites;
 };
 
 void CMainFrame::EnQueue(const std::function<void ()>& fn)
@@ -1133,6 +1187,13 @@ void CMainFrame::OnTreeCopyName(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wnd
 	CopyToClipboard(GetTestItem(m_treeView.GetSelectedTestItem()).fullName, *this);
 }
 
+void CMainFrame::OnTreeCopyCommand(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
+{
+	SingleTestCaseSelector selector(m_treeView, m_treeView.GetSelectedTestItem());
+	m_pRunner->TraverseTestTree(selector);
+	CopyToClipboard(m_pRunner->GetCommand(m_combo.GetCurSel(), GetOptions(), m_arguments), *this);
+}
+
 void CMainFrame::OnMruMenuItem(UINT /*uCode*/, int nID, HWND /*hwndCtrl*/)
 {
 	wchar_t pathName[m_mru.m_cchMaxItemLen_Max + 1];
@@ -1227,60 +1288,6 @@ void CMainFrame::SaveSettings()
 
 	m_mru.WriteToRegistry(RegistryPath);
 }
-
-
-class SingleTestCaseSelector : public TestTreeVisitor
-{
-public:
-	SingleTestCaseSelector(const CTreeView& treeView, unsigned id) :
-		m_pTreeView(&treeView),
-		m_id(id),
-		m_enable(false)
-	{
-	}
-
-	virtual void VisitTestCase(TestCase& tc) override
-	{
-		if (tc.id == m_id)
-			EnableSuites();
-		tc.enabled = IsEnabled(tc.id);
-	}
-
-	virtual void EnterTestSuite(TestSuite& ts) override
-	{
-		if (ts.id == m_id)
-		{
-			EnableSuites();
-			m_enable = true;
-		}
-		ts.enabled = IsEnabled(ts.id);
-		m_suites.push_back(&ts);
-	}
-
-	virtual void LeaveTestSuite() override
-	{
-		if (m_suites.back()->id == m_id)
-			m_enable = false;
-		m_suites.pop_back();
-	}
-
-private:
-	bool IsEnabled(unsigned id) const
-	{
-		return m_enable && m_pTreeView->IsChecked(id) || id == m_id;
-	}
-
-	void EnableSuites()
-	{
-		for (auto it = m_suites.begin(); it != m_suites.end(); ++it)
-			(*it)->enabled = true;
-	}
-
-	const CTreeView* m_pTreeView;
-	unsigned m_id;
-	bool m_enable;
-	std::vector<TestSuite*> m_suites;
-};
 
 void CMainFrame::RunSingle(unsigned id)
 {

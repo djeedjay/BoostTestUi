@@ -121,6 +121,7 @@ struct TestRunner
 	virtual unsigned GetEnabledOptions(unsigned options) = 0;
 	virtual bool IsRunning() const = 0;
 	virtual void SetRepeat(bool repeat) = 0;
+	virtual std::wstring GetCommand(int logLevel, unsigned options, const std::wstring& arguments) = 0;
 	virtual void Run(int logLevel, unsigned options, const std::wstring& arguments) = 0;
 	virtual void Continue() = 0;
 	virtual void Abort() = 0;
@@ -137,6 +138,7 @@ struct ArgumentBuilder
 
 	virtual unsigned GetEnabledOptions(unsigned options) const = 0;
 	virtual std::wstring BuildArgs(TestRunner& runner, int logLevel, unsigned& options) = 0;
+	virtual std::wstring BuildPublicArgs(TestRunner& runner, int logLevel, unsigned options);
 	virtual void FilterMessage(const std::string& msg);
 
 	virtual ~ArgumentBuilder();

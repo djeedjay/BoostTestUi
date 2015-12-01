@@ -28,6 +28,7 @@ public:
 
 	virtual unsigned GetEnabledOptions(unsigned options) const override;
 	virtual std::wstring BuildArgs(TestRunner& runner, int logLevel, unsigned& options) override;
+	virtual std::wstring BuildPublicArgs(TestRunner& runner, int logLevel, unsigned options) override;
 	virtual void FilterMessage(const std::string& msg) override;
 
 private:

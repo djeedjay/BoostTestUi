@@ -404,6 +404,7 @@ BEGIN
     ID_TREE_UNCHECK_ALL     "Uncheck all tests\nUncheck All"
     ID_TREE_CHECK_FAILED    "Check only failed tests\nCheck Failed"
 	ID_TREE_COPY_NAME       "Copy full name of the selected test to the clipboard\nCopy Name"
+	ID_TREE_COPY_COMMAND    "Copy command to run the selected test to the clipboard\nCopy Command"
 END
 
 STRINGTABLE
@@ -501,6 +502,7 @@ BEGIN
         MENUITEM "Check Failed",                ID_TREE_CHECK_FAILED
         MENUITEM SEPARATOR
         MENUITEM "Copy Name",                   ID_TREE_COPY_NAME
+        MENUITEM "Copy Command",                ID_TREE_COPY_COMMAND
     END
 END
 

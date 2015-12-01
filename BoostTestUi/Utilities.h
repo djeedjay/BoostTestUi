@@ -224,6 +224,7 @@ DWORD SetRichEditData(CRichEditCtrl& ctrl, DWORD format, LPWSTR resourcedId);
 std::wstring GetDlgItemText(const CWindow& wnd, int idc);
 
 void CopyToClipboard(const std::string& text, HWND owner);
+void CopyToClipboard(const std::wstring& text, HWND owner);
 
 } // namespace gj
 

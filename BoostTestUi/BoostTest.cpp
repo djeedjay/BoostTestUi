@@ -65,15 +65,15 @@ public:
 		return m_suites[1].all;
 	}
 
-	std::string GetArg() const
+	std::wstring GetArg() const
 	{
-		std::string arg;
+		std::wstring arg;
 		const Suite& suite = m_suites[1];
 		for (auto it = suite.cases.begin(); it != suite.cases.end(); ++it)
 		{
 			if (!arg.empty())
-				arg += ',';
-			arg += *it;
+				arg += L',';
+			arg += MultiByteToWideChar(*it);
 		}
 		return arg;
 	}
@@ -264,6 +264,24 @@ std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsign
 	GetEnableArg getArg;
 	runner.TraverseTestTree(getArg);
 	args << L" --gui_run=" << getArg.GetArg();
+	return args.str();
+}
+
+std::wstring ArgumentBuilder::BuildPublicArgs(TestRunner& runner, int logLevel, unsigned options)
+{
+	std::wostringstream args;
+	args << L"--log_level=" << GetLogLevelArg(logLevel);
+
+	if (options & ExeRunner::Randomize)
+		args << L" --random=1";
+
+	if (options & ExeRunner::Repeat)
+		options &= ~ExeRunner::WaitForDebugger;
+
+// Cannot enable disabled test cases:
+	GetEnableArg2 getArg;
+	runner.TraverseTestTree(getArg);
+	args << L" --run_test=" << getArg.GetArg();
 	return args.str();
 }
 
