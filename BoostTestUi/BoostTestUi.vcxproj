@@ -139,6 +139,7 @@
     <ClCompile Include="ArgumentsDlg.cpp" />
     <ClCompile Include="BoostHelpDlg.cpp" />
     <ClCompile Include="BoostTest.cpp" />
+    <ClCompile Include="BoostTest2.cpp" />
     <ClCompile Include="BoostTestUi.cpp" />
     <ClCompile Include="CategoryDlg.cpp" />
     <ClCompile Include="CategoryList.cpp" />

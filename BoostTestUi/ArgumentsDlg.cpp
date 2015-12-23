@@ -12,6 +12,14 @@
 
 namespace gj {
 
+BEGIN_MSG_MAP2(CArgumentsDlg)
+	MSG_WM_INITDIALOG(OnInitDialog)
+	MSG_WM_GETMINMAXINFO(OnGetMinMaxInfo)
+	COMMAND_ID_HANDLER_EX(IDOK, OnOk)
+	COMMAND_ID_HANDLER_EX(IDCANCEL, OnCancel)
+	CHAIN_MSG_MAP(CDialogResize<CArgumentsDlg>)
+END_MSG_MAP()
+
 CArgumentsDlg::CArgumentsDlg(const std::wstring& arguments) :
 	m_arguments(arguments)
 {
@@ -48,6 +56,16 @@ void CArgumentsDlg::OnOk(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)
 {
 	m_arguments = gj::GetDlgItemText(*this, IDC_ARGUMENTS);
 	EndDialog(wID);
+}
+
+void CArgumentsDlg::OnException()
+{
+	MessageBox(L"Unknown exception", LoadString(IDR_APPNAME).c_str(), MB_ICONERROR | MB_OK);
+}
+
+void CArgumentsDlg::OnException(const std::exception& ex)
+{
+	MessageBox(WStr(ex.what()), LoadString(IDR_APPNAME).c_str(), MB_ICONERROR | MB_OK);
 }
 
 } // namespace gj

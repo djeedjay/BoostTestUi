@@ -70,16 +70,41 @@ int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
 {
 	MessageLoop theLoop(_Module);
 
-	int argc;
 	std::wstring cmdLine = GetCommandLineW();
-	auto argv = CommandLineToArgvW(cmdLine.c_str(), &argc);
-	int args = argc;
 	std::wstring arguments;
 	int pos = cmdLine.find(L" --args ");
 	if (pos != cmdLine.npos)
+	{
 		arguments = cmdLine.substr(pos + 8);
+		cmdLine = cmdLine.substr(0, pos);
+	}
 
-	CMainFrame wndMain(argc > 1 ? argv[1] : L"", arguments);
+	int argc;
+	auto argv = CommandLineToArgvW(cmdLine.c_str(), &argc);
+
+	std::wstring fileName;
+	std::wstring run;
+
+	while (*argv != nullptr)
+	{
+		std::wstring arg = argv[0];
+		std::wstring val;
+		if (argv[1] != nullptr)
+			val = argv[1];
+		++argv;
+
+		if (arg.substr(0, 2) != L"--")
+		{
+			fileName = arg;
+		}
+		else if (arg == L"--run" && !val.empty())
+		{
+			run = val;
+			++argv;
+		}
+	}
+
+	CMainFrame wndMain(fileName, arguments);
 	LocalFree(argv);
 
 	if (wndMain.CreateEx() == nullptr)

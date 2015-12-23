@@ -7,7 +7,7 @@
 
 #include "stdafx.h"
 #include <vector>
-
+#include <iterator>
 #include <boost/system/system_error.hpp>
 #include "Utilities.h"
 

@@ -19,7 +19,7 @@ class CGoogleHelpDlg :
 	public CDialogResize<CGoogleHelpDlg>
 {
 public:
-	enum { IDD = IDD_GOOGLEHELP };
+	static const int IDD = IDD_GOOGLEHELP;
 
 	BEGIN_MSG_MAP(CGoogleHelpDlg)
 		MSG_WM_INITDIALOG(OnInitDialog)

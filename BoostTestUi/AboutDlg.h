@@ -17,7 +17,7 @@ namespace gj {
 class CAboutDlg : public CDialogImpl<CAboutDlg>
 {
 public:
-	enum { IDD = IDD_ABOUTBOX };
+	static const int IDD = IDD_ABOUTBOX;
 
 	BEGIN_MSG_MAP(CAboutDlg)
 		MSG_WM_INITDIALOG(OnInitDialog)

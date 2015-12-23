@@ -25,7 +25,7 @@ class CategoryDlg :
 public:
 	explicit CategoryDlg(CategoryList& categoryList);
 
-	enum { IDD = IDD_CATEGORIES };
+	static const int IDD = IDD_CATEGORIES;
 
 	BEGIN_MSG_MAP_EX(CategoryDlg)
 		MSG_WM_INITDIALOG(OnInitDialog)

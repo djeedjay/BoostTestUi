@@ -10,27 +10,23 @@
 
 #pragma once
 
+#include "AtlWinExt.h"
 #include "Resource.h"
 
 namespace gj {
 
 class CArgumentsDlg :
 	public CDialogImpl<CArgumentsDlg>,
-	public CDialogResize<CArgumentsDlg>
+	public CDialogResize<CArgumentsDlg>,
+	public ExceptionHandler<CArgumentsDlg, std::exception>
 {
 public:
 	explicit CArgumentsDlg(const std::wstring& arguments);
 	std::wstring GetArguments() const;
 
-	enum { IDD = IDD_ARGUMENTS };
+	static const int IDD = IDD_ARGUMENTS;
 
-	BEGIN_MSG_MAP(CArgumentsDlg)
-		MSG_WM_INITDIALOG(OnInitDialog)
-		MSG_WM_GETMINMAXINFO(OnGetMinMaxInfo)
-		COMMAND_ID_HANDLER_EX(IDOK, OnOk)
-		COMMAND_ID_HANDLER_EX(IDCANCEL, OnCancel)
-		CHAIN_MSG_MAP(CDialogResize<CArgumentsDlg>)
-	END_MSG_MAP()
+	DECLARE_MSG_MAP()
 
 	BEGIN_DLGRESIZE_MAP(CArgumentsDlg)
 		DLGRESIZE_CONTROL(IDC_ARGUMENTS, DLSZ_SIZE_X)
@@ -43,6 +39,8 @@ private:
 	void OnGetMinMaxInfo(MINMAXINFO* pInfo);
 	void OnCancel(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/);
 	void OnOk(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/);
+	void OnException();
+	void OnException(const std::exception& ex);
 
 	std::wstring m_arguments;
 };

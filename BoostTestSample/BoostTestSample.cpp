@@ -9,7 +9,6 @@
 #define BOOST_TEST_MODULE Boost Test Sample
 #include <boost/test/unit_test_gui.hpp>
 
-
 #ifndef BOOST_TEST_MODULE
 
 boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
@@ -28,15 +27,18 @@ using namespace boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE(FailingTests)
 
-BOOST_AUTO_TEST_CASE(TestFailedCheck)
+BOOST_AUTO_TEST_SUITE(EmptySuite)
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_CASE_ENABLE(TestFailedCheck, false)
 {
 	int i = 0;
 	BOOST_REQUIRE_EQUAL(i, 2);
 }
 
-BOOST_AUTO_TEST_CASE(TestDivideByZero)
+BOOST_AUTO_TEST_CASE_ENABLE(TestDivideByZero, true)
 {
-	BOOST_CHECKPOINT("About to force division by zero!");
+	BOOST_TEST_CHECKPOINT("About to force division by zero!");
 	int i = 1, j = 0;
 
 	i = i / j;
@@ -65,7 +67,7 @@ BOOST_AUTO_TEST_CASE(TestOk)
 {
 	int i = 0;
 	BOOST_CHECK_EQUAL(i, 0);
-	BOOST_MESSAGE(
+	BOOST_TEST_MESSAGE(
 		"This is a very long line to demonstrate that BoostTestUI can display a line over two hundred and sixty characters in length, correctly. "
 		"The Win32 listview control can not store lines with this length and it needs special effort to display longer lines in such a listview. "
 		"This is beyond column two hundred seventy so if this is still visible, the view is ok.");
@@ -75,7 +77,7 @@ BOOST_AUTO_TEST_CASE(Test10Sec)
 {
 	for (int i = 0; i < 10; ++i)
 	{
-		BOOST_MESSAGE("Waiting for Abort");
+		BOOST_TEST_MESSAGE("Waiting for Abort");
 		boost::this_thread::sleep(boost::posix_time::seconds(1));
 	}
 }
@@ -84,61 +86,61 @@ BOOST_AUTO_TEST_SUITE(LongRunningTests)
 
 BOOST_AUTO_TEST_CASE(TestWait1)
 {
-	BOOST_MESSAGE("Waiting for Abort");
+	BOOST_TEST_MESSAGE("Waiting for Abort");
 	boost::this_thread::sleep(boost::posix_time::seconds(1));
 }
 
 BOOST_AUTO_TEST_CASE(TestWait2)
 {
-	BOOST_MESSAGE("Waiting for Abort");
+	BOOST_TEST_MESSAGE("Waiting for Abort");
 	boost::this_thread::sleep(boost::posix_time::seconds(1));
 }
 
 BOOST_AUTO_TEST_CASE(TestWait3)
 {
-	BOOST_MESSAGE("Waiting for Abort");
+	BOOST_TEST_MESSAGE("Waiting for Abort");
 	boost::this_thread::sleep(boost::posix_time::seconds(1));
 }
 
 BOOST_AUTO_TEST_CASE(TestWait4)
 {
-	BOOST_MESSAGE("Waiting for Abort");
+	BOOST_TEST_MESSAGE("Waiting for Abort");
 	boost::this_thread::sleep(boost::posix_time::seconds(1));
 }
 
 BOOST_AUTO_TEST_CASE(TestWait5)
 {
-	BOOST_MESSAGE("Waiting for Abort");
+	BOOST_TEST_MESSAGE("Waiting for Abort");
 	boost::this_thread::sleep(boost::posix_time::seconds(1));
 }
 
 BOOST_AUTO_TEST_CASE(TestWait6)
 {
-	BOOST_MESSAGE("Waiting for Abort");
+	BOOST_TEST_MESSAGE("Waiting for Abort");
 	boost::this_thread::sleep(boost::posix_time::seconds(1));
 }
 
 BOOST_AUTO_TEST_CASE(TestWait7)
 {
-	BOOST_MESSAGE("Waiting for Abort");
+	BOOST_TEST_MESSAGE("Waiting for Abort");
 	boost::this_thread::sleep(boost::posix_time::seconds(1));
 }
 
 BOOST_AUTO_TEST_CASE(TestWait8)
 {
-	BOOST_MESSAGE("Waiting for Abort");
+	BOOST_TEST_MESSAGE("Waiting for Abort");
 	boost::this_thread::sleep(boost::posix_time::seconds(1));
 }
 
 BOOST_AUTO_TEST_CASE(TestWait9)
 {
-	BOOST_MESSAGE("Waiting for Abort");
+	BOOST_TEST_MESSAGE("Waiting for Abort");
 	boost::this_thread::sleep(boost::posix_time::seconds(1));
 }
 
 BOOST_AUTO_TEST_CASE(TestWait10)
 {
-	BOOST_MESSAGE("Waiting for Abort");
+	BOOST_TEST_MESSAGE("Waiting for Abort");
 	boost::this_thread::sleep(boost::posix_time::seconds(1));
 }
 

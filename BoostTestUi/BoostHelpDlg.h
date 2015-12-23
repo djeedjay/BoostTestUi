@@ -19,7 +19,7 @@ class CBoostHelpDlg :
 	public CDialogResize<CBoostHelpDlg>
 {
 public:
-	enum { IDD = IDD_BOOSTHELP };
+	static const int IDD = IDD_BOOSTHELP;
 
 	BEGIN_MSG_MAP(CBoostHelpDlg)
 		MSG_WM_INITDIALOG(OnInitDialog)

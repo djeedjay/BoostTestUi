@@ -12,6 +12,7 @@
 #include "hstream.h"
 #include "GetUnitTestType.h"
 #include "BoostTest.h"
+#include "BoostTest2.h"
 #include "GoogleTest.h"
 #include "NUnitTest.h"
 #include "BoostHelpDlg.h"
@@ -80,6 +81,8 @@ std::unique_ptr<ArgumentBuilder> CreateArgumentBuilder(const std::wstring& fileN
 	std::string type = GetUnitTestType(WideCharToMultiByte(fileName));
 	if (type == "boost")
 		return std::unique_ptr<ArgumentBuilder>(new BoostTest::ArgumentBuilder(fileName, runner, observer));
+	if (type == "boost2")
+		return std::unique_ptr<ArgumentBuilder>(new BoostTest2::ArgumentBuilder(fileName, runner, observer));
 	if (type == "google")
 		return std::unique_ptr<ArgumentBuilder>(new GoogleTest::ArgumentBuilder(fileName, runner, observer));
 	if (type == "nunit")

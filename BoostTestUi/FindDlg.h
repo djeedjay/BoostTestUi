@@ -25,7 +25,7 @@ class CFindDlg :
 public:
 	explicit CFindDlg(CMainFrame& mainFrame);
 
-	enum { IDD = IDD_FIND };
+	static const int IDD = IDD_FIND;
 
 	BEGIN_MSG_MAP(CFindDlg)
 		MSG_WM_INITDIALOG(OnInitDialog)

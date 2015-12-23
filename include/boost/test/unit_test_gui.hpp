@@ -10,75 +10,26 @@
 
 #define init_unit_test_suite init_unit_test_suite2
 
-// The boost.test version in the boost archive trunk has a slightly different api than all current releases
-#if BOOST_VERSION > 199999
-#	define BOOST_TEST_TRUNK_API
-#endif
-
 #include <iostream>
 #include <iomanip>
 #include <boost/test/unit_test.hpp>
-#if BOOST_TEST_TRUNK_API
-#	include <boost/test/tree/visitor.hpp>
-#endif
 #include <boost/test/execution_monitor.hpp>
-#include <boost/test/utils/runtime/cla/named_parameter.hpp>
-#include <boost/test/utils/runtime/cla/parser.hpp>
+
+// Starting with 1.59, boost.test directly supports list_content and wait_for_debugger:
+#if BOOST_VERSION >= 105900
+#	define BOOST_TEST_API_3
+#endif
+
+#ifndef BOOST_TEST_API_3
+#	include <boost/test/utils/runtime/cla/named_parameter.hpp>
+#	include <boost/test/utils/runtime/cla/parser.hpp>
+#endif
 
 #undef init_unit_test_suite
 
 namespace boost {
 namespace unit_test {
 namespace gui {
-
-#if !BOOST_TEST_TRUNK_API
-
-const test_unit_type TUT_ANY = tut_any;
-const test_unit_type TUT_CASE = tut_case;
-const test_unit_type TUT_SUITE = tut_suite;
-
-#endif
-
-class test_suite_access : public test_suite
-{
-public:
-	const std::vector<test_unit_id>& members() const
-	{
-		return m_members;
-	}
-
-private:
-	test_suite_access();
-};
-
-class test_tree_reporter : public test_tree_visitor
-{
-public:
-	test_tree_reporter() : m_indent(0)
-	{
-	}
-
-private:
-	virtual void visit(test_case const& tc)
-	{
-		std::cout << std::setw(m_indent) << "" << (tc.p_enabled? 'C': 'c') << tc.p_id << ":" << tc.p_name << "\n";
-	}
-
-	virtual bool test_suite_start(test_suite const& ts)
-	{
-		if (m_indent >= 0)
-			std::cout << std::setw(m_indent) << "" << (ts.p_enabled? 'S': 's') << ts.p_id << ":" << ts.p_name << "\n";
-		m_indent += 4;
-		return true;
-	}
-
-	virtual void test_suite_finish(test_suite const&)
-	{
-		m_indent -= 4;
-	}
-
-	int m_indent;
-};
 
 class gui_observer : public test_observer
 {
@@ -127,6 +78,115 @@ public:
 	{
 		std::cout << "#exception " << e.what() << std::endl;
 	}
+};
+
+} // namespace gui
+} // namespace unit_test
+} // namespace boost
+
+boost::unit_test::test_suite* init_unit_test_suite2(int argc, char* argv[]);
+
+#ifdef BOOST_TEST_API_3
+
+namespace boost {
+namespace unit_test {
+
+class Enable : public decorator::enable_if_impl
+{
+public:
+	explicit Enable(bool enable) : m_enable(enable)
+	{
+	}
+
+private:
+    // decorator::base interface
+    virtual void apply(boost::unit_test::test_unit& tu)
+	{
+		apply_impl(tu, m_enable);
+	}
+
+	virtual boost::unit_test::decorator::base_ptr clone() const
+	{
+		return boost::unit_test::decorator::base_ptr(new Enable(m_enable));
+	}
+
+	bool m_enable;
+};
+
+} // namespace unit_test
+} // namespace boost
+
+#define BOOST_AUTO_TEST_CASE_ENABLE(name, enable) \
+	BOOST_AUTO_TEST_CASE(name, *Enable(enable))
+
+#ifndef BOOST_TEST_NO_GUI_INIT
+
+boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
+{
+	for (int i = 1; i < argc; ++i)
+	{
+		if (argv[i] == std::string("--gui_run"))
+		{
+			static boost::unit_test::gui::gui_observer observer;
+			boost::unit_test::framework::register_observer(observer);
+			break;
+		}
+	}
+
+	return init_unit_test_suite2(argc, argv);
+}
+
+extern "C" __declspec(dllexport) inline void unit_test_type_boost2()
+{
+}
+
+#endif // !BOOST_TEST_NO_GUI_INIT
+
+#else // !BOOST_TEST_API_3
+
+namespace boost {
+namespace unit_test {
+namespace gui {
+
+class test_suite_access : public test_suite
+{
+public:
+	const std::vector<test_unit_id>& members() const
+	{
+		return m_members;
+	}
+
+private:
+	test_suite_access();
+};
+
+class test_tree_reporter : public test_tree_visitor
+{
+public:
+	test_tree_reporter() : m_indent(0)
+	{
+	}
+
+private:
+	virtual void visit(test_case const& tc)
+	{
+		std::cout << std::setw(m_indent) << "" << (tc.p_enabled? 'C': 'c') << tc.p_id << ":" << tc.p_name << "\n";
+	}
+
+	virtual bool test_suite_start(test_suite const& ts)
+	{
+		if (m_indent >= 0)
+			std::cout << std::setw(m_indent) << "" << (ts.p_enabled? 'S': 's') << ts.p_id << ":" << ts.p_name << "\n";
+		m_indent += 4;
+		return true;
+	}
+
+	virtual void test_suite_finish(test_suite const&)
+	{
+		m_indent -= 4;
+	}
+
+	int m_indent;
 };
 
 class test_tree_enabler : public test_tree_visitor
@@ -250,6 +310,7 @@ inline test_case* enable_test_case(test_case* tc, bool enable)
 } // namespace unit_test
 } // namespace boost
 
+
 #define BOOST_FIXTURE_TEST_CASE_ENABLE(test_name, F, enable)              \
 struct test_name : public F { void test_method(); };                      \
 																		  \
@@ -275,8 +336,6 @@ BOOST_FIXTURE_TEST_CASE_ENABLE(test_name, BOOST_AUTO_TEST_CASE_FIXTURE, enable)
 
 #ifndef BOOST_TEST_NO_GUI_INIT
 
-boost::unit_test::test_suite* init_unit_test_suite2(int argc, char* argv[]);
-
 boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
 {
 	boost::unit_test::gui::runner runner(argc, argv);
@@ -289,7 +348,9 @@ extern "C" __declspec(dllexport) inline void unit_test_type_boost()
 {
 }
 
-#endif
+#endif // !BOOST_TEST_NO_GUI_INIT
+
+#endif // !BOOST_TEST_API_3
 
 #define init_unit_test_suite init_unit_test_suite2
 
