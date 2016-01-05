@@ -162,6 +162,8 @@ fs::wpath GetTestUiPath()
 {
 	std::array<wchar_t, MAX_PATH> buf;
 	DWORD size = GetModuleFileNameW(nullptr, buf.data(), buf.size());
+	if (size == 0)
+		ThrowLastError("GetModuleFileName");
 	return GetParentPath(buf.data());
 }
 
@@ -298,7 +300,7 @@ void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const 
 	NUnitTest::LoadTestUnits(tree, is, m_pObserver);
 }
 
-unsigned ArgumentBuilder::GetEnabledOptions(unsigned options) const
+unsigned ArgumentBuilder::GetEnabledOptions(unsigned /*options*/) const
 {
 	return ExeRunner::Randomize | ExeRunner::WaitForDebugger;
 }

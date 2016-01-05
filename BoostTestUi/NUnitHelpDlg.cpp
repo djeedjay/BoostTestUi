@@ -12,7 +12,7 @@
 
 namespace gj {
 
-BOOL CNUnitHelpDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
+BOOL CNUnitHelpDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
 	CenterWindow(GetParent());
 	DlgResize_Init();
@@ -26,12 +26,12 @@ BOOL CNUnitHelpDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 
 void SampleContextMenu(CWindow wnd, CRichEditCtrl& ctrl, CPoint pt);
 
-void CNUnitHelpDlg::OnContextMenu(CWindow wnd, CPoint pt)
+void CNUnitHelpDlg::OnContextMenu(CWindow /*wnd*/, CPoint pt)
 {
 	SampleContextMenu(*this, m_sample, pt);
 }
 
-void CNUnitHelpDlg::OnCopy(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)
+void CNUnitHelpDlg::OnCopy(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/)
 {
 	m_sample.Copy();
 }

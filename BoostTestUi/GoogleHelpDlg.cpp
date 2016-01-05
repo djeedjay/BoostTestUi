@@ -12,7 +12,7 @@
 
 namespace gj {
 
-BOOL CGoogleHelpDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
+BOOL CGoogleHelpDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
 	CenterWindow(GetParent());
 	DlgResize_Init();
@@ -26,12 +26,12 @@ BOOL CGoogleHelpDlg::OnInitDialog(CWindow wndFocus, LPARAM lInitParam)
 
 void SampleContextMenu(CWindow wnd, CRichEditCtrl& ctrl, CPoint pt);
 
-void CGoogleHelpDlg::OnContextMenu(CWindow wnd, CPoint pt)
+void CGoogleHelpDlg::OnContextMenu(CWindow /*wnd*/, CPoint pt)
 {
 	SampleContextMenu(*this, m_sample, pt);
 }
 
-void CGoogleHelpDlg::OnCopy(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)
+void CGoogleHelpDlg::OnCopy(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/)
 {
 	m_sample.Copy();
 }

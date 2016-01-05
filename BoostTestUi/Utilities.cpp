@@ -8,6 +8,7 @@
 #include "stdafx.h"
 #include <vector>
 #include <iterator>
+#include <memory>
 #include <boost/system/system_error.hpp>
 #include "Utilities.h"
 
@@ -158,7 +159,7 @@ DWORD SetRichEditData(CRichEditCtrl& ctrl, DWORD format, const BYTE* pData, size
 {
 	RichEditStream stream(pData, len);
 	EDITSTREAM es = { reinterpret_cast<DWORD_PTR>(&stream), 0, &EditStreamCallback };
-	return ctrl.StreamIn(SF_RTF, es);
+	return ctrl.StreamIn(format, es);
 }
 
 DWORD SetRichEditData(CRichEditCtrl& ctrl, DWORD format, LPWSTR resourcedId)
@@ -166,7 +167,7 @@ DWORD SetRichEditData(CRichEditCtrl& ctrl, DWORD format, LPWSTR resourcedId)
 	CResource resource;
 	if (!resource.Load(RT_RCDATA, resourcedId))
 		ThrowLastError("RT_RCDATA");
-	return SetRichEditData(ctrl, SF_RTF, static_cast<const BYTE*>(resource.Lock()), resource.GetSize());
+	return SetRichEditData(ctrl, format, static_cast<const BYTE*>(resource.Lock()), resource.GetSize());
 }
 
 std::wstring GetDlgItemText(const CWindow& wnd, int idc)

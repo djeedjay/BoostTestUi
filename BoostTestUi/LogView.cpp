@@ -162,7 +162,7 @@ bool CLogView::Find(const std::string& text, int direction)
 	{
 		if (line < 0)
 			line += m_logLines.size();
-		if (line == m_logLines.size())
+		if (static_cast<size_t>(line) == m_logLines.size())
 			line = 0;
 
 		if (m_logLines[line].message.find(text) != std::string::npos)
@@ -414,7 +414,6 @@ LRESULT CLogView::OnCustomDraw(NMHDR* pnmh)
 
 	auto& nmhdr = *reinterpret_cast<NMLVCUSTOMDRAW*>(pnmh);
 
-	int item = nmhdr.nmcd.dwItemSpec;
 	switch (nmhdr.nmcd.dwDrawStage)
 	{
 	case CDDS_PREPAINT:
@@ -460,9 +459,9 @@ LRESULT CLogView::OnItemChanged(NMHDR* pnmh)
 	return 0;
 }
 
-LRESULT CLogView::OnGetInfoTip(NMHDR* pnmh)
+LRESULT CLogView::OnGetInfoTip(NMHDR* /*pnmh*/)
 {
-	auto& nmhdr = *reinterpret_cast<NMLVGETINFOTIP*>(pnmh);
+//	auto& nmhdr = *reinterpret_cast<NMLVGETINFOTIP*>(pnmh);
 
 	return 0;
 }
