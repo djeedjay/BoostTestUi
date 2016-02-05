@@ -99,8 +99,8 @@ public:
 	}
 
 private:
-    // decorator::base interface
-    virtual void apply(boost::unit_test::test_unit& tu)
+	// decorator::base interface
+	virtual void apply(boost::unit_test::test_unit& tu)
 	{
 		apply_impl(tu, m_enable);
 	}
@@ -201,7 +201,7 @@ private:
 	void enable(test_unit_id id)
 	{
 		bool enable = m_it != m_arg.end() && (*m_it++ == '1');
-		framework::get(id, TUT_ANY).p_enabled.set(enable);
+		framework::get(id, tut_any).p_enabled.set(enable);
 	}
 
 	virtual void visit(test_case const& tc)
@@ -289,7 +289,7 @@ public:
 
 	static void traverse_test_tree(test_unit_id id, test_tree_visitor& v)
 	{
-		if (ut_detail::test_id_2_unit_type(id) == TUT_CASE)
+		if (ut_detail::test_id_2_unit_type(id) == tut_case)
 			traverse_test_tree(framework::get<test_case>(id), v);
 		else
 			traverse_test_tree(framework::get<test_suite>(id), v);
