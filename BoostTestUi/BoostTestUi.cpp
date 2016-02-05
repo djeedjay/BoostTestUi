@@ -29,7 +29,7 @@ struct ComInitialization
 	}
 };
 
-class CAppModuleInitialization
+class CAppModuleInitialization : boost::noncopyable
 {
 public:
 	CAppModuleInitialization(CAppModule& module, HINSTANCE hInstance) :
@@ -47,7 +47,8 @@ private:
 	CAppModule& m_module;
 };
 
-class MessageLoop : public CMessageLoop
+class MessageLoop : boost::noncopyable,
+	public CMessageLoop
 {
 public:
 	explicit MessageLoop(CAppModule& module) :
@@ -72,7 +73,7 @@ int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
 
 	std::wstring cmdLine = GetCommandLineW();
 	std::wstring arguments;
-	int pos = cmdLine.find(L" --args ");
+	auto pos = cmdLine.find(L" --args ");
 	if (pos != cmdLine.npos)
 	{
 		arguments = cmdLine.substr(pos + 8);
@@ -85,13 +86,12 @@ int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
 	std::wstring fileName;
 	std::wstring run;
 
-	while (*argv != nullptr)
+	for (int i = 1 ; i < argc; ++i)
 	{
-		std::wstring arg = argv[0];
+		std::wstring arg = argv[i];
 		std::wstring val;
-		if (argv[1] != nullptr)
-			val = argv[1];
-		++argv;
+		if (i + 1 < argc)
+			val = argv[i + 1];
 
 		if (arg.substr(0, 2) != L"--")
 		{
@@ -100,7 +100,7 @@ int Run(LPTSTR /*lpstrCmdLine*/, int nCmdShow)
 		else if (arg == L"--run" && !val.empty())
 		{
 			run = val;
-			++argv;
+			++i;
 		}
 	}
 
