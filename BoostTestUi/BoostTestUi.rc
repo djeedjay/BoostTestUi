@@ -333,8 +333,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,6,0
- PRODUCTVERSION 1,0,6,0
+ FILEVERSION 1,0,8,0
+ PRODUCTVERSION 1,0,8,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -350,12 +350,12 @@ BEGIN
         BLOCK "040904B0"
         BEGIN
             VALUE "FileDescription", "BoostTestUi"
-            VALUE "FileVersion", "1,0,6,0"
+            VALUE "FileVersion", "1,0,8,0"
             VALUE "InternalName", "BoostTestUi"
             VALUE "LegalCopyright", "Copyright 2012"
             VALUE "OriginalFilename", "BoostTestUi.exe"
             VALUE "ProductName", "Boost Test Runner"
-            VALUE "ProductVersion", "1,0,6,0"
+            VALUE "ProductVersion", "1,0,8,0"
         END
     END
     BLOCK "VarFileInfo"
