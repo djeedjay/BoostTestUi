@@ -341,6 +341,13 @@ namespace BoostTestUI
 		}
 
 		[Test]
+		public void AssertPass()
+		{
+			Assert.Pass("This is a message from a passed test");
+			Assert.Fail("Should not reach this");
+		}
+
+		[Test]
 		public void IgnoreTest1()
 		{
 			Assert.Ignore("Ignored Test");
