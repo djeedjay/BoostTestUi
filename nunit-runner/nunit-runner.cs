@@ -63,6 +63,11 @@ namespace TestRunner
 				System.Console.WriteLine("Ignored: \"{0}\"", message);
 		}
 
+		public void Pass(string message)
+		{
+			System.Console.WriteLine("Assert.Pass: \"{0}\"", message);
+		}
+
 		public void Exception(string message)
 		{
 			System.Console.WriteLine("#BeginException");
@@ -120,6 +125,11 @@ namespace TestRunner
 		public static bool IsA(System.Type testType, System.Type baseType)
 		{
 			return IsA(testType, baseType.FullName);
+		}
+
+		public static bool IsA<T>(System.Type testType)
+		{
+			return IsA(testType, typeof(T));
 		}
 
 		public static object GetAttribute(System.Reflection.ICustomAttributeProvider provider, string attributeName, bool inherit)
@@ -206,9 +216,9 @@ namespace TestRunner
 			return index < 0 ? e.StackTrace : e.StackTrace.Substring(index + 1);
 		}
 
-		public static bool IsExpected(System.Reflection.TargetInvocationException e)
+		public static bool IsSuccessException(System.Reflection.TargetInvocationException e)
 		{
-			return IsExpected(e.InnerException);
+			return IsSuccessException(e.InnerException);
 		}
 
 		public static bool IsExpected(System.Reflection.TargetInvocationException e, string expectedExceptionName)
@@ -216,13 +226,27 @@ namespace TestRunner
 			return IsExpected(e.InnerException, expectedExceptionName);
 		}
 
-		public static bool IsExpected(System.Exception e)
+		public static bool IsSuccessException(System.Exception e)
 		{
 			if (e is System.Reflection.TargetInvocationException)
 			{
-				return IsExpected(e as System.Reflection.TargetInvocationException);
+				return IsSuccessException(e as System.Reflection.TargetInvocationException);
 			}
 			return Reflection.IsA(e.GetType(), typeof(NUnit.Framework.SuccessException).FullName);
+		}
+
+		public static System.Object InnerException(System.Reflection.TargetInvocationException e)
+		{
+			return InnerException(e.InnerException);
+		}
+
+		public static System.Object InnerException(System.Exception e)
+		{
+			if (e is System.Reflection.TargetInvocationException)
+			{
+				return InnerException(e as System.Reflection.TargetInvocationException);
+			}
+			return e;
 		}
 
 		public static bool IsExpected(System.Exception e, string expectedExceptionName)
@@ -231,9 +255,7 @@ namespace TestRunner
 			{
 				return IsExpected(e as System.Reflection.TargetInvocationException, expectedExceptionName);
 			}
-			return
-				Reflection.IsA(e.GetType(), typeof(NUnit.Framework.SuccessException).FullName) ||
-				Reflection.IsA(e.GetType(), expectedExceptionName);
+			return Reflection.IsA(e.GetType(), expectedExceptionName);
 		}
 
 		public static void Report(System.Reflection.TargetInvocationException e, TestReporter reporter)
@@ -267,9 +289,9 @@ namespace TestRunner
 
 		public static void Handle(System.Exception e, string expectedExceptionName)
 		{
-			if (expectedExceptionName != "" && !Exception.IsExpected(e, expectedExceptionName))
-				throw e;
-			return;
+			if (Exception.IsSuccessException(e) || expectedExceptionName != "" && Exception.IsExpected(e, expectedExceptionName))
+				return;
+			throw e;
 		}
 	}
 
@@ -316,7 +338,7 @@ namespace TestRunner
 			this.arguments = args;
 		}
 
-		public void Run(TestFixture fixture)
+		public void Run(TestFixture fixture, TestReporter reporter)
 		{
 			try
 			{
@@ -324,7 +346,9 @@ namespace TestRunner
 			}
 			catch (System.Exception e)
 			{
-				if (!Exception.IsExpected(e))
+				if (Exception.IsSuccessException(e))
+					reporter.Pass((string)Reflection.GetProperty(Exception.InnerException(e), "Message"));
+				else
 					throw;
 			}
 		}
@@ -419,7 +443,7 @@ namespace TestRunner
 			}
 		}
 
-		public void Run(TestFixture fixture)
+		public void Run(TestFixture fixture, TestReporter reporter)
 		{
 			var exception = Reflection.GetAttribute(methodInfo, typeof(NUnit.Framework.ExpectedExceptionAttribute), false);
 			string expectedExceptionName = null;
@@ -446,10 +470,15 @@ namespace TestRunner
 			}
 			catch (System.Exception e)
 			{
-//				Exception.Handle(expectedExceptionName);
-				if (expectedExceptionName != "" && !Exception.IsExpected(e, expectedExceptionName))
-					throw;
-				return;
+				if (Exception.IsSuccessException(e))
+				{
+					reporter.Pass((string)Reflection.GetProperty(Exception.InnerException(e), "Message"));
+				}
+				else
+				{
+					Exception.Handle(e, expectedExceptionName);
+					return;
+				}
 			}
 
 			if (expectedExceptionName != null)
@@ -907,7 +936,7 @@ namespace TestRunner
 			{
 				fixture.SetUp();
 				setUpDone = true;
-				test.Run(fixture);
+				test.Run(fixture, reporter);
 				runState = TestCaseState.Success;
 			}
 			catch (System.Exception e)
@@ -954,7 +983,7 @@ namespace TestRunner
 			{
 				fixture.SetUp();
 				setUpDone = true;
-				testCase.Run(fixture);
+				testCase.Run(fixture, reporter);
 				runState = TestCaseState.Success;
 			}
 			catch (System.Exception e)

@@ -194,7 +194,6 @@ std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsign
 	if (!getArg.AllCases())
 		args << L" " << getArg.GetArg();
 	args << L" -- --gui_run";
-	m_pObserver->test_message(Severity::Info, Str(getArg.GetArg()));
 	return args.str();
 }
 

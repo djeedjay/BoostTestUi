@@ -170,7 +170,7 @@ void Process::Run(const std::wstring& pathName, const std::wstring& args)
 		nullptr,
 		&startupInfo,
 		&processInformation))
-		ThrowLastError("SetHandleInformation");
+		ThrowLastError(pathName);
 
 	m_hProcess.Attach(processInformation.hProcess);
 	m_hThread.Attach(processInformation.hThread);
