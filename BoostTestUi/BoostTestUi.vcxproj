@@ -143,6 +143,7 @@
     <ClCompile Include="BoostTestUi.cpp" />
     <ClCompile Include="CategoryDlg.cpp" />
     <ClCompile Include="CategoryList.cpp" />
+    <ClCompile Include="DevEnv.cpp" />
     <ClCompile Include="ExeRunner.cpp" />
     <ClCompile Include="FindDlg.cpp" />
     <ClCompile Include="GoogleHelpDlg.cpp" />
@@ -153,7 +154,6 @@
     <ClCompile Include="NUnitHelpDlg.cpp" />
     <ClCompile Include="NUnitTest.cpp" />
     <ClCompile Include="Process.cpp" />
-    <ClCompile Include="ShowSourceLine.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -172,6 +172,7 @@
     <ClInclude Include="BoostTest.h" />
     <ClInclude Include="CategoryDlg.h" />
     <ClInclude Include="CategoryList.h" />
+    <ClInclude Include="DevEnv.h" />
     <ClInclude Include="ExeRunner.h" />
     <ClInclude Include="FindDlg.h" />
     <ClInclude Include="GoogleHelpDlg.h" />
@@ -184,7 +185,6 @@
     <ClInclude Include="Process.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Severity.h" />
-    <ClInclude Include="ShowSourceLine.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="streamredirector.h" />
     <ClInclude Include="TestCaseState.h" />

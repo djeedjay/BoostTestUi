@@ -1381,6 +1381,11 @@ void CMainFrame::Run()
 	m_pRunner->Run(m_combo.GetCurSel(), GetOptions(), m_arguments);
 }
 
+DevEnv& CMainFrame::getDevEnv()
+{
+	return m_devEnv;
+}
+
 void TreeViewStateStorage::Clear()
 {
 	m_tests.clear();

@@ -26,8 +26,11 @@
 #include "FindDlg.h"
 #include "CategoryList.h"
 #include "ExeRunner.h"
+#include "DevEnv.h"
 
 namespace gj {
+
+class DevEnv;
 
 class TreeViewStateStorage
 {
@@ -66,6 +69,8 @@ public:
 	TestUnit GetTestItem(unsigned id) const;
 
 	void EnQueue(const std::function<void ()>& fn);
+
+	DevEnv& getDevEnv();
 
 	BEGIN_UPDATE_UI_MAP(CMainFrame)
 	    UPDATE_ELEMENT(ID_FILE_AUTO_RUN, UPDUI_MENUPOPUP)
@@ -219,6 +224,7 @@ private:
 	int m_ignoredTestCount;
 	int m_failedTestCount;
 	TestCaseState::type m_testCaseState;
+	DevEnv m_devEnv;
 
 	boost::mutex m_mtx;
 	std::queue<std::function<void ()>> m_q;

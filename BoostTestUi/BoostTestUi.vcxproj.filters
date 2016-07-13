@@ -27,9 +27,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShowSourceLine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ExeRunner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -87,6 +84,9 @@
     <ClCompile Include="BoostTest2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DevEnv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDlg.h">
@@ -102,9 +102,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="streamredirector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ShowSourceLine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ExeRunner.h">
@@ -174,6 +171,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AtlWinExt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DevEnv.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
