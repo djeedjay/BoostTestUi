@@ -7,28 +7,7 @@
 
 #include "stdafx.h"
 #include "DevEnv.h"
-
-namespace {
-
-template <typename Itf>
-CComPtr<Itf> GetActiveObject(const CLSID& clsid)
-{
-	CComPtr<IUnknown> pIUnk;
-	HRESULT hr = ::GetActiveObject(clsid, nullptr, &pIUnk);
-	CComPtr<Itf> pItf;
-	if (SUCCEEDED(hr))
-		hr = pIUnk->QueryInterface(&pItf);
-	return pItf;
-}
-
-CLSID ClsidFromProgId(const std::wstring& progId)
-{
-	CLSID clsid = CLSID_NULL;
-	CLSIDFromProgID(progId.c_str(), &clsid);
-	return clsid;
-}
-
-} // namespace
+#include <vector>
 
 #pragma warning(disable: 4278)
 #pragma warning(disable: 4146)
@@ -36,6 +15,78 @@ CLSID ClsidFromProgId(const std::wstring& progId)
 #import "libid:80cc9f66-e7d8-4ddd-85b6-d9e6cd0e93e2" version("8.0") lcid("0") raw_interfaces_only named_guids
 #pragma warning(default: 4146)
 #pragma warning(default: 4278)
+
+typedef CComPtr<EnvDTE::_DTE> DTEPtr;
+typedef std::pair<std::wstring, DTEPtr> DTEInfo;
+typedef std::vector<DTEInfo> DTEInfos;
+
+namespace {
+
+DTEInfos getDTEInfos()
+{
+	DTEInfos dteInfos;
+	CComPtr<IRunningObjectTable> pRot;
+	CComPtr<IEnumMoniker> pEnumMoniker;
+	CComPtr<IMoniker> pMoniker;
+
+	HRESULT hr = GetRunningObjectTable(0, &pRot);
+	if (SUCCEEDED(hr) && pRot)
+		hr = pRot->EnumRunning(&pEnumMoniker);
+
+	if (SUCCEEDED(hr) && pEnumMoniker)
+		while (pEnumMoniker->Next(1, &pMoniker, nullptr) == S_OK)
+		{
+			CComPtr<IUnknown> pObj;
+			pRot->GetObject(pMoniker, &pObj);
+			pMoniker.Release();
+
+			DTEPtr pDte = CComQIPtr<EnvDTE::_DTE>(pObj);
+
+			if (!pDte)
+				continue;
+
+			bool isNew = true;
+
+			for (auto it = std::begin(dteInfos); isNew && it != std::end(dteInfos); ++it)
+				isNew &= !it->second.IsEqualObject(pDte);
+
+			if (!isNew)
+				continue;
+
+			CComBSTR name;
+			CComBSTR version;
+			CComBSTR solutionName;
+			CComPtr<EnvDTE::_Solution> pSolution;
+
+			hr = pDte->get_Name(&name);
+			if (SUCCEEDED(hr))
+				hr = pDte->get_Version(&version);
+			if (SUCCEEDED(hr))
+				hr = pDte->get_Solution(&pSolution);
+			if (SUCCEEDED(hr) && pSolution)
+				hr = pSolution->get_FullName(&solutionName);
+			if (SUCCEEDED(hr))
+			{
+				if (solutionName.Length() == 0)
+					solutionName = "<none>";
+
+				std::wstring description;
+				description += std::wstring(name, name.Length());
+				description += L" ";
+				description += std::wstring(version, version.Length());
+				description += L" (";
+				description += std::wstring(solutionName, solutionName.Length());
+				description += L")";
+
+				dteInfos.push_back(DTEInfo(description, pDte));
+			}
+		}
+
+	return dteInfos;
+}
+
+} // namespace
+
 
 namespace gj {
 
@@ -47,21 +98,11 @@ public:
 
 void DevEnv::Impl::ShowSourceLine(const std::string& fileName, int lineNr)
 {
-	const wchar_t* progIds[] =
-	{
-		L"VisualStudio.DTE",
-		L"VisualStudio.DTE.10.0",
-		L"VisualStudio.DTE.9.0",
-		L"VisualStudio.DTE.8.0",
-		L"VisualStudio.DTE.7.1",
-		L"VisualStudio.DTE.7.0"
-	};
+	auto dteInfos = getDTEInfos();
 
-	for (auto it = std::begin(progIds); it != std::end(progIds); ++it)
+	for (auto it = std::begin(dteInfos); it != std::end(dteInfos); ++it)
 	{
-		auto pIDte = GetActiveObject<EnvDTE::_DTE>(ClsidFromProgId(*it));
-		if (!pIDte)
-			continue;
+		auto pIDte = it->second;
 
 		CComPtr<EnvDTE::ItemOperations> pIOps;
 		CComPtr<EnvDTE::Window> pWindow;
