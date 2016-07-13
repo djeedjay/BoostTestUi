@@ -21,6 +21,7 @@ public:
 	~DevEnv();
 
 	void ShowSourceLine(const std::string& fileName, int lineNr);
+	bool AttachDebugger(long testProcessID);
 
 private:
 	class Impl;

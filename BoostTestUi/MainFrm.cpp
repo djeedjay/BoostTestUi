@@ -864,7 +864,7 @@ void CMainFrame::test_waiting(const std::wstring& processName, unsigned processI
 {
 	EnQueue([this, processName, processId]()
 	{
-		if (this->MessageBox(
+		if (m_devEnv.AttachDebugger(processId) || this->MessageBox(
 			WStr(wstringbuilder() << L"Attach debugger to " << processName << L", pid: "<< processId),
 			LoadString(IDR_APPNAME).c_str(),
 			MB_OKCANCEL) == IDOK)

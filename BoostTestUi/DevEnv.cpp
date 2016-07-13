@@ -85,6 +85,41 @@ DTEInfos getDTEInfos()
 	return dteInfos;
 }
 
+bool AttachDebugger(DTEPtr pIDte, long testProcessID)
+{
+	CComPtr<EnvDTE::Debugger> pDebugger;
+	CComPtr<EnvDTE::Processes> pProcesses;
+
+	HRESULT hr = pIDte->get_Debugger(&pDebugger);
+	if (SUCCEEDED(hr) && pDebugger)
+		hr = pDebugger->get_LocalProcesses(&pProcesses);
+	if (SUCCEEDED(hr) && pProcesses)
+	{
+		long count = 0;
+		hr = pProcesses->get_Count(&count);
+
+		if (SUCCEEDED(hr))
+			for (long i = 1; i <= count; ++i)
+			{
+				CComPtr<EnvDTE::Process> pProcess;
+				long processID = 0;
+
+				hr = pProcesses->Item(_variant_t(i), &pProcess);
+
+				if (SUCCEEDED(hr) && pProcess)
+					hr = pProcess->get_ProcessID(&processID);
+				if (SUCCEEDED(hr) && processID == testProcessID)
+				{
+					hr = pProcess->Attach();
+					if (SUCCEEDED(hr))
+						return true;
+				}
+			}
+	}
+
+	return false;
+}
+
 } // namespace
 
 
@@ -94,6 +129,7 @@ class DevEnv::Impl
 {
 public:
 	void ShowSourceLine(const std::string& fileName, int lineNr);
+	bool AttachDebugger(long testProcessID);
 };
 
 void DevEnv::Impl::ShowSourceLine(const std::string& fileName, int lineNr)
@@ -126,6 +162,19 @@ void DevEnv::Impl::ShowSourceLine(const std::string& fileName, int lineNr)
 	}
 }
 
+bool DevEnv::Impl::AttachDebugger(long testProcessID)
+{
+	auto dteInfos = getDTEInfos();
+	for (auto it = std::begin(dteInfos); it != std::end(dteInfos); ++it)
+	{
+		DTEPtr pIDte = it->second;
+
+		if (::AttachDebugger(pIDte, testProcessID))
+			return true;
+	}
+
+	return false;
+}
 
 DevEnv::DevEnv()
 	: m_pImpl(new Impl)
@@ -140,6 +189,11 @@ DevEnv::~DevEnv()
 void DevEnv::ShowSourceLine(const std::string& fileName, int lineNr)
 {
 	m_pImpl->ShowSourceLine(fileName, lineNr);
+}
+
+bool DevEnv::AttachDebugger(long testProcessID)
+{
+	return m_pImpl->AttachDebugger(testProcessID);
 }
 
 } // namespace gj
