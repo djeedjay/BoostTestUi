@@ -167,6 +167,17 @@ HRESULT AttachDebugger(DTEPtr pIDte, long testProcessID)
 	return hr;
 }
 
+DTEPtr activate(CComPtr<IUnknown>& pUnk)
+{
+	DTEPtr pIDte = com_cast<EnvDTE::_DTE>(pUnk);
+	DTEPtr pDummy;
+
+	if (pIDte && FAILED(pIDte->get_DTE(&pDummy)))
+		pUnk = pIDte = DTEPtr();
+
+	return pIDte;
+}
+
 } // namespace
 
 
@@ -183,15 +194,15 @@ DevEnv::~DevEnv()
 
 void DevEnv::SelectDte()
 {
-	m_pIDte = ::SelectDTE(m_selectDte, com_cast<EnvDTE::_DTE>(m_pIDte));
+	m_pIDte = ::SelectDTE(m_selectDte, activate(m_pIDte));
 }
 
 void DevEnv::ShowSourceLine(const std::string& fileName, int lineNr)
 {
-	DTEPtr pIDte = com_cast<EnvDTE::_DTE>(m_pIDte);
+	DTEPtr pIDte = activate(m_pIDte);
 
 	if (!pIDte)
-		m_pIDte = pIDte = ::SelectDTE(m_selectDte);
+		pIDte = ::SelectDTE(m_selectDte);
 
 	if (pIDte && SUCCEEDED(::ShowSourceLine(pIDte, fileName, lineNr)))
 		m_pIDte = pIDte;
@@ -199,7 +210,7 @@ void DevEnv::ShowSourceLine(const std::string& fileName, int lineNr)
 
 bool DevEnv::AttachDebugger(long testProcessID)
 {
-	DTEPtr pIDte = com_cast<EnvDTE::_DTE>(m_pIDte);
+	DTEPtr pIDte = activate(m_pIDte);
 
 	if (!pIDte)
 		pIDte = ::SelectDTE(m_selectDte);
