@@ -7,7 +7,6 @@
 
 #include "stdafx.h"
 #include "DevEnv.h"
-#include <vector>
 
 #pragma warning(disable: 4278)
 #pragma warning(disable: 4146)
@@ -40,7 +39,7 @@ DTEInfos getDTEInfos()
 			pRot->GetObject(pMoniker, &pObj);
 			pMoniker.Release();
 
-			DTEPtr pDte = CComQIPtr<EnvDTE::_DTE>(pObj);
+			DTEPtr pDte = com_cast<EnvDTE::_DTE>(pObj);
 
 			if (!pDte)
 				continue;
@@ -85,7 +84,53 @@ DTEInfos getDTEInfos()
 	return dteInfos;
 }
 
-bool AttachDebugger(DTEPtr pIDte, long testProcessID)
+DTEPtr SelectDTE(const std::function<int(const std::vector<std::wstring>& names, int indexHint)>& select, DTEPtr pIDteHint = DTEPtr())
+{
+	auto dteInfos = getDTEInfos();
+	std::vector<std::wstring> names;
+	int indexHint = -1;
+
+	for (size_t i = 0; i < dteInfos.size(); ++i)
+	{
+		auto& dteInfo(dteInfos[i]);
+
+		names.push_back(dteInfo.first);
+
+		if (dteInfo.second.IsEqualObject(pIDteHint))
+			indexHint = i;
+	}
+
+	int index = select ? select(names, indexHint) : indexHint;
+
+	if (0 <= index && size_t(index) < dteInfos.size())
+		return dteInfos[index].second;
+	else
+		return DTEPtr();
+}
+
+HRESULT ShowSourceLine(DTEPtr pIDte, const std::string& fileName, int lineNr)
+{
+	CComPtr<EnvDTE::ItemOperations> pIOps;
+	CComPtr<EnvDTE::Window> pWindow;
+
+	HRESULT hr = pIDte->get_ItemOperations(&pIOps);
+	if (SUCCEEDED(hr))
+		hr = pIOps->OpenFile(CComBSTR(fileName.c_str()), CComBSTR(EnvDTE::vsViewKindTextView), &pWindow);
+
+	CComPtr<EnvDTE::Document> pDocument;
+	CComPtr<IDispatch> pIDisp;
+	if (SUCCEEDED(hr))
+		hr = pIDte->get_ActiveDocument(&pDocument);
+	if (SUCCEEDED(hr))
+		hr = pDocument->get_Selection(&pIDisp);
+	CComPtr<EnvDTE::TextSelection> pSelection = com_cast<EnvDTE::TextSelection>(pIDisp);
+	if (SUCCEEDED(hr) && pSelection)
+		hr = pSelection->GotoLine(lineNr, VARIANT_FALSE);
+
+	return hr;
+}
+
+HRESULT AttachDebugger(DTEPtr pIDte, long testProcessID)
 {
 	CComPtr<EnvDTE::Debugger> pDebugger;
 	CComPtr<EnvDTE::Processes> pProcesses;
@@ -99,6 +144,7 @@ bool AttachDebugger(DTEPtr pIDte, long testProcessID)
 		hr = pProcesses->get_Count(&count);
 
 		if (SUCCEEDED(hr))
+		{
 			for (long i = 1; i <= count; ++i)
 			{
 				CComPtr<EnvDTE::Process> pProcess;
@@ -110,14 +156,15 @@ bool AttachDebugger(DTEPtr pIDte, long testProcessID)
 					hr = pProcess->get_ProcessID(&processID);
 				if (SUCCEEDED(hr) && processID == testProcessID)
 				{
-					hr = pProcess->Attach();
-					if (SUCCEEDED(hr))
-						return true;
+					return pProcess->Attach();
 				}
 			}
+
+			return E_FAIL;
+		}
 	}
 
-	return false;
+	return hr;
 }
 
 } // namespace
@@ -125,75 +172,45 @@ bool AttachDebugger(DTEPtr pIDte, long testProcessID)
 
 namespace gj {
 
-class DevEnv::Impl
-{
-public:
-	void ShowSourceLine(const std::string& fileName, int lineNr);
-	bool AttachDebugger(long testProcessID);
-};
-
-void DevEnv::Impl::ShowSourceLine(const std::string& fileName, int lineNr)
-{
-	auto dteInfos = getDTEInfos();
-
-	for (auto it = std::begin(dteInfos); it != std::end(dteInfos); ++it)
-	{
-		auto pIDte = it->second;
-
-		CComPtr<EnvDTE::ItemOperations> pIOps;
-		CComPtr<EnvDTE::Window> pWindow;
-
-		HRESULT hr = pIDte->get_ItemOperations(&pIOps);
-		if (SUCCEEDED(hr))
-			hr = pIOps->OpenFile(CComBSTR(fileName.c_str()), CComBSTR(EnvDTE::vsViewKindTextView), &pWindow);
-
-		CComPtr<EnvDTE::Document> pDocument;
-		CComPtr<IDispatch> pIDisp;
-		if (SUCCEEDED(hr))
-			hr = pIDte->get_ActiveDocument(&pDocument);
-		if (SUCCEEDED(hr))
-			hr = pDocument->get_Selection(&pIDisp);
-		CComPtr<EnvDTE::TextSelection> pSelection = com_cast<EnvDTE::TextSelection>(pIDisp);
-		if (SUCCEEDED(hr) && pSelection)
-			hr = pSelection->GotoLine(lineNr, VARIANT_FALSE);
-
-		if (SUCCEEDED(hr))
-			break;
-	}
-}
-
-bool DevEnv::Impl::AttachDebugger(long testProcessID)
-{
-	auto dteInfos = getDTEInfos();
-	for (auto it = std::begin(dteInfos); it != std::end(dteInfos); ++it)
-	{
-		DTEPtr pIDte = it->second;
-
-		if (::AttachDebugger(pIDte, testProcessID))
-			return true;
-	}
-
-	return false;
-}
-
-DevEnv::DevEnv()
-	: m_pImpl(new Impl)
+DevEnv::DevEnv(const std::function<int(const std::vector<std::wstring>& names, int indexHint)>& selectDte)
+	: m_selectDte(selectDte)
 {
 }
 
 DevEnv::~DevEnv()
 {
-	delete m_pImpl;
+}
+
+void DevEnv::SelectDte()
+{
+	m_pIDte = ::SelectDTE(m_selectDte, com_cast<EnvDTE::_DTE>(m_pIDte));
 }
 
 void DevEnv::ShowSourceLine(const std::string& fileName, int lineNr)
 {
-	m_pImpl->ShowSourceLine(fileName, lineNr);
+	DTEPtr pIDte = com_cast<EnvDTE::_DTE>(m_pIDte);
+
+	if (!pIDte)
+		m_pIDte = pIDte = ::SelectDTE(m_selectDte);
+
+	if (pIDte && SUCCEEDED(::ShowSourceLine(pIDte, fileName, lineNr)))
+		m_pIDte = pIDte;
 }
 
 bool DevEnv::AttachDebugger(long testProcessID)
 {
-	return m_pImpl->AttachDebugger(testProcessID);
+	DTEPtr pIDte = com_cast<EnvDTE::_DTE>(m_pIDte);
+
+	if (!pIDte)
+		pIDte = ::SelectDTE(m_selectDte);
+
+	if (pIDte && SUCCEEDED(::AttachDebugger(pIDte, testProcessID)))
+	{
+		m_pIDte = pIDte;
+		return true;
+	}
+	else
+		return false;
 }
 
 } // namespace gj

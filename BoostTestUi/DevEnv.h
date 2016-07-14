@@ -11,22 +11,25 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <functional>
 
 namespace gj {
 
 class DevEnv
 {
 public:
-	DevEnv();
+	DevEnv(const std::function<int(const std::vector<std::wstring>& names, int indexHint)>& selectDte);
 	~DevEnv();
+
+	void SelectDte();
 
 	void ShowSourceLine(const std::string& fileName, int lineNr);
 	bool AttachDebugger(long testProcessID);
 
 private:
-	class Impl;
-
-	Impl* m_pImpl;
+	CComPtr<IUnknown> m_pIDte;
+	std::function<int(const std::vector<std::wstring>& names, int indexHint)> m_selectDte;
 };
 
 } // namespace gj

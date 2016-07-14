@@ -102,7 +102,8 @@ CMainFrame::CMainFrame(const std::wstring& fileName, const std::wstring& argumen
 	m_logAutoClear(true),
 	m_randomize(false),
 	m_repeat(false),
-	m_debugger(false)
+	m_debugger(false),
+	m_devEnv([](...) { return 0; })
 {
 }
 
