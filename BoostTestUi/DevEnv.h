@@ -22,6 +22,8 @@ public:
 	DevEnv(const std::function<int(const std::vector<std::wstring>& names, int indexHint)>& selectDte);
 	~DevEnv();
 
+	bool HasSelection();
+	void ClearSelection();
 	void SelectDte();
 
 	void ShowSourceLine(const std::string& fileName, int lineNr);

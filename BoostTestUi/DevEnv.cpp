@@ -192,6 +192,16 @@ DevEnv::~DevEnv()
 {
 }
 
+bool DevEnv::HasSelection()
+{
+	return activate(m_pIDte) != nullptr;
+}
+
+void DevEnv::ClearSelection()
+{
+	m_pIDte = nullptr;
+}
+
 void DevEnv::SelectDte()
 {
 	m_pIDte = ::SelectDTE(m_selectDte, activate(m_pIDte));
