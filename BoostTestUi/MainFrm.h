@@ -190,6 +190,7 @@ private:
 	void RunAll();
 	void Run();
 	void EndTestCase(unsigned id, unsigned long /*elapsed*/, TestCaseState::type state);
+	int SelectDevEnv(const std::vector<std::wstring>& names, int indexHint);
 
 	std::wstring m_pathName;
 	std::wstring m_arguments;

@@ -16,6 +16,7 @@
 #include <boost/filesystem.hpp>
 #include "Utilities.h"
 #include "CategoryDlg.h"
+#include "SelectDevEnvDlg.h"
 #include "BoostHelpDlg.h"
 #include "GoogleHelpDlg.h"
 #include "NUnitHelpDlg.h"
@@ -103,7 +104,7 @@ CMainFrame::CMainFrame(const std::wstring& fileName, const std::wstring& argumen
 	m_randomize(false),
 	m_repeat(false),
 	m_debugger(false),
-	m_devEnv([](...) { return 0; })
+	m_devEnv([this](const std::vector<std::wstring>& names, int indexHint) { return SelectDevEnv(names, indexHint); })
 {
 }
 
@@ -975,6 +976,15 @@ void CMainFrame::EndTestCase(unsigned id, unsigned long /*elapsed*/, TestCaseSta
 	m_progressBar.OffsetPos(1);
 	UpdateStatusBar();
 	UpdateProgressBar();
+}
+
+int CMainFrame::SelectDevEnv(const std::vector<std::wstring>& names, int indexHint)
+{
+	SelectDevEnvDlg dlg(names, indexHint);
+	if (dlg.DoModal() != IDOK)
+		return indexHint;
+
+	return dlg.GetIndex();
 }
 
 void CMainFrame::test_suite_finish(unsigned id, unsigned long /*elapsed*/)
