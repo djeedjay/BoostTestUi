@@ -117,7 +117,7 @@ private:
 } // namespace boost
 
 #define BOOST_AUTO_TEST_CASE_ENABLE(name, enable) \
-	BOOST_AUTO_TEST_CASE(name, *Enable(enable))
+	BOOST_AUTO_TEST_CASE(name, *::boost::unit_test::Enable(enable))
 
 #ifndef BOOST_TEST_NO_GUI_INIT
 
@@ -129,6 +129,13 @@ boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
 		{
 			static boost::unit_test::gui::gui_observer observer;
 			boost::unit_test::framework::register_observer(observer);
+
+			while (i < argc)
+			{
+				argv[i] = argv[i + 1];
+				++i;
+			}
+			--argc;
 			break;
 		}
 	}
