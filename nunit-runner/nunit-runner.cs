@@ -1198,20 +1198,27 @@ namespace TestRunner
 
 		static void Main(string[] args)
 		{
-			var libs = ReadOptions(args);
-			foreach (string lib in libs)
+			try
 			{
-				var filename = System.IO.Path.GetFullPath(lib);
-				using (AssemblyResolver resolver = new AssemblyResolver(System.IO.Path.GetDirectoryName(filename)))
+				var libs = ReadOptions(args);
+				foreach (string lib in libs)
 				{
-					TestLib testLib = new TestLib(filename, randomize);
-					if (list)
-						testLib.List();
-					if (wait)
-						Wait();
-					if (run)
-						testLib.Run(filter, new TestReporter(logLevel));
+					var filename = System.IO.Path.GetFullPath(lib);
+					using (AssemblyResolver resolver = new AssemblyResolver(System.IO.Path.GetDirectoryName(filename)))
+					{
+						TestLib testLib = new TestLib(filename, randomize);
+						if (list)
+							testLib.List();
+						if (wait)
+							Wait();
+						if (run)
+							testLib.Run(filter, new TestReporter(logLevel));
+					}
 				}
+			}
+			catch (System.Exception ex)
+			{
+				System.Console.Error.WriteLine("Error: " + ex);
 			}
 		}
 	}
