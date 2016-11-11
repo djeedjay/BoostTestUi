@@ -14,7 +14,7 @@
 
 namespace gj {
 
-std::string chomp(std::string s)
+std::string Chomp(std::string s)
 {
 	size_t n = s.size();
 	while (n > 0 && s[n - 1] < ' ')
@@ -23,13 +23,18 @@ std::string chomp(std::string s)
 	return s;
 }
 
-std::wstring chomp(std::wstring s)
+std::wstring Chomp(std::wstring s)
 {
 	size_t n = s.size();
 	while (n > 0 && s[n - 1] < L' ')
 		--n;
 	s.resize(n);
 	return s;
+}
+
+std::string Quote(const std::string& s)
+{
+	return "\"" + s + "\"";
 }
 
 std::wstring LoadString(int id)

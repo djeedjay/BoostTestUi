@@ -16,7 +16,6 @@
 #include "CatchTest.h"
 #include "GoogleTest.h"
 #include "NUnitTest.h"
-#include "BoostHelpDlg.h"
 #include "ExeRunner.h"
 
 namespace gj {
@@ -95,6 +94,8 @@ std::unique_ptr<ArgumentBuilder> CreateArgumentBuilder(const std::wstring& fileN
 
 	if (type == "boost/noheader")
 		throw NoHeaderError("Did you forget to #include <boost/test/unit_test_gui.hpp>?", UnitTestType::Boost);
+	if (type == "catch/noheader")
+		throw NoHeaderError("Did you forget to #include <catch-gui.hpp>?", UnitTestType::Catch);
 	if (type == "google/noheader")
 		throw NoHeaderError("Did you forget to #include <gtest/gtest-gui.h>?", UnitTestType::Google);
 
@@ -375,7 +376,7 @@ void ExeRunner::RunTestIteration()
 	std::string line;
 	while (std::getline(hs, line))
 	{
-		m_pArgBuilder->FilterMessage(chomp(line));
+		m_pArgBuilder->FilterMessage(Chomp(line));
 	}
 }
 

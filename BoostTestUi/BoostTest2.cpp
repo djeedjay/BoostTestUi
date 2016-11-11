@@ -143,7 +143,7 @@ void LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pObserver
 	std::string line;
 	while (std::getline(is, line))
 	{
-		line = chomp(line);
+		line = Chomp(line);
 		std::smatch sm;
 
 		if (line == "{")

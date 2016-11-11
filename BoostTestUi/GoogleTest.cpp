@@ -108,7 +108,7 @@ void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const 
 	std::string line;
 	while (std::getline(is, line))
 	{
-		line = chomp(line);
+		line = Chomp(line);
 		std::smatch sm;
 		if (!std::regex_search(line, sm, re))
 			continue;

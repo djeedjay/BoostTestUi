@@ -16,10 +16,7 @@
 #include <boost/filesystem.hpp>
 #include "Utilities.h"
 #include "CategoryDlg.h"
-#include "BoostHelpDlg.h"
-#include "CatchHelpDlg.h"
-#include "GoogleHelpDlg.h"
-#include "NUnitHelpDlg.h"
+#include "SampleCodeDlg.h"
 #include "AboutDlg.h"
 #include "ArgumentsDlg.h"
 #include "ExeRunner.h"
@@ -1144,28 +1141,28 @@ void LoadRichEditLibrary()
 void CMainFrame::OnHelpBoost(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	LoadRichEditLibrary();
-	CBoostHelpDlg dlg;
+	SampleCodeDlg dlg(IDD_BOOSTHELP, IDR_BOOSTTESTSAMPLE_RTF);
 	dlg.DoModal();
 }
 
 void CMainFrame::OnHelpCatch(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	LoadRichEditLibrary();
-	CCatchHelpDlg dlg;
+	SampleCodeDlg dlg(IDD_CATCHHELP, IDR_CATCHTESTSAMPLE_RTF);
 	dlg.DoModal();
 }
 
 void CMainFrame::OnHelpGoogle(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	LoadRichEditLibrary();
-	CGoogleHelpDlg dlg;
+	SampleCodeDlg dlg(IDD_GOOGLEHELP, IDR_GOOGLETESTSAMPLE_RTF);
 	dlg.DoModal();
 }
 
 void CMainFrame::OnHelpNUnit(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	LoadRichEditLibrary();
-	CNUnitHelpDlg dlg;
+	SampleCodeDlg dlg(IDD_NUNITHELP, IDR_NUNITSAMPLE_RTF);
 	dlg.DoModal();
 }
 

@@ -60,12 +60,6 @@
     <ClCompile Include="GetUnitTestType.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BoostHelpDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GoogleHelpDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="NUnitTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -81,16 +75,13 @@
     <ClCompile Include="FindDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NUnitHelpDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="BoostTest2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CatchTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CatchHelpDlg.cpp">
+    <ClCompile Include="SampleCodeDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -155,12 +146,6 @@
     <ClInclude Include="version.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="BoostHelpDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GoogleHelpDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="NUnitTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -185,16 +170,10 @@
     <ClInclude Include="CatchTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CatchHelpDlg.h">
+    <ClInclude Include="SampleCodeDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="boost\test\unit_test_gui.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gtest\gtest-gui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="catch\catch-gui.hpp">
+    <ClInclude Include="..\include\catch\catch-gui.hpp">
       <Filter>Header Files\include</Filter>
     </ClInclude>
   </ItemGroup>

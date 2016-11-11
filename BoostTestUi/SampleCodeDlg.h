@@ -5,8 +5,8 @@
 
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
 
-#ifndef BOOST_TESTUI_BOOSTHELPDLG_H
-#define BOOST_TESTUI_BOOSTHELPDLG_H
+#ifndef BOOST_TESTUI_SAMPLECODEDLG_H
+#define BOOST_TESTUI_SAMPLECODEDLG_H
 
 #pragma once
 
@@ -14,23 +14,25 @@
 
 namespace gj {
 
-class CBoostHelpDlg :
-	public CDialogImpl<CBoostHelpDlg>,
-	public CDialogResize<CBoostHelpDlg>
+class SampleCodeDlg :
+	public CDialogImpl<SampleCodeDlg>,
+	public CDialogResize<SampleCodeDlg>
 {
 public:
-	static const int IDD = IDD_BOOSTHELP;
+	const int IDD;
 
-	BEGIN_MSG_MAP(CBoostHelpDlg)
+	SampleCodeDlg(int dlgId, int rtfId);
+
+	BEGIN_MSG_MAP(SampleCodeDlg)
 		MSG_WM_INITDIALOG(OnInitDialog)
 		MSG_WM_CONTEXTMENU(OnContextMenu);
 		COMMAND_ID_HANDLER_EX(ID_SAMPLE_COPY, OnCopy)
 		COMMAND_ID_HANDLER_EX(IDOK, OnCloseCmd)
 		COMMAND_ID_HANDLER_EX(IDCANCEL, OnCloseCmd)
-		CHAIN_MSG_MAP(CDialogResize<CBoostHelpDlg>)
+		CHAIN_MSG_MAP(CDialogResize<SampleCodeDlg>)
 	END_MSG_MAP()
 
-	BEGIN_DLGRESIZE_MAP(CBoostHelpDlg)
+	BEGIN_DLGRESIZE_MAP(SampleCodeDlg)
 		DLGRESIZE_CONTROL(IDC_DESCRIPTION, DLSZ_SIZE_X)
 		DLGRESIZE_CONTROL(IDC_SAMPLE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
 		DLGRESIZE_CONTROL(IDC_SEEALSO, DLSZ_MOVE_Y)
@@ -44,10 +46,11 @@ private:
 	void OnCopy(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/);
 	void OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/);
 
+	int m_rtfId;
 	CRichEditCtrl m_sample;
 	CHyperLink m_link;
 };
 
 } // namespace gj
 
-#endif // BOOST_TESTUI_BOOSTHELPDLG_H
+#endif // BOOST_TESTUI_SAMPLECODEDLG_H

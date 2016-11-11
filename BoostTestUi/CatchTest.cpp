@@ -65,8 +65,11 @@ private:
 	void AddTestCase(const std::string& name)
 	{
 		if (!m_arg.empty())
-			m_arg += ':';
-		m_arg += m_pTestSuite->name + "." + name;
+			m_arg += ' ';
+		if (name.find(' ') == name.npos)
+			m_arg += name;
+		else
+			m_arg += Quote(name);
 	}
 
 	const TestSuite* m_pTestSuite;
@@ -106,7 +109,7 @@ void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const 
 	std::string line;
 	while (std::getline(is, line))
 	{
-		line = chomp(line);
+		line = Chomp(line);
 		node.children.push_back(TestCase(GetId(line), line));
 	}
 }
@@ -119,7 +122,7 @@ unsigned ArgumentBuilder::GetEnabledOptions(unsigned /*options*/) const
 std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int /*logLevel*/, unsigned& options)
 {
 	std::wostringstream args;
-	args << L"--use-colour no";
+	args << L"-r teamcity";
 
 	if (options & ExeRunner::Randomize)
 		args << L" --order rand";
@@ -130,7 +133,7 @@ std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int /*logLevel*/, un
 	GetEnableArg getArg;
 	runner.TraverseTestTree(getArg);
 	if (!getArg.AllCases())
-		args << L" --gtest_filter=" << MultiByteToWideChar(getArg.GetArg());
+		args << L" " << MultiByteToWideChar(getArg.GetArg());
 
 	return args.str();
 }
