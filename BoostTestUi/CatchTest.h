@@ -32,6 +32,7 @@ public:
 
 private:
 	unsigned GetId(const std::string& name);
+	void HandleClientNotification(const std::string& line);
 
 	std::wstring m_fileName;
 	ExeRunner* m_pRunner;

@@ -122,7 +122,7 @@ unsigned ArgumentBuilder::GetEnabledOptions(unsigned /*options*/) const
 std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int /*logLevel*/, unsigned& options)
 {
 	std::wostringstream args;
-	args << L"-r teamcity";
+	args << L"-r boosttestui";
 
 	if (options & ExeRunner::Randomize)
 		args << L" --order rand";
@@ -159,60 +159,83 @@ unsigned ArgumentBuilder::GetId(const std::string& name)
 	return id;
 }
 
-void ArgumentBuilder::FilterMessage(const std::string& msg)
+template <typename T>
+T GetArg(std::istream& is)
 {
-	static const std::regex reWaiting("^#waiting");
-	static const std::regex reStart("^\\[==========\\] Running (\\d+) tests? from \\d+ test cases?.");
-	static const std::regex reTest("^\\[----------\\] \\d+ tests? from ([\\w_/]+)( \\((\\d+) ms total\\))?");
-	static const std::regex reBegin("^\\[ RUN      \\] ([\\w\\._/]+)");
-	static const std::regex reError("\\(\\d+\\): error: ");
-//	static const std::regex reEnd("^\\[(       OK )|(  FAILED  )\\] ([\\w\\._/]+) \\((\\d+) ms\\)"); // VC regex bug??
-	static const std::regex reEnd("^\\[(       OK |  FAILED  )\\] ([\\w\\._/]+).*\\((\\d+) ms\\)");
-	static const std::regex reFinish("^\\[==========\\] \\d+ tests? from \\d+ test cases? ran. \\((\\d+) ms total\\)");
-	static const std::regex reAssertion("Assertion failed:");
+	T value = T();
+	is >> value;
+	return value;
+}
 
-	Severity::type severity = Severity::Info;
-	std::smatch sm;
-	if (std::regex_search(msg, sm, reWaiting))
-		return m_pRunner->OnWaiting();
-	else if (std::regex_search(msg, sm, reStart))
+std::string GetArg(std::istream& is)
+{
+	while (std::isspace(is.peek()))
+		is.get();
+	std::string value;
+	std::getline(is, value);
+	return value;
+}
+
+void ArgumentBuilder::HandleClientNotification(const std::string& line)
+{
+	std::istringstream ss(line);
+	char c;
+	std::string command;
+	ss >> c >> command;
+
+	if (command == "RunStarted")
 	{
-		m_pRunner->OnTestIterationStart(get_arg<unsigned>(sm[1]));
+		m_pRunner->OnTestIterationStart(GetArg<unsigned>(ss));
 		m_pRunner->OnTestSuiteStart(m_rootId);
 	}
-	else if (std::regex_search(msg, sm, reTest) && !sm[2].matched)
+	else if (command == "RunFinished")
 	{
-		m_pRunner->OnTestSuiteStart(GetId(sm[1]));
-	}
-	else if (std::regex_search(msg, sm, reBegin))
-	{
-		m_pRunner->OnTestCaseStart(GetId(sm[1]));
-	}
-	else if (std::regex_search(msg, reError))
-	{
-		severity = Severity::Error;
-		m_pRunner->OnTestAssertion(false);
-	}
-	else if (std::regex_search(msg, reAssertion))
-	{
-		severity = Severity::Assertion;
-	}
-
-	m_pObserver->test_message(severity, msg);
-
-	if (std::regex_search(msg, sm, reEnd))
-	{
-		m_pRunner->OnTestCaseFinish(GetId(sm[2]), get_arg<unsigned>(sm[3]));
-	}
-	else if (std::regex_search(msg, sm, reTest) && sm[2].matched)
-	{
-		m_pRunner->OnTestSuiteFinish(GetId(sm[1]), get_arg<unsigned>(sm[3]));
-	}
-	else if (std::regex_search(msg, sm, reFinish))
-	{
-		m_pRunner->OnTestSuiteFinish(m_rootId, get_arg<unsigned>(sm[1]));
+		m_pRunner->OnTestSuiteFinish(m_rootId, 0);
 		m_pRunner->OnTestIterationFinish();
 	}
+	else if (command == "TestIgnored")
+		m_pRunner->OnTestUnitSkipped(GetId(GetArg(ss)));
+	else if (command == "TestStarted")
+		m_pRunner->OnTestCaseStart(GetId(GetArg(ss)));
+	else if (command == "SuiteStarted")
+		m_pRunner->OnTestSuiteStart(GetId(GetArg(ss)));
+	else if (command == "Assertion")
+		m_pRunner->OnTestAssertion(false);
+	else if (command == "TestFinished")
+	{
+		auto state = GetArg<bool>(ss) ? TestCaseState::Success : TestCaseState::Failed;
+		auto id = GetId(GetArg(ss));
+		m_pRunner->OnTestCaseFinish(id, 0, state);
+	}
+	else if (command == "SuiteFinished")
+	{
+		m_pRunner->OnTestSuiteFinish(GetId(GetArg(ss)), 0);
+	}
+	else if (command == "Waiting")
+	{
+		m_pRunner->OnWaiting();
+	}
+	else
+	{
+		m_pObserver->test_message(Severity::Info, line);
+	}
+}
+
+void ArgumentBuilder::FilterMessage(const std::string& msg)
+{
+	if (msg[0] == '#')
+		return HandleClientNotification(msg);
+
+//	static const std::regex reError(": Error$");
+//	std::smatch sm;
+//	if (std::regex_search(msg, sm, reError))
+//		severity = Severity::Error;
+
+//	static const std::regex reFailure(": Failure$");
+//	if (std::regex_search(msg, sm, reFailure))
+//		severity = Severity::Fatal;
+
+	m_pObserver->test_message(Severity::Info, msg);
 }
 
 } // namespace CatchTest
