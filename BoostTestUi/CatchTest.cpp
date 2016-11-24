@@ -15,6 +15,17 @@
 namespace gj {
 namespace CatchTest {
 
+const wchar_t* GetLogLevelArg(int logLevel)
+{
+	switch (logLevel)
+	{
+	case 0: return L"minimal";
+	case 1: return L"medium";
+	case 2:
+	default: return L"all";
+	}
+}
+
 class GetEnableArg : public TestTreeVisitor
 {
 public:
@@ -119,10 +130,14 @@ unsigned ArgumentBuilder::GetEnabledOptions(unsigned /*options*/) const
 	return ExeRunner::Randomize | ExeRunner::WaitForDebugger;
 }
 
-std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int /*logLevel*/, unsigned& options)
+std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsigned& options)
 {
 	std::wostringstream args;
+
 	args << L"-r boosttestui";
+
+	if (logLevel > 1)
+		args << " --success";
 
 	if (options & ExeRunner::Randomize)
 		args << L" --order rand";
@@ -200,7 +215,7 @@ void ArgumentBuilder::HandleClientNotification(const std::string& line)
 	else if (command == "SuiteStarted")
 		m_pRunner->OnTestSuiteStart(GetId(GetArg(ss)));
 	else if (command == "Assertion")
-		m_pRunner->OnTestAssertion(false);
+		m_pRunner->OnTestAssertion(GetArg<bool>(ss));
 	else if (command == "TestFinished")
 	{
 		auto state = GetArg<bool>(ss) ? TestCaseState::Success : TestCaseState::Failed;

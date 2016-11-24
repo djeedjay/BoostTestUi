@@ -28,3 +28,49 @@ TEST_CASE("Test2")
 
 	std::cout << "Test2 leave\n";
 }
+
+TEST_CASE("TestSections")
+{
+	std::vector<int> v;
+
+	REQUIRE(v.empty());
+
+	SECTION("Section 1")
+	{
+		v.push_back(1);
+		REQUIRE(v.size() == 1);
+
+		SECTION("Section 1.1")
+		{
+			v.push_back(2);
+			REQUIRE(v.size() == 2);
+		}
+	}
+
+	SECTION("Section 2")
+	{
+		v.emplace_back(2);
+		REQUIRE(v.size() == 1);
+	}
+}
+
+struct Fixture
+{
+	Fixture() :
+		value(0)
+	{
+	}
+
+	int value;
+};
+
+TEST_CASE_METHOD(Fixture, "Fixture Test Method 1")
+{
+	REQUIRE(value == 0);
+}
+
+TEST_CASE_METHOD(Fixture, "Fixture Test Method 2")
+{
+	++value;
+	REQUIRE(value == 1);
+}
