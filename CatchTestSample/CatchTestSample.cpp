@@ -8,7 +8,7 @@ unsigned int Factorial(unsigned int number)
     return number <= 1 ? number : Factorial(number-1)*number;
 }
 
-TEST_CASE("Factorials are computed", "[factorial]")
+TEST_CASE("Factorials are computed", "[factorial][tag1][tag2]")
 {
 	std::cout << "Factorial test enter\n";
 
@@ -20,7 +20,7 @@ TEST_CASE("Factorials are computed", "[factorial]")
 	std::cout << "Factorial test leave\n";
 }
 
-TEST_CASE("Test2")
+TEST_CASE("Test2", "[!shouldfail]")
 {
 	std::cout << "Test2 enter\n";
 
@@ -69,7 +69,7 @@ TEST_CASE_METHOD(Fixture, "Fixture Test Method 1")
 	REQUIRE(value == 0);
 }
 
-TEST_CASE_METHOD(Fixture, "Fixture Test Method 2")
+TEST_CASE_METHOD(Fixture, "Fixture Test Method 2", "[!hide]")
 {
 	++value;
 	REQUIRE(value == 1);

@@ -76,7 +76,7 @@ private:
 	void AddTestCase(const std::string& name)
 	{
 		if (!m_arg.empty())
-			m_arg += ' ';
+			m_arg += ',';
 		if (name.find(' ') == name.npos)
 			m_arg += name;
 		else
@@ -104,7 +104,7 @@ std::wstring ArgumentBuilder::GetExePathName()
 
 std::wstring ArgumentBuilder::GetListArg()
 {
-	return L"--list-test-names-only";
+	return L"--list-tests";
 }
 
 std::string FullName(const std::string& testCaseName, const std::string& testName)
@@ -121,7 +121,37 @@ void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const 
 	while (std::getline(is, line))
 	{
 		line = Chomp(line);
-		node.children.push_back(TestCase(GetId(line), line));
+		auto b = line.c_str();
+		auto p = b;
+		while (*p && std::isspace(*p))
+			++p;
+		if (p == b || *p == '\0')
+			continue;
+
+		if (!node.children.empty() && *p == '[')
+		{
+			b = nullptr;
+			while (*p)
+			{
+				if (*p == '[')
+					b = p + 1;
+				else if (b && *p == ']' && p != b)
+				{
+					std::string tag(b, p);
+					if (tag == "." || tag == "hide")
+						node.children.back().data.enabled = false;
+					else if (std::isalnum(tag[0]))
+						node.children.back().data.categories.push_back(tag);
+					b = nullptr;
+				}
+				++p;
+			}
+		}
+		else
+		{
+			std::string name(p);
+			node.children.push_back(TestCase(GetId(name), name));
+		}
 	}
 }
 
