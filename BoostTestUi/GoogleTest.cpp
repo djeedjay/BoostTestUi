@@ -213,7 +213,7 @@ void ArgumentBuilder::FilterMessage(const std::string& msg)
 
 	if (std::regex_search(msg, sm, reEnd))
 	{
-		m_pRunner->OnTestCaseFinish(GetId(sm[2]), get_arg<unsigned>(sm[3]));
+		m_pRunner->OnTestCaseFinish(GetId(sm[2]), get_arg<unsigned>(sm[3]), sm[1].str().find("OK") != std::string::npos ? TestCaseState::Success : TestCaseState::Failed);
 	}
 	else if (std::regex_search(msg, sm, reTest) && sm[2].matched)
 	{
