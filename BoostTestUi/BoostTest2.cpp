@@ -163,6 +163,10 @@ void LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pObserver
 			auto enable = color == "green";
 			node.children.push_back(TestUnit(id, type, label, enable));
 		}
+		else
+		{
+			pObserver->test_message(Severity::Info, line);
+		}
 	}
 }
 
