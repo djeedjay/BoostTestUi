@@ -17,9 +17,7 @@
 #include "Utilities.h"
 #include "CategoryDlg.h"
 #include "SelectDevEnvDlg.h"
-#include "BoostHelpDlg.h"
-#include "GoogleHelpDlg.h"
-#include "NUnitHelpDlg.h"
+#include "SampleCodeDlg.h"
 #include "AboutDlg.h"
 #include "ArgumentsDlg.h"
 #include "ExeRunner.h"
@@ -61,6 +59,7 @@ BEGIN_MSG_MAP2(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_FILE_SAVE_AS, OnFileSaveAs)
 	COMMAND_ID_HANDLER_EX(ID_FILE_AUTO_RUN, OnFileAutoRun)
 	COMMAND_ID_HANDLER_EX(ID_FILE_CREATE_BOOST_HPP, OnFileCreateBoostHpp)
+	COMMAND_ID_HANDLER_EX(ID_FILE_CREATE_CATCH_HPP, OnFileCreateCatchHpp)
 	COMMAND_ID_HANDLER_EX(ID_FILE_CREATE_GOOGLE_HPP, OnFileCreateGoogleHpp)
 	COMMAND_ID_HANDLER_EX(ID_LOG_AUTO_CLEAR, OnLogAutoClear)
 	COMMAND_ID_HANDLER_EX(ID_RESET_SELECTION, OnResetSelection)
@@ -76,6 +75,7 @@ BEGIN_MSG_MAP2(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_TEST_ABORT, OnTestAbort)
 	COMMAND_ID_HANDLER_EX(ID_TEST_CATEGORIES, OnTestCategories)
 	COMMAND_ID_HANDLER_EX(ID_HELP_BOOST, OnHelpBoost)
+	COMMAND_ID_HANDLER_EX(ID_HELP_CATCH, OnHelpCatch)
 	COMMAND_ID_HANDLER_EX(ID_HELP_GOOGLE, OnHelpGoogle)
 	COMMAND_ID_HANDLER_EX(ID_HELP_NUNIT, OnHelpNUnit)
 	COMMAND_ID_HANDLER_EX(ID_APP_ABOUT, OnAppAbout)
@@ -639,6 +639,7 @@ void CMainFrame::OnHelp(LPHELPINFO /*lpHelpInfo*/)
 	switch (m_helpType)
 	{
 	case UnitTestType::Boost: return OnHelpBoost(0, 0, *this);
+	case UnitTestType::Catch: return OnHelpCatch(0, 0, *this);
 	case UnitTestType::Google: return OnHelpGoogle(0, 0, *this); 
 	case UnitTestType::NUnit: return OnHelpNUnit(0, 0, *this); 
 	}
@@ -778,6 +779,18 @@ void CMainFrame::OnFileCreateBoostHpp(UINT /*uNotifyCode*/, int /*nID*/, CWindow
 
 	ScopedCursor cursor(::LoadCursor(nullptr, IDC_WAIT));
 	CreateHpp(IDR_UNIT_TEST_GUI_HPP, dlg.m_szFileName);
+}
+
+void CMainFrame::OnFileCreateCatchHpp(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
+{
+	CFileDialog dlg(FALSE, L".hpp", L"catch-gui.hpp", OFN_OVERWRITEPROMPT, L"C++ Header Files (*.hpp)\0*.hpp\0All Files\0*.*\0\0", 0);
+	dlg.m_ofn.nFilterIndex = 0;
+	dlg.m_ofn.lpstrTitle = L"Create catch-gui.hpp";
+	if (dlg.DoModal() != IDOK)
+		return;
+
+	ScopedCursor cursor(::LoadCursor(nullptr, IDC_WAIT));
+	CreateHpp(IDR_CATCH_GUI_HPP, dlg.m_szFileName);
 }
 
 void CMainFrame::OnFileCreateGoogleHpp(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
@@ -1139,21 +1152,28 @@ void LoadRichEditLibrary()
 void CMainFrame::OnHelpBoost(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	LoadRichEditLibrary();
-	CBoostHelpDlg dlg;
+	SampleCodeDlg dlg(IDD_BOOSTHELP, IDR_BOOSTTESTSAMPLE_RTF);
+	dlg.DoModal();
+}
+
+void CMainFrame::OnHelpCatch(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
+{
+	LoadRichEditLibrary();
+	SampleCodeDlg dlg(IDD_CATCHHELP, IDR_CATCHTESTSAMPLE_RTF);
 	dlg.DoModal();
 }
 
 void CMainFrame::OnHelpGoogle(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	LoadRichEditLibrary();
-	CGoogleHelpDlg dlg;
+	SampleCodeDlg dlg(IDD_GOOGLEHELP, IDR_GOOGLETESTSAMPLE_RTF);
 	dlg.DoModal();
 }
 
 void CMainFrame::OnHelpNUnit(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	LoadRichEditLibrary();
-	CNUnitHelpDlg dlg;
+	SampleCodeDlg dlg(IDD_NUNITHELP, IDR_NUNITSAMPLE_RTF);
 	dlg.DoModal();
 }
 

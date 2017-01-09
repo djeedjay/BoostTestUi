@@ -92,6 +92,7 @@ BEGIN
         POPUP "Create Header"
         BEGIN
             MENUITEM "Boost Test...",               ID_FILE_CREATE_BOOST_HPP
+            MENUITEM "Catch Test...",               ID_FILE_CREATE_CATCH_HPP
             MENUITEM "Google Test...",              ID_FILE_CREATE_GOOGLE_HPP
         END
         MENUITEM SEPARATOR
@@ -127,6 +128,7 @@ BEGIN
     POPUP "&Help"
     BEGIN
         MENUITEM "Using Boost Test...",         ID_HELP_BOOST
+        MENUITEM "Using Catch Test...",         ID_HELP_CATCH
         MENUITEM "Using Google Test...",        ID_HELP_GOOGLE
         MENUITEM "Using NUnit Test...",         ID_HELP_NUNIT
         MENUITEM SEPARATOR
@@ -175,6 +177,18 @@ BEGIN
     LTEXT           "http://www.boost.org/libs/test",IDC_URL,37,185,97,8
 END
 
+IDD_CATCHHELP DIALOGEX 0, 0, 245, 177
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "How To Create a Catch Unit Test"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,187,157,50,14
+    CONTROL         "",IDC_SAMPLE,"RichEdit20W",ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_BORDER | WS_TABSTOP,7,59,230,76
+    LTEXT           "Select File -> Create Header -> Catch Test...\r\nto create the catch-gui.hpp file somewhere in your include path.\r\n\r\nCopy the code template below into a Win32 Console Application project. Then extend the assertions and test cases.",IDC_DESCRIPTION,7,12,230,40
+    LTEXT           "See also",IDC_SEEALSO,7,139,28,8
+    LTEXT           "https://github.com/philsquared/Catch",IDC_URL,37,139,124,8
+END
+
 IDD_GOOGLEHELP DIALOGEX 0, 0, 243, 242
 STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "How To Create a Google Unit Test"
@@ -193,7 +207,7 @@ CAPTION "How To Create an NUnit Unit Test"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,186,202,50,14
-    CONTROL         "",IDC_SAMPLE,"RichEdit20W",ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_BORDER | WS_TABSTOP,7,36,229,148
+    CONTROL         "",IDC_SAMPLE,"RichEdit20W",WS_BORDER | WS_TABSTOP | 0x884,7,36,229,148
     LTEXT           "Copy the code template below into a C# Class Libary project. Then extend the assertions, tests and test fixture.",IDC_DESCRIPTION,7,12,229,21
     LTEXT           "See also",IDC_SEEALSO,7,186,28,8
     LTEXT           "http://www.nunit.org/",IDC_URL,37,186,123,8
@@ -261,12 +275,24 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
+    IDD_FIND, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 310
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 40
+    END
+
     IDD_BOOSTHELP, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 237
         TOPMARGIN, 7
         BOTTOMMARGIN, 216
+    END
+
+    IDD_CATCHHELP, DIALOG
+    BEGIN
     END
 
     IDD_GOOGLEHELP, DIALOG
@@ -406,13 +432,23 @@ END
 
 STRINGTABLE
 BEGIN
+    ID_TEST_ABORT           "Abort the running unit test\nAbort"
+    ID_LOG_SELECTALL        "Select all log lines\nSelect All"
+    ID_LOG_COPY             "Copy selected log lines to the clipboard\nCopy"
+    ID_LOG_CLEAR            "Clear log display\nClear Log"
     ID_TEST_RANDOMIZE       "Run the selected test cases in random order\nRandomize"
     ID_TEST_DEBUGGER        "Provide a prompt to attach the debugger when the test is run\nWait for Debugger"
+END
+
+STRINGTABLE
+BEGIN
     ID_LOG_AUTO_CLEAR       "Clear log at each test run\nAuto Clear"
     ID_LOG_AUTOCLEARLOG     "Clear log on "
     ID_FILE_AUTO_RUN        "Run selected test cases on Load\nAuto Run"
     ID_FILE_CREATE_BOOST_HPP 
                             "Create unit_test_gui.hpp for building boost unit tests\nCreate unit_test_gui.hpp"
+    ID_FILE_CREATE_CATCH_HPP 
+                            "Create catch-gui.hpp for building catch unit tests\nCreate catch-gui.hpp"
     ID_FILE_CREATE_GOOGLE_HPP 
                             "Create gtest-gui.h for building google unit tests\nCreate gtest-gui.hpp"
     ID_LOGLEVEL             "Select test log detail\nLog Level"
@@ -421,19 +457,13 @@ BEGIN
     ID_TREE_RUN_ALL         "Run all unit tests\nRun All"
     ID_TREE_CHECK_ALL       "Check all tests\nCheck All"
     ID_TREE_UNCHECK_ALL     "Uncheck all tests\nUncheck All"
+END
+
+STRINGTABLE
+BEGIN
     ID_TREE_CHECK_FAILED    "Check only failed tests\nCheck Failed"
-	ID_TREE_COPY_NAME       "Copy full name of the selected test to the clipboard\nCopy Name"
-	ID_TREE_COPY_COMMAND    "Copy command to run the selected test to the clipboard\nCopy Command"
-END
-
-STRINGTABLE
-BEGIN
-    ID_TEST_RUNNERARGS      "Set testrunner command line arguments\nTestRunner Arguments"
-    ID_LOG_FIND             "Find log text\nFind"
-END
-
-STRINGTABLE
-BEGIN
+    ID_TREE_COPY_NAME       "Copy full name of the selected test to the clipboard\nCopy Name"
+    ID_TREE_COPY_COMMAND    "Copy command to run the selected test to the clipboard\nCopy Command"
     ID_TEST_REPEAT          "Repeat the selected test cases until a failure occurs\nRepeat"
     ID_HELP_BOOST           "Display how to build a boost unit test\nBoost Unit Test"
     ID_HELP_GOOGLE          "Display how to build a google unit test\nGoogle Unit Test"
@@ -445,10 +475,8 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_TEST_ABORT           "Abort the running unit test\nAbort"
-    ID_LOG_SELECTALL        "Select all log lines\nSelect All"
-    ID_LOG_COPY             "Copy selected log lines to the clipboard\nCopy"
-    ID_LOG_CLEAR            "Clear log display\nClear Log"
+    ID_TEST_RUNNERARGS      "Set testrunner command line arguments\nTestRunner Arguments"
+    ID_LOG_FIND             "Find log text\nFind"
 END
 
 STRINGTABLE
@@ -550,11 +578,13 @@ END
 // RCDATA
 //
 
-IDR_UNIT_TEST_GUI_HPP   RCDATA                  "boost/test/unit_test_gui.hpp"
-IDR_GTEST_GUI_H         RCDATA                  "gtest/gtest-gui.h"
-IDR_BOOSTTESTSAMPLE_RTF RCDATA                  "BoostTestSample.rtf"
+IDR_UNIT_TEST_GUI_HPP    RCDATA                  "boost/test/unit_test_gui.hpp"
+IDR_CATCH_GUI_HPP        RCDATA                  "catch/catch-gui.hpp"
+IDR_GTEST_GUI_H          RCDATA                  "gtest/gtest-gui.h"
+IDR_BOOSTTESTSAMPLE_RTF  RCDATA                  "BoostTestSample.rtf"
+IDR_CATCHTESTSAMPLE_RTF  RCDATA                  "CatchTestSample.rtf"
 IDR_GOOGLETESTSAMPLE_RTF RCDATA                  "GoogleTestSample.rtf"
-IDR_NUNITSAMPLE_RTF     RCDATA                  "NUnitSample.rtf"
+IDR_NUNITSAMPLE_RTF      RCDATA                  "NUnitSample.rtf"
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 

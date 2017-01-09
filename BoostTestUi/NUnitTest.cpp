@@ -186,7 +186,7 @@ std::wstring ArgumentBuilder::GetExePathName()
 
 std::wstring ArgumentBuilder::GetListArg()
 {
-	return L"/list " + m_fileName;
+	return L"/list \"" + m_fileName + L"\"";
 }
 
 template <typename T>
@@ -267,7 +267,7 @@ std::string LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pO
 	std::getline(is, line);
 	while (is)
 	{
-		line = chomp(line);
+		line = Chomp(line);
 		std::smatch sm;
 		if (!std::regex_match(line, sm, re))
 		{
@@ -320,7 +320,7 @@ std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsign
 	args << L" /run";
 	if (!getArg.AllCases())
 		args << L":" << getArg.GetArg();
-	args << L" " << m_fileName;
+	args << L" \"" << m_fileName + L"\"";
 	return args.str();
 }
 

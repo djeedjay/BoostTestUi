@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="Boost Test Runner 1.0" Language="1033" Version="1.0.0.0" Manufacturer="Boost" UpgradeCode="b25897f6-501e-491a-9a2f-2f815d19b007">
+	<Product Id="*" Name="Boost Test Runner 1.0" Language="1033" Version="1.1.0.0" Manufacturer="Boost" UpgradeCode="b25897f6-501e-491a-9a2f-2f815d19b007">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
@@ -28,7 +28,7 @@
         <Directory Id="ProgramMenuDir" Name="Boost Test Runner">
           <Component Id="ProgramMenuDir" Guid="E58963B9-1682-47F8-8B01-F33FB3F78FBF">
             <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
-            <RegistryValue Root='HKCU' Key='Software/[Manufacturer]/[ProductName]' Type='string' Value='' KeyPath='yes' />
+            <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName]' Type='string' Value='' KeyPath='yes' />
           </Component>
         </Directory>
       </Directory>
@@ -41,7 +41,7 @@
       <ComponentRef Id='ProgramMenuDir' />
     </Feature>
 
-    <Icon Id="BoostTestUi.exe" SourceFile="$(var.BoostTestUi.ProjectDir)/res/BoostTestUI.ico" />
+    <Icon Id="BoostTestUi.exe" SourceFile="$(var.BoostTestUi.ProjectDir)\res\BoostTestUI.ico" />
 
   </Product>
 </Wix>

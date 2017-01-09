@@ -100,7 +100,7 @@ std::string FullName(const std::string& testCaseName, const std::string& testNam
 
 void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const std::string& testName)
 {
-	static const std::regex re("([\\w\\d_/]+)(\\.)?");
+	static const std::regex re("\\s*([\\w\\d_/]+)(\\.)?");
 
 	m_rootId = GetId(testName);
 	tree.children.push_back(TestSuite(m_rootId, testName));
@@ -108,10 +108,13 @@ void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const 
 	std::string line;
 	while (std::getline(is, line))
 	{
-		line = chomp(line);
+		line = Chomp(line);
 		std::smatch sm;
-		if (!std::regex_search(line, sm, re))
+		if (!std::regex_match(line, sm, re))
+		{
+			m_pObserver->test_message(Severity::Info, line);
 			continue;
+		}
 
 		bool enabled = sm[1].str().substr(0, 9) != "DISABLED_";
 		if (sm[2].matched)
@@ -213,7 +216,7 @@ void ArgumentBuilder::FilterMessage(const std::string& msg)
 
 	if (std::regex_search(msg, sm, reEnd))
 	{
-		m_pRunner->OnTestCaseFinish(GetId(sm[2]), get_arg<unsigned>(sm[3]));
+		m_pRunner->OnTestCaseFinish(GetId(sm[2]), get_arg<unsigned>(sm[3]), sm[1].str().find("OK") != std::string::npos ? TestCaseState::Success : TestCaseState::Failed);
 	}
 	else if (std::regex_search(msg, sm, reTest) && sm[2].matched)
 	{

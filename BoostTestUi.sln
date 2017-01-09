@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GTestNoHeader", "GTestNoHea
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "BoostTestUiSetup", "BoostTestUiSetup\BoostTestUiSetup.wixproj", "{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CatchTestSample", "CatchTestSample\CatchTestSample.vcxproj", "{F63B1D72-D73D-45A4-8A22-D49B989DA99E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -183,6 +185,20 @@ Global
 		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Release|x64.ActiveCfg = Release|x86
 		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Release|x86.ActiveCfg = Release|x86
 		{6E52889E-06C1-45DC-AF99-ACCCAFB863FF}.Release|x86.Build.0 = Release|x86
+		{F63B1D72-D73D-45A4-8A22-D49B989DA99E}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{F63B1D72-D73D-45A4-8A22-D49B989DA99E}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{F63B1D72-D73D-45A4-8A22-D49B989DA99E}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{F63B1D72-D73D-45A4-8A22-D49B989DA99E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F63B1D72-D73D-45A4-8A22-D49B989DA99E}.Debug|Win32.Build.0 = Debug|Win32
+		{F63B1D72-D73D-45A4-8A22-D49B989DA99E}.Debug|x64.ActiveCfg = Debug|Win32
+		{F63B1D72-D73D-45A4-8A22-D49B989DA99E}.Debug|x86.ActiveCfg = Debug|Win32
+		{F63B1D72-D73D-45A4-8A22-D49B989DA99E}.Release|Any CPU.ActiveCfg = Release|Win32
+		{F63B1D72-D73D-45A4-8A22-D49B989DA99E}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{F63B1D72-D73D-45A4-8A22-D49B989DA99E}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{F63B1D72-D73D-45A4-8A22-D49B989DA99E}.Release|Win32.ActiveCfg = Release|Win32
+		{F63B1D72-D73D-45A4-8A22-D49B989DA99E}.Release|Win32.Build.0 = Release|Win32
+		{F63B1D72-D73D-45A4-8A22-D49B989DA99E}.Release|x64.ActiveCfg = Release|Win32
+		{F63B1D72-D73D-45A4-8A22-D49B989DA99E}.Release|x86.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

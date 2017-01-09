@@ -13,9 +13,9 @@
 #include "GetUnitTestType.h"
 #include "BoostTest.h"
 #include "BoostTest2.h"
+#include "CatchTest.h"
 #include "GoogleTest.h"
 #include "NUnitTest.h"
-#include "BoostHelpDlg.h"
 #include "ExeRunner.h"
 
 namespace gj {
@@ -83,6 +83,8 @@ std::unique_ptr<ArgumentBuilder> CreateArgumentBuilder(const std::wstring& fileN
 		return std::unique_ptr<ArgumentBuilder>(new BoostTest::ArgumentBuilder(fileName, runner, observer));
 	if (type == "boost2")
 		return std::unique_ptr<ArgumentBuilder>(new BoostTest2::ArgumentBuilder(fileName, runner, observer));
+	if (type == "catch")
+		return std::unique_ptr<ArgumentBuilder>(new CatchTest::ArgumentBuilder(fileName, runner, observer));
 	if (type == "google")
 		return std::unique_ptr<ArgumentBuilder>(new GoogleTest::ArgumentBuilder(fileName, runner, observer));
 	if (type == "nunit")
@@ -92,6 +94,8 @@ std::unique_ptr<ArgumentBuilder> CreateArgumentBuilder(const std::wstring& fileN
 
 	if (type == "boost/noheader")
 		throw NoHeaderError("Did you forget to #include <boost/test/unit_test_gui.hpp>?", UnitTestType::Boost);
+	if (type == "catch/noheader")
+		throw NoHeaderError("Did you forget to #include <catch-gui.hpp>?", UnitTestType::Catch);
 	if (type == "google/noheader")
 		throw NoHeaderError("Did you forget to #include <gtest/gtest-gui.h>?", UnitTestType::Google);
 
@@ -372,7 +376,7 @@ void ExeRunner::RunTestIteration()
 	std::string line;
 	while (std::getline(hs, line))
 	{
-		m_pArgBuilder->FilterMessage(chomp(line));
+		m_pArgBuilder->FilterMessage(Chomp(line));
 	}
 }
 

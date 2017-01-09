@@ -140,6 +140,7 @@ private:
 	void OnFileSaveAs(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnFileAutoRun(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnFileCreateBoostHpp(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnFileCreateCatchHpp(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnFileCreateGoogleHpp(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnLogAutoClear(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnResetSelection(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -155,6 +156,7 @@ private:
 	void OnTestAbort(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestCategories(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnHelpBoost(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnHelpCatch(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnHelpGoogle(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnHelpNUnit(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnAppAbout(UINT uNotifyCode, int nID, CWindow wndCtl);

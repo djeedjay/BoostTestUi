@@ -185,7 +185,7 @@ LRESULT CTreeView::OnGetInfoTip(NMHDR* pnmh)
 	return 0;
 }
 
-LRESULT CTreeView::OnClick(NMHDR* pnmh)
+LRESULT CTreeView::OnClick(NMHDR* /*pnmh*/)
 {
 	// Q261289
 	DWORD dwpos = GetMessagePos();
@@ -202,7 +202,7 @@ LRESULT CTreeView::OnClick(NMHDR* pnmh)
 	return 0;
 }
 
-LRESULT CTreeView::OnRClick(NMHDR* pnmh)
+LRESULT CTreeView::OnRClick(NMHDR* /*pnmh*/)
 {
 	// Q222905
 	SendMessage(WM_CONTEXTMENU, (WPARAM)m_hWnd, GetMessagePos());
@@ -438,7 +438,7 @@ BOOL CTreeView::SetExtendedState(HTREEITEM hItem, UINT stateEx)
 	return SetItem(&item);
 }
 
-void CTreeView::EnableItem(unsigned id, bool enable)
+void CTreeView::EnableItem(unsigned /*id*/, bool /*enable*/)
 {
 //	auto it = m_items.find(id);
 //	if (it != m_items.end())

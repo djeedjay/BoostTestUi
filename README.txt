@@ -13,6 +13,7 @@ This is a Visual Studio 2010 project with the following dependencies:
 - boost 1.43 or later
 - WTL 8.0 or later
 - gtest 1.6.0 or later (only required for the GTestSample sample unit test)
+- Catch 1.5.8 or later
 
 These libraries must be installed in Libraries. All projects should now build.
 

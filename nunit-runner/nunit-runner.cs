@@ -1122,11 +1122,18 @@ namespace TestRunner
 		{
 			switch (arg)
 			{
-				case "minimal": return LogLevel.Minimal;
-				case "medium": return LogLevel.Medium;
-				case "all":
-				default: return LogLevel.All;
+			case "minimal": return LogLevel.Minimal;
+			case "medium": return LogLevel.Medium;
+			case "all":
+			default: return LogLevel.All;
 			}
+		}
+
+		static void Help()
+		{
+			System.Console.WriteLine(
+				"nunit_runner runs NUnit processes for BoostTestUi. Use BoostTestUi to run tests."
+			);
 		}
 
 		static void HandleOption(string arg)
@@ -1139,6 +1146,10 @@ namespace TestRunner
 				arg = arg.Substring(0, i);
 			}
 
+			if (arg == "?" || arg.ToLower() == "h")
+			{
+				Help();
+			}
 			if (arg.ToLower() == "list")
 			{
 				list = true;
@@ -1165,6 +1176,10 @@ namespace TestRunner
 		static System.Collections.Generic.List<string> ReadOptions(string[] args)
 		{
 			var libs = new System.Collections.Generic.List<string>();
+			if (args.Length == 0)
+			{
+				Help();
+			}
 			foreach (string arg in args)
 			{
 				if (arg.StartsWith("/"))
@@ -1183,20 +1198,27 @@ namespace TestRunner
 
 		static void Main(string[] args)
 		{
-			var libs = ReadOptions(args);
-			foreach (string lib in libs)
+			try
 			{
-				var filename = System.IO.Path.GetFullPath(lib);
-				using (AssemblyResolver resolver = new AssemblyResolver(System.IO.Path.GetDirectoryName(filename)))
+				var libs = ReadOptions(args);
+				foreach (string lib in libs)
 				{
-					TestLib testLib = new TestLib(filename, randomize);
-					if (list)
-						testLib.List();
-					if (wait)
-						Wait();
-					if (run)
-						testLib.Run(filter, new TestReporter(logLevel));
+					var filename = System.IO.Path.GetFullPath(lib);
+					using (AssemblyResolver resolver = new AssemblyResolver(System.IO.Path.GetDirectoryName(filename)))
+					{
+						TestLib testLib = new TestLib(filename, randomize);
+						if (list)
+							testLib.List();
+						if (wait)
+							Wait();
+						if (run)
+							testLib.Run(filter, new TestReporter(logLevel));
+					}
 				}
+			}
+			catch (System.Exception ex)
+			{
+				System.Console.Error.WriteLine("Error: " + ex);
 			}
 		}
 	}

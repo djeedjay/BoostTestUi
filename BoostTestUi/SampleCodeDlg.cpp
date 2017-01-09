@@ -6,58 +6,58 @@
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
 
 #include "stdafx.h"
-#include "resource.h"
 #include "Utilities.h"
-#include "BoostHelpDlg.h"
+#include "SampleCodeDlg.h"
 
 namespace gj {
 
-BOOL CBoostHelpDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
+SampleCodeDlg::SampleCodeDlg(int dlgId, int rtfId) :
+	IDD(dlgId),
+	m_rtfId(rtfId)
+{
+}
+
+BOOL SampleCodeDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
 	CenterWindow(GetParent());
 	DlgResize_Init();
 
 	m_sample = GetDlgItem(IDC_SAMPLE);
-	SetRichEditData(m_sample, SF_RTF, MAKEINTRESOURCE(IDR_BOOSTTESTSAMPLE_RTF));
+	SetRichEditData(m_sample, SF_RTF, MAKEINTRESOURCE(m_rtfId));
 
 	m_link.SubclassWindow(GetDlgItem(IDC_URL));
 	return TRUE;
 }
 
-void SampleContextMenu(CWindow wnd, CRichEditCtrl& ctrl, CPoint pt)
+void SampleCodeDlg::OnContextMenu(CWindow /*wnd*/, CPoint pt)
 {
 	CHARRANGE selRange;
-	ctrl.GetSel(selRange);
+	m_sample.GetSel(selRange);
 	if (pt == CPoint(-1, -1))
-		pt = ctrl.PosFromChar(selRange.cpMin);
+		pt = m_sample.PosFromChar(selRange.cpMin);
 	else
-		ctrl.ScreenToClient(&pt);
+		m_sample.ScreenToClient(&pt);
 
 	CRect rect;
-	ctrl.GetClientRect(&rect);
+	m_sample.GetClientRect(&rect);
 	if (!rect.PtInRect(pt))
 		return;
 
 	if (selRange.cpMin == selRange.cpMax)
-		ctrl.SetSel(0, -1);
+		m_sample.SetSel(0, -1);
 	CMenu menuContext;
 	menuContext.LoadMenu(IDR_SAMPLE_CONTEXTMENU);
 	CMenuHandle menuPopup(menuContext.GetSubMenu(0));
-	ctrl.ClientToScreen(&pt);
-	menuPopup.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, wnd);
+	m_sample.ClientToScreen(&pt);
+	menuPopup.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, *this);
 }
 
-void CBoostHelpDlg::OnContextMenu(CWindow /*wnd*/, CPoint pt)
-{
-	SampleContextMenu(*this, m_sample, pt);
-}
-
-void CBoostHelpDlg::OnCopy(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/)
+void SampleCodeDlg::OnCopy(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/)
 {
 	m_sample.Copy();
 }
 
-void CBoostHelpDlg::OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)
+void SampleCodeDlg::OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)
 {
 	EndDialog(wID);
 }
