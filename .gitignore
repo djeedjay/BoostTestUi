@@ -1,6 +1,7 @@
 Debug/
 Release/
 ipch/
+packages/
 *.vcxproj.user
 *.opensdf
 *.sdf
