@@ -11,6 +11,7 @@
 #define IDD_CATCHHELP                   102
 #define IDD_GOOGLEHELP                  103
 #define IDD_NUNITHELP                   104
+#define IDD_SELECT_DEVENV               105
 #define IDR_MAINFRAME                   128
 #define IDR_APPNAME                     129
 #define IDR_UNIT_TEST_GUI_HPP           200
@@ -60,6 +61,7 @@
 #define IDC_TEXT                        1028
 #define IDC_PREVIOUS                    1029
 #define IDC_NEXT                        1030
+#define IDC_DEVENV_LIST                 1031
 #define ID_TEST_ABORT                   32773
 #define ID_LOG_SELECTALL                32776
 #define ID_LOG_CLEARSELECTION           32777
@@ -108,7 +110,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        217
 #define _APS_NEXT_COMMAND_VALUE         32822
-#define _APS_NEXT_CONTROL_VALUE         1031
-#define _APS_NEXT_SYMED_VALUE           104
+#define _APS_NEXT_CONTROL_VALUE         1032
+#define _APS_NEXT_SYMED_VALUE           105
 #endif
 #endif

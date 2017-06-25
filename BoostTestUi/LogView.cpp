@@ -12,7 +12,6 @@
 #include <array>
 #include "Resource.h"
 #include "Utilities.h"
-#include "ShowSourceLine.h"
 #include "MainFrm.h"
 #include "LogView.h"
 
@@ -440,7 +439,7 @@ LRESULT CLogView::OnDblClick(NMHDR* pnmh)
 	if (std::regex_match(line, sm, re1) ||
 		std::regex_search(line, sm, re2) ||
 		std::regex_search(line, sm, re3))
-		ShowSourceLine(sm[1], to_int(sm[2]));
+		m_pMainFrame->GetDevEnv().ShowSourceLine(sm[1], to_int(sm[2]));
 
 	return 0;
 }

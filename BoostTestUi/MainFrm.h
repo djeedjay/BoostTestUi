@@ -26,6 +26,7 @@
 #include "FindDlg.h"
 #include "CategoryList.h"
 #include "ExeRunner.h"
+#include "DevEnv.h"
 
 namespace gj {
 
@@ -64,6 +65,8 @@ public:
 	void SelectItem(unsigned id);
 	bool IsActiveItem(unsigned id) const;
 	TestUnit GetTestItem(unsigned id) const;
+
+	DevEnv& GetDevEnv();
 
 	void EnQueue(const std::function<void ()>& fn);
 
@@ -221,6 +224,7 @@ private:
 	int m_ignoredTestCount;
 	int m_failedTestCount;
 	TestCaseState::type m_testCaseState;
+	DevEnv m_devEnv;
 
 	boost::mutex m_mtx;
 	std::queue<std::function<void ()>> m_q;

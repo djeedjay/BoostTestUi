@@ -873,11 +873,17 @@ TestUnit CMainFrame::GetTestItem(unsigned id) const
 	return m_pRunner->GetTestUnit(id);
 }
 
+DevEnv& CMainFrame::GetDevEnv()
+{
+	return m_devEnv;
+}
+
 void CMainFrame::test_waiting(const std::wstring& processName, unsigned processId)
 {
 	EnQueue([this, processName, processId]()
 	{
-		if (this->MessageBox(
+		if (m_devEnv.AttachDebugger(processId) ||
+			this->MessageBox(
 			WStr(wstringbuilder() << L"Attach debugger to " << processName << L", pid: "<< processId),
 			LoadString(IDR_APPNAME).c_str(),
 			MB_OKCANCEL) == IDOK)

@@ -9,10 +9,6 @@
 
 #define NOMINMAX
 
-#include <algorithm>
-using std::min;
-using std::max;
-
 // Change these values to use different versions
 #define WINVER		0x0501
 #define _WIN32_WINNT 0x0501
@@ -38,6 +34,13 @@ using std::max;
 #pragma warning(pop)
 
 extern CAppModule _Module;
+
+#pragma warning(disable: 4278)
+#pragma warning(disable: 4146)
+//The following #import imports EnvDTE based on its LIBID.
+#import "libid:80cc9f66-e7d8-4ddd-85b6-d9e6cd0e93e2" version("8.0") lcid("0") raw_interfaces_only named_guids
+#pragma warning(default: 4146)
+#pragma warning(default: 4278)
 
 #if defined _M_IX86
   #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")

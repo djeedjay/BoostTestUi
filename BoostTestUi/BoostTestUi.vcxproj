@@ -152,7 +152,8 @@
     <ClCompile Include="NUnitTest.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="SampleCodeDlg.cpp" />
-    <ClCompile Include="ShowSourceLine.cpp" />
+    <ClCompile Include="SelectDevEnvDlg.cpp" />
+    <ClCompile Include="DevEnv.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -183,8 +184,9 @@
     <ClInclude Include="Process.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SampleCodeDlg.h" />
+    <ClInclude Include="SelectDevEnvDlg.h" />
     <ClInclude Include="Severity.h" />
-    <ClInclude Include="ShowSourceLine.h" />
+    <ClInclude Include="DevEnv.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="streamredirector.h" />
     <ClInclude Include="TestCaseState.h" />

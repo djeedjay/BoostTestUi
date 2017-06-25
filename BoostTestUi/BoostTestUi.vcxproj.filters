@@ -27,9 +27,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShowSourceLine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ExeRunner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -84,6 +81,12 @@
     <ClCompile Include="SampleCodeDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SelectDevEnvDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DevEnv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDlg.h">
@@ -99,9 +102,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="streamredirector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ShowSourceLine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ExeRunner.h">
@@ -175,6 +175,12 @@
     </ClInclude>
     <ClInclude Include="..\include\catch\catch-gui.hpp">
       <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectDevEnvDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DevEnv.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
