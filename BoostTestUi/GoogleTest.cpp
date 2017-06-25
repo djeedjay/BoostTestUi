@@ -100,7 +100,7 @@ std::string FullName(const std::string& testCaseName, const std::string& testNam
 
 void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const std::string& testName)
 {
-	static const std::regex re("\\s*([\\w\\d_/]+)(\\.)?");
+	static const std::regex re("\\s*([\\w\\d_/]+)(\\.)?(\\s+#.*)?");
 
 	m_rootId = GetId(testName);
 	tree.children.push_back(TestSuite(m_rootId, testName));
