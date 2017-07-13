@@ -80,32 +80,12 @@ namespace TestRunner
                 var sourceType = Reflection.GetProperty(testCaseSourceAttr, "SourceType") as System.Type ?? methodInfo.DeclaringType;
 
                 var bindingFlags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static;
-                var methodArgsArray = sourceType.GetField(sourceName, bindingFlags).GetValue(null);
-
+                object methodArgsArray = methodArgsArray = sourceType?.GetField(sourceName, bindingFlags)?.GetValue(null);
                 if (methodArgsArray == null)
                     throw new System.InvalidOperationException("Invalid sourcename and/or sourceType");
 
-                var hasMultipleMethodArgs = methodParams.Length > 1;
-                if (hasMultipleMethodArgs)
-                {
-                    foreach (object[] methodArgs in (object[])methodArgsArray)
-                    {
-                        var argsCountMatch = (methodParams.Length == methodArgs.Length);
-                        int i = -1;
-                        var argsTypesMatch = argsCountMatch && methodParams.All(p => ++i < 0 || methodArgs[i] == null || p.ParameterType == methodArgs[i].GetType());
-
-                        if (argsCountMatch && argsTypesMatch)
-                            TestCases.Add(new TestCase(methodInfo, methodArgs));
-                    }
-                }
-                else
-                {
-                    foreach (var methodArg in (System.Array)methodArgsArray)
-                    {
-                        if (methodParams[0].ParameterType == methodArg.GetType())
-                            TestCases.Add(new TestCase(methodInfo, new object[] { methodArg }));
-                    }
-                }
+                foreach (var methodArgs in (System.Array)methodArgsArray)
+                    TestCases.Add(new TestCase(methodInfo, methodArgs as object[] ?? new object[] { methodArgs as object }));
             }
         }
 
@@ -124,12 +104,7 @@ namespace TestRunner
                     Categories.AddRange(categories.Cast<string>());
 
                 var methodArgs = (object[])Reflection.GetProperty(testCaseAttr, "Arguments");
-                var argsCountMatch = (methodParams.Length == methodArgs.Length);
-                int i = -1;
-                var argsTypesMatch = argsCountMatch && methodParams.All(p => ++i < 0 || methodArgs[i] == null || p.ParameterType == methodArgs[i].GetType());
-
-                if (argsCountMatch && argsTypesMatch)
-                    TestCases.Add(new TestCase(methodInfo, methodArgs));
+                TestCases.Add(new TestCase(methodInfo, methodArgs));
             }
         }
 

@@ -2,6 +2,6 @@
 {
     public static class DataSourceSample
     {
-        public static int[] EventNumbers = new int[] { 2, 4, 6, 8 };
+        public static int[] EvenNumbers = new int[] { 2, 4, 6, 8 };
     }
 }

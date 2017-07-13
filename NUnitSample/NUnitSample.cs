@@ -352,5 +352,37 @@ namespace BoostTestUI
 		{
 			Assert.Ignore("Ignored Test");
 		}
-	}
+
+        [Test]
+        [TestCase(1, "1")]
+        public void TestCaseAttributeTest1(int nr, string txt)
+        {
+            Assert.Pass();
+        }
+
+        [TestCase(2f)]
+        public void TestCaseAttributeTest2(float fl)
+        {
+            Assert.Pass();
+        }
+
+        [TestCaseSource("TestData")]
+        public void TestCaseSourceInternalTest(int nr, double dbl)
+        {
+            Assert.Pass();
+        }
+
+        public static object[] TestData = new object[]
+        {
+            new object[] { 1, 2d },
+            new object[] { 2, 3d },
+        };
+
+        [TestCaseSource(typeof(DataSourceSample), "EvenNumbers", Category = "MyCategory")]
+        public void TestCaseSourceExternalTest(int nr)
+        {
+            Assert.That(nr % 2 == 0);
+        }
+
+    }
 }
