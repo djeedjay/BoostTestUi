@@ -103,7 +103,7 @@ namespace TestRunner
                 if (Reflection.GetProperty(testCaseAttr, "Categories") is System.Collections.IList categories)
                     Categories.AddRange(categories.Cast<string>());
 
-                var methodArgs = (object[])Reflection.GetProperty(testCaseAttr, "Arguments");
+                var methodArgs = Reflection.GetProperty(testCaseAttr, "Arguments") as object[];
                 TestCases.Add(new TestCase(methodInfo, methodArgs));
             }
         }

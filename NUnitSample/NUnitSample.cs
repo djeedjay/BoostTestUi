@@ -365,6 +365,12 @@ namespace BoostTestUI
         {
             Assert.Pass();
         }
+        
+        [TestCase(42, typeof(int))]
+        public void TestCaseAttributeTest3(int nr, System.Type myType)
+        {
+            Assert.Pass();
+        }
 
         [TestCaseSource("TestData")]
         public void TestCaseSourceInternalTest(int nr, double dbl)
