@@ -7,26 +7,31 @@
 
 namespace TestRunner
 {
-	class AssemblyResolver : System.IDisposable
-	{
-		private string path;
+    class AssemblyResolver : System.IDisposable
+    {
+        private string path;
 
-		public AssemblyResolver(string path)
-		{
-			this.path = path;
-			System.AppDomain.CurrentDomain.AssemblyResolve += new System.ResolveEventHandler(OnAssemblyResolve);
-		}
+        public AssemblyResolver(string path)
+        {
+            this.path = path;
+            System.AppDomain.CurrentDomain.AssemblyResolve += new System.ResolveEventHandler(OnAssemblyResolve);
+        }
 
-		public void Dispose()
-		{
-			System.AppDomain.CurrentDomain.AssemblyResolve -= new System.ResolveEventHandler(OnAssemblyResolve);
-		}
+        public void Dispose()
+        {
+            System.AppDomain.CurrentDomain.AssemblyResolve -= new System.ResolveEventHandler(OnAssemblyResolve);
+        }
 
-		private System.Reflection.Assembly OnAssemblyResolve(object sender, System.ResolveEventArgs args)
-		{
-			var filename = args.Name.Substring(0, args.Name.IndexOf(","));
-			return System.Reflection.Assembly.LoadFrom(path + "\\" + filename + ".dll");
-		}
-	}
+        private System.Reflection.Assembly OnAssemblyResolve(object sender, System.ResolveEventArgs args)
+        {
+            var filename = args.Name.Substring(0, args.Name.IndexOf(","));
+
+            var filePath = System.String.Format(@"{0}\{1}.dll", path, filename);
+            if (System.IO.File.Exists(filePath))
+                return System.Reflection.Assembly.LoadFrom(path + "\\" + filename + ".dll");
+
+            return null; // let the GAC try resolving it
+        }
+    }
 
 }
