@@ -26,9 +26,13 @@ namespace TestRunner
         {
             var filename = args.Name.Substring(0, args.Name.IndexOf(","));
 
-            var filePath = System.String.Format(@"{0}\{1}.dll", path, filename);
-            if (System.IO.File.Exists(filePath))
-                return System.Reflection.Assembly.LoadFrom(path + "\\" + filename + ".dll");
+            var filePathDll = System.String.Format(@"{0}\{1}.dll", path, filename);
+            if (System.IO.File.Exists(filePathDll))
+                return System.Reflection.Assembly.LoadFrom(filePathDll);
+
+            var filePathExe = System.String.Format(@"{0}\{1}.exe", path, filename);
+            if (System.IO.File.Exists(filePathExe))
+                return System.Reflection.Assembly.LoadFrom(filePathExe);
 
             return null; // let the GAC try resolving it
         }
