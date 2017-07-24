@@ -306,7 +306,7 @@ namespace TestRunner
 			this.paramInfo = paramInfo;
 			dataAttribute = Reflection.GetAttribute(paramInfo, typeof(NUnit.Framework.ParameterDataAttribute), false);
 			if (dataAttribute == null)
-				throw new System.Exception("Missing ParameterData Attribute");
+				throw new System.Exception("Missing ParameterData Attribute on method " + paramInfo.Member + " '" + paramInfo.ParameterType + " " + paramInfo.Name + "'");
 			methodInfo = dataAttribute.GetType().GetMethod("GetData");
 		}
 
@@ -645,12 +645,24 @@ namespace TestRunner
 		
 		public TestNamespace(string name) : base(name)
 		{
-			Items = new System.Collections.Generic.List<TestItem>();
+            Items = new System.Collections.Generic.List<TestItem>();
 		}
 
-		public void Add(string path, System.Type type, object[] arguments)
+        public void Add(string path, System.Type type, object[] arguments)
+        {
+            try
+            {
+                AddInternal(path, type, arguments);
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine("Exception adding '" + path + "'\n" + ex);
+            }
+        }
+
+        private void AddInternal(string path, System.Type type, object[] arguments)
 		{
-			int index = path.IndexOf('.');
+            int index = path.IndexOf('.');
 			if (index < 0)
 			{
 				Items.Add(new TestFixtureClass(path, type, arguments));
@@ -711,6 +723,7 @@ namespace TestRunner
 			var lib = System.Reflection.Assembly.LoadFile(name);
 			System.Type[] classes = lib.GetTypes();
 			System.Array.Sort(classes, CompareTypesByName);
+            int foundTestFixtures = 0;
 			foreach (System.Type type in classes)
 			{
 				if (type.IsClass)
@@ -719,17 +732,22 @@ namespace TestRunner
 					if (attrs.Count() == 1)
 					{
 						global.Add(type.FullName, type, null);
-					}
+                        foundTestFixtures++;
+                    }
 					else
 					{
 						foreach (var attr in attrs)
 						{
-							var arguments = Reflection.GetProperty(attr, "Arguments") as object[];
+                            var arguments = Reflection.GetProperty(attr, "Arguments") as object[];
 							global.Add(type.FullName + "." + MethodHelper.GetDisplayName(type.GetConstructor(MethodHelper.GetArgumentTypes(arguments)), arguments), type, arguments);
 						}
 					}
 				}
 			}
+            if (foundTestFixtures == 0)
+            {
+                System.Console.WriteLine("Could not found the [TestFixture] attribute on any class");
+            }
 		}
 
 		private static string Label(Test test, TestCase testCase)
@@ -1216,9 +1234,17 @@ namespace TestRunner
 					}
 				}
 			}
-			catch (System.Exception ex)
+            catch (System.Reflection.ReflectionTypeLoadException ex)
+            {
+                System.Console.Error.WriteLine("Error loading Test Library: " + ex);
+                foreach (var loaderEx in ex.LoaderExceptions)
+                {
+                    System.Console.Error.WriteLine("Loader error: " + loaderEx.Message);
+                }
+            }
+            catch (System.Exception ex)
 			{
-				System.Console.Error.WriteLine("Error: " + ex);
+				System.Console.Error.WriteLine("Error loading Test Library: " + ex);
 			}
 		}
 	}
