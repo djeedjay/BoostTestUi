@@ -384,6 +384,19 @@ namespace BoostTestUI
             new object[] { 2, 3d },
         };
 
+        [TestCaseSource("NullTestData")]
+        public void TestCaseSourceTest1(object[] data)
+        {
+            Assert.That(data != null);
+            Assert.That(data.Length, Is.EqualTo(1));
+            Assert.That(data[0], Is.Null);
+        }
+
+        public static object[] NullTestData =
+        {
+            new object[] { null },
+        };
+
         [TestCaseSource(typeof(DataSourceSample), "EvenNumbers", Category = "MyCategory")]
         public void TestCaseSourceExternalTest(int nr)
         {
