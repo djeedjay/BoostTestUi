@@ -104,6 +104,7 @@ namespace TestRunner
                 foreach (string lib in libs)
                 {
                     var filename = System.IO.Path.GetFullPath(lib);
+                    System.AppDomain.CurrentDomain.SetData("APPBASE", System.IO.Path.GetDirectoryName(filename));
                     using (AssemblyResolver resolver = new AssemblyResolver(System.IO.Path.GetDirectoryName(filename)))
                     {
                         TestLib testLib = new TestLib(filename, randomize);
