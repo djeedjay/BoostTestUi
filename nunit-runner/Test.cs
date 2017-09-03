@@ -73,19 +73,33 @@ namespace TestRunner
 
             foreach (var testCaseSourceAttr in Reflection.GetAttributes(methodInfo, typeof(NUnit.Framework.TestCaseSourceAttribute), false))
             {
-                if (Reflection.GetProperty(testCaseSourceAttr, "Category") is string category)
+                string category = Reflection.GetProperty(testCaseSourceAttr, "Category") as string;
+                if (category != null)
                     Categories.Add(category);
 
                 var sourceName = Reflection.GetProperty(testCaseSourceAttr, "SourceName") as string;
-                var sourceType = Reflection.GetProperty(testCaseSourceAttr, "SourceType") as System.Type ?? methodInfo.DeclaringType;
+                var sourceType = Reflection.GetProperty(testCaseSourceAttr, "SourceType") as System.Type;
+                if (sourceType == null)
+                    sourceType = methodInfo.DeclaringType;
 
                 var bindingFlags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static;
-                object methodArgsArray = methodArgsArray = sourceType?.GetField(sourceName, bindingFlags)?.GetValue(null);
+                object methodArgsArray = null;
+                if (sourceType == null)
+                    throw new System.InvalidOperationException("Invalid sourceType");
+
+                var field = sourceType.GetField(sourceName, bindingFlags);
+                if (field == null)
+                    throw new System.InvalidOperationException("Invalid sourceName");
+
+                methodArgsArray = field.GetValue(null);
                 if (methodArgsArray == null)
                     throw new System.InvalidOperationException("Invalid sourcename and/or sourceType");
 
                 foreach (var methodArgs in (System.Array)methodArgsArray)
-                    TestCases.Add(new TestCase(methodInfo, methodArgs as object[] ?? new object[] { methodArgs as object }));
+                {
+                    var args = (methodArgs as object[] != null) ? methodArgs as object[] : new object[] { methodArgs as object };
+                    TestCases.Add(new TestCase(methodInfo, args));
+                }
             }
         }
 
@@ -97,10 +111,12 @@ namespace TestRunner
 
             foreach (var testCaseAttr in Reflection.GetAttributes(methodInfo, typeof(NUnit.Framework.TestCaseAttribute), false))
             {
-                if (Reflection.GetProperty(testCaseAttr, "Category") is string category)
+                string category = Reflection.GetProperty(testCaseAttr, "Category") as string;
+                if (category != null)
                     Categories.Add(category);
 
-                if (Reflection.GetProperty(testCaseAttr, "Categories") is System.Collections.IList categories)
+                System.Collections.IList categories = Reflection.GetProperty(testCaseAttr, "Categories") as System.Collections.IList;
+                if (categories != null)
                     Categories.AddRange(categories.Cast<string>());
 
                 var methodArgs = Reflection.GetProperty(testCaseAttr, "Arguments") as object[];
