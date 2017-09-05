@@ -39,6 +39,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataSourceSample.cs" />
     <Compile Include="NUnitSample.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestGFI03SetGet.cs" />

@@ -143,7 +143,7 @@ void LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pObserver
 	std::string line;
 	while (std::getline(is, line))
 	{
-		line = chomp(line);
+		line = Chomp(line);
 		std::smatch sm;
 
 		if (line == "{")
@@ -162,6 +162,10 @@ void LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pObserver
 			auto type = id < 65536 ? TestUnit::TestSuite : TestUnit::TestCase;
 			auto enable = color == "green";
 			node.children.push_back(TestUnit(id, type, label, enable));
+		}
+		else
+		{
+			pObserver->test_message(Severity::Info, line);
 		}
 	}
 }

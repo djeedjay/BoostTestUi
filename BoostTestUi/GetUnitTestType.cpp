@@ -113,6 +113,10 @@ std::string GetUnitTestType(const std::string& path)
 	if (std::search(file.begin(), file.end(), BOOST_TESTS_TO_RUN.begin(), BOOST_TESTS_TO_RUN.end()) != file.end())
 		return "boost/noheader";
 
+	std::string CatchSession("Catch::"); CatchSession.append("Session");
+	if (std::search(file.begin(), file.end(), CatchSession.begin(), CatchSession.end()) != file.end())
+		return "catch/noheader";
+
 	std::string GTEST_COLOR("GTEST_"); GTEST_COLOR.append("COLOR");
 	if (std::search(file.begin(), file.end(), GTEST_COLOR.begin(), GTEST_COLOR.end()) != file.end())
 		return "google/noheader";

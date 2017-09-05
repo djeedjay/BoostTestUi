@@ -203,7 +203,7 @@ std::string LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pO
 	std::getline(is, line);
 	while (is)
 	{
-		line = chomp(line);
+		line = Chomp(line);
 		std::smatch sm;
 		if (!std::regex_match(line, sm, re))
 		{

@@ -5,8 +5,8 @@
 
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
 
-#ifndef BOOST_TESTUI_NUNITHELPDLG_H
-#define BOOST_TESTUI_NUNITHELPDLG_H
+#ifndef BOOST_TESTUI_SAMPLECODEDLG_H
+#define BOOST_TESTUI_SAMPLECODEDLG_H
 
 #pragma once
 
@@ -14,23 +14,25 @@
 
 namespace gj {
 
-class CNUnitHelpDlg :
-	public CDialogImpl<CNUnitHelpDlg>,
-	public CDialogResize<CNUnitHelpDlg>
+class SampleCodeDlg :
+	public CDialogImpl<SampleCodeDlg>,
+	public CDialogResize<SampleCodeDlg>
 {
 public:
-	enum { IDD = IDD_NUNITHELP };
+	const int IDD;
 
-	BEGIN_MSG_MAP(CNUnitHelpDlg)
+	SampleCodeDlg(int dlgId, int rtfId);
+
+	BEGIN_MSG_MAP(SampleCodeDlg)
 		MSG_WM_INITDIALOG(OnInitDialog)
 		MSG_WM_CONTEXTMENU(OnContextMenu);
 		COMMAND_ID_HANDLER_EX(ID_SAMPLE_COPY, OnCopy)
 		COMMAND_ID_HANDLER_EX(IDOK, OnCloseCmd)
 		COMMAND_ID_HANDLER_EX(IDCANCEL, OnCloseCmd)
-		CHAIN_MSG_MAP(CDialogResize<CNUnitHelpDlg>)
+		CHAIN_MSG_MAP(CDialogResize<SampleCodeDlg>)
 	END_MSG_MAP()
 
-	BEGIN_DLGRESIZE_MAP(CNUnitHelpDlg)
+	BEGIN_DLGRESIZE_MAP(SampleCodeDlg)
 		DLGRESIZE_CONTROL(IDC_DESCRIPTION, DLSZ_SIZE_X)
 		DLGRESIZE_CONTROL(IDC_SAMPLE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
 		DLGRESIZE_CONTROL(IDC_SEEALSO, DLSZ_MOVE_Y)
@@ -38,21 +40,17 @@ public:
 		DLGRESIZE_CONTROL(IDOK, DLSZ_MOVE_X | DLSZ_MOVE_Y)
 	END_DLGRESIZE_MAP()
 
-// Handler prototypes (uncomment arguments if needed):
-//	LRESULT MessageHandler(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-//	LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
-
+private:
 	BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
 	void OnContextMenu(CWindow wnd, CPoint point);
 	void OnCopy(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/);
 	void OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/);
 
-private:
+	int m_rtfId;
 	CRichEditCtrl m_sample;
 	CHyperLink m_link;
 };
 
 } // namespace gj
 
-#endif // BOOST_TESTUI_NUNITHELPDLG_H
+#endif // BOOST_TESTUI_SAMPLECODEDLG_H

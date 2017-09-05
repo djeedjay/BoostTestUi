@@ -26,6 +26,7 @@
 #include "FindDlg.h"
 #include "CategoryList.h"
 #include "ExeRunner.h"
+#include "DevEnv.h"
 
 namespace gj {
 
@@ -64,6 +65,8 @@ public:
 	void SelectItem(unsigned id);
 	bool IsActiveItem(unsigned id) const;
 	TestUnit GetTestItem(unsigned id) const;
+
+	DevEnv& GetDevEnv();
 
 	void EnQueue(const std::function<void ()>& fn);
 
@@ -135,6 +138,7 @@ private:
 	void OnFileSaveAs(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnFileAutoRun(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnFileCreateBoostHpp(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnFileCreateCatchHpp(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnFileCreateGoogleHpp(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnLogAutoClear(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnResetSelection(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -150,6 +154,7 @@ private:
 	void OnTestAbort(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestCategories(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnHelpBoost(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnHelpCatch(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnHelpGoogle(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnHelpNUnit(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnAppAbout(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -219,6 +224,7 @@ private:
 	int m_ignoredTestCount;
 	int m_failedTestCount;
 	TestCaseState::type m_testCaseState;
+	DevEnv m_devEnv;
 
 	boost::mutex m_mtx;
 	std::queue<std::function<void ()>> m_q;

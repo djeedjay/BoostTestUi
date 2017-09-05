@@ -23,8 +23,10 @@ namespace NUnit.Framework
 	public static class RepeatAttribute { }
 	public static class SuccessException { }
 	public static class IgnoreException { }
+    public static class TestCaseAttribute { }
+    public static class TestCaseSourceAttribute { }
 
-	public class NoExpectedException : System.Exception
+    public class NoExpectedException : System.Exception
 	{
 		public NoExpectedException(string message)
 			: base(message)

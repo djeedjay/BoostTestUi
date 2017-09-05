@@ -12,7 +12,6 @@
 #include <array>
 #include "Resource.h"
 #include "Utilities.h"
-#include "ShowSourceLine.h"
 #include "MainFrm.h"
 #include "LogView.h"
 
@@ -383,7 +382,7 @@ void CLogView::DrawSubItem(CDCHandle dc, int iItem, int iSubItem) const
 	HDITEM item;
 	item.mask = HDI_FORMAT;
 	unsigned align = (GetHeader().GetItem(iSubItem, &item)) ? GetTextAlign(item) : HDF_LEFT;
-	::DrawTextA(dc, text.c_str(), text.size(), &rect, align | DT_NOCLIP | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+	::DrawTextA(dc, text.c_str(), text.size(), &rect, align | DT_NOCLIP | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
 }
 
 void CLogView::DrawItem(CDCHandle dc, int iItem, unsigned /*iItemState*/) const
@@ -440,7 +439,7 @@ LRESULT CLogView::OnDblClick(NMHDR* pnmh)
 	if (std::regex_match(line, sm, re1) ||
 		std::regex_search(line, sm, re2) ||
 		std::regex_search(line, sm, re3))
-		ShowSourceLine(sm[1], to_int(sm[2]));
+		m_pMainFrame->GetDevEnv().ShowSourceLine(sm[1], to_int(sm[2]));
 
 	return 0;
 }

@@ -23,7 +23,7 @@ namespace gj {
 
 struct UnitTestType
 {
-	enum type { Boost, Google, NUnit };
+	enum type { Boost, Catch, Google, NUnit };
 };
 
 class NoHeaderError : public std::runtime_error

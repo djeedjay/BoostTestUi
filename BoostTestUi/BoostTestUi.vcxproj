@@ -139,23 +139,23 @@
   <ItemGroup>
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="ArgumentsDlg.cpp" />
-    <ClCompile Include="BoostHelpDlg.cpp" />
     <ClCompile Include="BoostTest.cpp" />
     <ClCompile Include="BoostTest2.cpp" />
     <ClCompile Include="BoostTestUi.cpp" />
+    <ClCompile Include="CatchTest.cpp" />
     <ClCompile Include="CategoryDlg.cpp" />
     <ClCompile Include="CategoryList.cpp" />
     <ClCompile Include="ExeRunner.cpp" />
     <ClCompile Include="FindDlg.cpp" />
-    <ClCompile Include="GoogleHelpDlg.cpp" />
     <ClCompile Include="GoogleTest.cpp" />
     <ClCompile Include="GetUnitTestType.cpp" />
     <ClCompile Include="LogView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
-    <ClCompile Include="NUnitHelpDlg.cpp" />
     <ClCompile Include="NUnitTest.cpp" />
     <ClCompile Include="Process.cpp" />
-    <ClCompile Include="ShowSourceLine.cpp" />
+    <ClCompile Include="SampleCodeDlg.cpp" />
+    <ClCompile Include="SelectDevEnvDlg.cpp" />
+    <ClCompile Include="DevEnv.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -166,17 +166,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\boost\test\unit_test_gui.hpp" />
+    <ClInclude Include="..\include\catch\catch-gui.hpp" />
     <ClInclude Include="..\include\gtest\gtest-gui.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="ArgumentsDlg.h" />
     <ClInclude Include="AtlWinExt.h" />
-    <ClInclude Include="BoostHelpDlg.h" />
     <ClInclude Include="BoostTest.h" />
+    <ClInclude Include="CatchTest.h" />
     <ClInclude Include="CategoryDlg.h" />
     <ClInclude Include="CategoryList.h" />
     <ClInclude Include="ExeRunner.h" />
     <ClInclude Include="FindDlg.h" />
-    <ClInclude Include="GoogleHelpDlg.h" />
     <ClInclude Include="GoogleTest.h" />
     <ClInclude Include="hstream.h" />
     <ClInclude Include="GetUnitTestType.h" />
@@ -185,8 +185,10 @@
     <ClInclude Include="NUnitTest.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SampleCodeDlg.h" />
+    <ClInclude Include="SelectDevEnvDlg.h" />
     <ClInclude Include="Severity.h" />
-    <ClInclude Include="ShowSourceLine.h" />
+    <ClInclude Include="DevEnv.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="streamredirector.h" />
     <ClInclude Include="TestCaseState.h" />
@@ -197,6 +199,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BoostTestSample.rtf" />
+    <None Include="CatchTestSample.rtf" />
     <None Include="GoogleTestSample.rtf" />
     <None Include="NUnitSample.rtf" />
     <None Include="ReadMe.txt" />
