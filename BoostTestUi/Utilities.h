@@ -153,6 +153,16 @@ public:
 	{
 	}
 
+	scope_guard(scope_guard&& rhs) : 
+		m_action(std::move(rhs.m_action)),
+		m_released(rhs.m_released)
+	{
+		rhs.m_released = true;
+	}
+
+	scope_guard(const scope_guard& rhs) = delete;
+	scope_guard& operator=(const scope_guard& rhs) = delete;
+
 	void release()
 	{
 		m_released = true;

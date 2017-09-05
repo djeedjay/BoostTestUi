@@ -107,8 +107,8 @@ public:
 		else
 		{
 			parent.all = false;
-			for (auto it = suite.cases.begin(); it != suite.cases.end(); ++it)
-				parent.cases.push_back(suite.name + '/' + *it);
+			for (auto& tc : suite.cases)
+				parent.cases.push_back(suite.name + '/' + tc);
 		}
 		m_suites.pop_back();
 	}

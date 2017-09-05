@@ -65,7 +65,7 @@ void SelectDevEnvDlg::UpdateUiState()
 {
 }
 
-void SelectDevEnvDlg::OnDblClick(UINT /*uNotifyCode*/, int nID, CWindow /*wndCtl*/)
+void SelectDevEnvDlg::OnDblClick(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	EndDialog(IDOK);
 }
