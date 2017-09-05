@@ -138,7 +138,9 @@ T GetArg(std::istream& is)
 
 void LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pObserver)
 {
-	static const std::regex re("tu(\\d+)\\[.*color=(\\w+).*label=\"(.*?)(\\|.*)?\"\\];");
+	static const std::regex re0("digraph\\s*.*");
+	static const std::regex re1("tu(\\d+)\\[.*color=(\\w+).*label=\"(.*?)(\\|.*)?\"\\];");
+	static const std::regex re2("tu(\\d+)\\s*->\\s*tu(\\d+);");
 
 	std::string line;
 	while (std::getline(is, line))
@@ -146,7 +148,10 @@ void LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pObserver
 		line = Chomp(line);
 		std::smatch sm;
 
-		if (line == "{")
+		if (std::regex_match(line, sm, re0))
+		{
+		}
+		else if (line == "{")
 		{
 			LoadTestUnits(node.children.back(), is, pObserver);
 		}
@@ -154,7 +159,7 @@ void LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pObserver
 		{
 			return;
 		}
-		else if (std::regex_match(line, sm, re))
+		else if (std::regex_match(line, sm, re1))
 		{
 			auto id = std::stoi(sm[1]);
 			auto color = sm[2];
@@ -162,6 +167,9 @@ void LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pObserver
 			auto type = id < 65536 ? TestUnit::TestSuite : TestUnit::TestCase;
 			auto enable = color == "green";
 			node.children.push_back(TestUnit(id, type, label, enable));
+		}
+		else if (std::regex_match(line, sm, re2))
+		{
 		}
 		else
 		{
