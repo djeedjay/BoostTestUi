@@ -149,7 +149,7 @@ bool DevEnv::AttachDebugger(unsigned processId)
 
 		long id = 0;
 		hr = pIProcess->get_ProcessID(&id);
-		if (SUCCEEDED(hr) && id == processId)
+		if (SUCCEEDED(hr) && static_cast<unsigned>(id) == processId)
 		{
 			hr = pIProcess->Attach();
 			if (FAILED(hr))
