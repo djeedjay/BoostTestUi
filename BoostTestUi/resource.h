@@ -33,6 +33,7 @@
 #define IDD_ARGUMENTS                   216
 #define IDD_FIND                        217
 #define IDI_WARN                        218
+#define IDD_SELECT_DEBUG                218
 #define IDC_TREEVIEW                    1000
 #define IDC_PROGRESSBAR                 1001
 #define IDC_LOGVIEW                     1002
@@ -62,6 +63,11 @@
 #define IDC_PREVIOUS                    1029
 #define IDC_NEXT                        1030
 #define IDC_DEVENV_LIST                 1031
+#define IDC_AUTO                        1032
+#define IDC_TYPE                        1033
+#define IDC_LIST                        1034
+#define IDC_TREE1                       1035
+#define IDC_TREE                        1035
 #define ID_TEST_ABORT                   32773
 #define ID_LOG_SELECTALL                32776
 #define ID_LOG_CLEARSELECTION           32777
@@ -108,9 +114,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        217
+#define _APS_NEXT_RESOURCE_VALUE        218
 #define _APS_NEXT_COMMAND_VALUE         32822
-#define _APS_NEXT_CONTROL_VALUE         1032
+#define _APS_NEXT_CONTROL_VALUE         1036
 #define _APS_NEXT_SYMED_VALUE           105
 #endif
 #endif

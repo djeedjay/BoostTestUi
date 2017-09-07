@@ -73,7 +73,9 @@ END
 //
 
 IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
+
 IDI_RUN                 BITMAP                  "res\\run.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -145,11 +147,17 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\BoostTestUi.ico"
+
 IDI_EMPTY               ICON                    "res\\empty.ico"
+
 IDI_TICK                ICON                    "res\\tick.ico"
+
 IDI_CROSS               ICON                    "res\\cross.ico"
+
 IDI_TICKG               ICON                    "res\\tickg.ico"
+
 IDI_WARN                ICON                    "res\\warn.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -183,7 +191,7 @@ CAPTION "How To Create a Catch Unit Test"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,187,157,50,14
-    CONTROL         "",IDC_SAMPLE,"RichEdit20W",ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_BORDER | WS_TABSTOP,7,59,230,76
+    CONTROL         "",IDC_SAMPLE,"RichEdit20W",WS_BORDER | WS_TABSTOP | 0x884,7,59,230,76
     LTEXT           "Select File -> Create Header -> Catch Test...\r\nto create the catch-gui.hpp file somewhere in your include path.\r\n\r\nCopy the code template below into a Win32 Console Application project. Then extend the assertions and test cases.",IDC_DESCRIPTION,7,12,230,40
     LTEXT           "See also",IDC_SEEALSO,7,139,28,8
     LTEXT           "https://github.com/philsquared/Catch",IDC_URL,37,139,124,8
@@ -266,6 +274,20 @@ BEGIN
     LISTBOX         IDC_DEVENV_LIST,7,7,303,149,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
 END
 
+IDD_SELECT_DEBUG DIALOGEX 0, 0, 309, 131
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Select Code Type"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Automatically determine the type of code to debug",IDC_AUTO,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,7,7,179,10
+    CONTROL         "Debug these code types:",IDC_TYPE,"Button",BS_AUTORADIOBUTTON,7,23,97,10
+    CONTROL         "",IDC_TREE,"SysTreeView32",WS_BORDER | WS_HSCROLL | WS_VSCROLL | WS_TABSTOP,18,33,284,74
+    DEFPUSHBUTTON   "OK",IDOK,135,110,82,14
+    PUSHBUTTON      "Cancel",IDCANCEL,220,110,82,14
+END
+
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
@@ -277,9 +299,7 @@ BEGIN
     IDD_FIND, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 310
         TOPMARGIN, 7
-        BOTTOMMARGIN, 40
     END
 
     IDD_BOOSTHELP, DIALOG
@@ -334,6 +354,14 @@ BEGIN
         RIGHTMARGIN, 310
         TOPMARGIN, 7
         BOTTOMMARGIN, 176
+    END
+
+    IDD_SELECT_DEBUG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 124
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -398,6 +426,17 @@ BEGIN
     BEGIN
         VALUE "Translation", 0x409, 1200
     END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_SELECT_DEBUG AFX_DIALOG_LAYOUT
+BEGIN
+    0
 END
 
 
@@ -569,13 +608,20 @@ END
 // RCDATA
 //
 
-IDR_UNIT_TEST_GUI_HPP    RCDATA                  "boost/test/unit_test_gui.hpp"
-IDR_CATCH_GUI_HPP        RCDATA                  "catch/catch-gui.hpp"
-IDR_GTEST_GUI_H          RCDATA                  "gtest/gtest-gui.h"
-IDR_BOOSTTESTSAMPLE_RTF  RCDATA                  "BoostTestSample.rtf"
-IDR_CATCHTESTSAMPLE_RTF  RCDATA                  "CatchTestSample.rtf"
+IDR_UNIT_TEST_GUI_HPP   RCDATA                  "boost/test/unit_test_gui.hpp"
+
+IDR_CATCH_GUI_HPP       RCDATA                  "catch/catch-gui.hpp"
+
+IDR_GTEST_GUI_H         RCDATA                  "gtest/gtest-gui.h"
+
+IDR_BOOSTTESTSAMPLE_RTF RCDATA                  "BoostTestSample.rtf"
+
+IDR_CATCHTESTSAMPLE_RTF RCDATA                  "CatchTestSample.rtf"
+
 IDR_GOOGLETESTSAMPLE_RTF RCDATA                  "GoogleTestSample.rtf"
-IDR_NUNITSAMPLE_RTF      RCDATA                  "NUnitSample.rtf"
+
+IDR_NUNITSAMPLE_RTF     RCDATA                  "NUnitSample.rtf"
+
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 

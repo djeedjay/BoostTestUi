@@ -8,6 +8,7 @@
 #include "stdafx.h"
 #include <algorithm>
 #include "SelectDevEnvDlg.h"
+#include "SelectDebugDlg.h"
 #include "Utilities.h"
 #include "DevEnv.h"
 
@@ -119,6 +120,53 @@ bool DevEnv::ShowSourceLine(const std::string& fileName, int lineNr)
 	return true;
 }
 
+bool Attach(EnvDTE80::Process2* pIProcess2)
+{
+	CComPtr<EnvDTE80::Transport> pITransport;
+	HRESULT hr = pIProcess2->get_Transport(&pITransport);
+	if (FAILED(hr))
+		return false;
+
+	CComPtr<EnvDTE80::Engines> pIEngines;
+	hr = pITransport->get_Engines(&pIEngines);
+	if (FAILED(hr))
+		return false;
+
+	long count = 0;
+	hr = pIEngines->get_Count(&count);
+	if (FAILED(hr))
+		return false;
+
+	std::vector<std::wstring> debugEngines;
+
+	for (long i = 1; i <= count; ++i)
+	{
+		CComPtr<EnvDTE80::Engine> pIEngine;
+		hr = pIEngines->Item(CComVariant(i), &pIEngine);
+		if (FAILED(hr))
+			continue;
+
+		CComBSTR name;
+		hr = pIEngine->get_Name(&name);
+//		hr = pIEngine->get_ID(&name);
+		if (FAILED(hr) || name.Length() == 0)
+			continue;
+
+		debugEngines.push_back(name.m_str);
+//		OutputDebugStringW(WStr(std::wstring(name) + L"\n"));
+	}
+
+	SelectDebugDlg dlg(debugEngines);
+	if (dlg.DoModal() != IDOK)
+		return false;
+
+	hr = pIProcess2->Attach2(CComVariant(dlg.GetSelection().c_str()));
+	if (FAILED(hr))
+		return false;
+
+	return true;
+}
+
 bool DevEnv::AttachDebugger(unsigned processId)
 {
 	auto pIDte = GetDte();
@@ -149,13 +197,24 @@ bool DevEnv::AttachDebugger(unsigned processId)
 
 		long id = 0;
 		hr = pIProcess->get_ProcessID(&id);
-		if (SUCCEEDED(hr) && static_cast<unsigned>(id) == processId)
+		if (FAILED(hr))
+			continue;
+
+		if (static_cast<unsigned>(id) != processId)
+			continue;
+
+		if (auto pIProcess2 = com_cast<EnvDTE80::Process2>(pIProcess))
+		{
+			if (!Attach(pIProcess2))
+				return false;
+		}
+		else
 		{
 			hr = pIProcess->Attach();
 			if (FAILED(hr))
 				return false;
-			break;
 		}
+		break;
 	}
 
 	m_pIDte = pIDte;
@@ -169,6 +228,8 @@ CComPtr<EnvDTE::_DTE> DevEnv::GetDte()
 		return m_pIDte;
 
 	auto instances = GetDteInstances();
+	if (instances.empty())
+		return nullptr;
 	if (instances.size() == 1)
 		return instances[0].pIDte;
 

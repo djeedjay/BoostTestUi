@@ -39,6 +39,7 @@ extern CAppModule _Module;
 #pragma warning(disable: 4146)
 //The following #import imports EnvDTE based on its LIBID.
 #import "libid:80cc9f66-e7d8-4ddd-85b6-d9e6cd0e93e2" version("8.0") lcid("0") raw_interfaces_only named_guids
+#import "libid:1A31287A-4D7D-413E-8E32-3B374931BD89" version("8.0") lcid("0") raw_interfaces_only named_guids
 #pragma warning(default: 4146)
 #pragma warning(default: 4278)
 
