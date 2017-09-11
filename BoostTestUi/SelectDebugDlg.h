@@ -22,9 +22,10 @@ class SelectDebugDlg :
 	public CDialogImpl<SelectDebugDlg>
 {
 public:
-	explicit SelectDebugDlg(const std::vector<std::wstring>& types, int selection = -1);
+	explicit SelectDebugDlg(const std::vector<std::wstring>& types, bool autoSelect, const std::vector<std::wstring>& selection);
 
-	std::wstring GetSelection() const;
+	bool GetAutoSelect() const;
+	std::vector<std::wstring> GetSelection() const;
 
 	static const int IDD = IDD_SELECT_DEBUG;
 
@@ -32,6 +33,7 @@ public:
 		MSG_WM_INITDIALOG(OnInitDialog)
 		COMMAND_HANDLER_EX(IDC_AUTO, BN_CLICKED, OnClicked)
 		COMMAND_HANDLER_EX(IDC_TYPE, BN_CLICKED, OnClicked)
+		NOTIFY_HANDLER_EX(IDC_TREE, TVN_ITEMCHANGED, OnItemChanged)
 		COMMAND_ID_HANDLER_EX(IDOK, OnOk)
 		COMMAND_ID_HANDLER_EX(IDCANCEL, OnCancel)
 	END_MSG_MAP()
@@ -39,13 +41,16 @@ public:
 private:
 	BOOL OnInitDialog(CWindow wndFocus, LPARAM lInitParam);
 	void OnClicked(UINT uNotifyCode, int nID, CWindow wndCtl);
+	LRESULT OnItemChanged(LPNMHDR pnmh);
 	void OnOk(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnCancel(UINT uNotifyCode, int nID, CWindow wndCtl);
 
 	void InitializeList();
 	void UpdateUiState();
 
-	const std::vector<std::wstring>& m_types;
+	std::vector<std::wstring> m_types;
+	bool m_autoSelect;
+	std::vector<std::wstring> m_selection;
 };
 
 } // namespace gj

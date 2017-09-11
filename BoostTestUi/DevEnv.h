@@ -11,6 +11,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include "SelectDevEnvDlg.h"
 
 namespace gj {
@@ -25,9 +26,12 @@ public:
 
 private:
 	CComPtr<EnvDTE::_DTE> GetDte();
+	bool Attach(EnvDTE80::Process2* pIProcess2);
 
 	int m_index;
 	CComPtr<EnvDTE::_DTE> m_pIDte;
+	bool m_autoSelectEngine;
+	std::vector<std::wstring> m_engineSelection;
 };
 
 } // namespace gj

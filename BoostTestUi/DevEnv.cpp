@@ -7,6 +7,7 @@
 
 #include "stdafx.h"
 #include <algorithm>
+#include <atlsafe.h>
 #include "SelectDevEnvDlg.h"
 #include "SelectDebugDlg.h"
 #include "Utilities.h"
@@ -37,7 +38,7 @@ std::vector<DteInstance> GetDteInstances()
 	{
 		CComPtr<IMoniker> pIMoniker;
 		if (pEnumMoniker->Next(1, &pIMoniker, nullptr) != S_OK)
-			return instances;
+			break;
 
 		CComPtr<IUnknown> pIObj;
 		pRot->GetObject(pIMoniker, &pIObj);
@@ -79,7 +80,9 @@ std::vector<DteInstance> GetDteInstances()
 }
 
 DevEnv::DevEnv() :
-	m_index(-1)
+	m_index(-1),
+	m_autoSelectEngine(true),
+	m_engineSelection({L"Native"})
 {
 }
 
@@ -120,7 +123,7 @@ bool DevEnv::ShowSourceLine(const std::string& fileName, int lineNr)
 	return true;
 }
 
-bool Attach(EnvDTE80::Process2* pIProcess2)
+bool DevEnv::Attach(EnvDTE80::Process2* pIProcess2)
 {
 	CComPtr<EnvDTE80::Transport> pITransport;
 	HRESULT hr = pIProcess2->get_Transport(&pITransport);
@@ -153,14 +156,32 @@ bool Attach(EnvDTE80::Process2* pIProcess2)
 			continue;
 
 		debugEngines.push_back(name.m_str);
-//		OutputDebugStringW(WStr(std::wstring(name) + L"\n"));
 	}
 
-	SelectDebugDlg dlg(debugEngines);
+	std::sort(debugEngines.begin(), debugEngines.end());
+	SelectDebugDlg dlg(debugEngines, m_autoSelectEngine, m_engineSelection);
 	if (dlg.DoModal() != IDOK)
 		return false;
 
-	hr = pIProcess2->Attach2(CComVariant(dlg.GetSelection().c_str()));
+	if (dlg.GetAutoSelect())
+	{
+		hr = pIProcess2->Attach();
+		if (FAILED(hr))
+			return false;
+
+		return true;
+	}
+
+	auto selection = dlg.GetSelection();
+	CComSafeArray<BSTR> coll(selection.size());
+	int index = 0;
+	for (auto& item : selection)
+	{
+		coll[index] = item.c_str();
+		++index;
+	}
+
+	hr = pIProcess2->Attach2(CComVariant(coll));
 	if (FAILED(hr))
 		return false;
 

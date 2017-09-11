@@ -8,6 +8,7 @@
 #pragma once
 
 #define NOMINMAX
+#define _CRT_SECURE_NO_WARNINGS
 
 // Change these values to use different versions
 #define WINVER		0x0501

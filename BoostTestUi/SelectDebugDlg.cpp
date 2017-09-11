@@ -15,8 +15,10 @@
 
 namespace gj {
 
-SelectDebugDlg::SelectDebugDlg(const std::vector<std::wstring>& types, int selection) :
-	m_types(types)
+SelectDebugDlg::SelectDebugDlg(const std::vector<std::wstring>& types, bool autoSelect, const std::vector<std::wstring>& selection) :
+	m_types(types),
+	m_autoSelect(autoSelect),
+	m_selection(selection)
 {
 }
 
@@ -29,14 +31,21 @@ BOOL SelectDebugDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 
 void SelectDebugDlg::InitializeList()
 {
-	CheckRadioButton(IDC_AUTO, IDC_TYPE, IDC_AUTO);
+	auto InSelection = [&](const std::wstring& type)
+	{
+		return std::find(m_selection.begin(), m_selection.end(), type) != m_selection.end();
+	};
+
+	CheckRadioButton(IDC_AUTO, IDC_TYPE, m_autoSelect ? IDC_AUTO : IDC_TYPE);
 
 	CTreeViewCtrl tree = GetDlgItem(IDC_TREE);
 	tree.SetWindowLongPtr(GWL_STYLE, tree.GetWindowLongPtr(GWL_STYLE) | WS_CLIPCHILDREN | TVS_DISABLEDRAGDROP | TVS_NOTOOLTIPS | TVS_CHECKBOXES);
 
 	for (auto& type : m_types)
 	{
-		tree.InsertItem(WStr(type), TVI_ROOT, TVI_LAST);
+		auto item = tree.InsertItem(WStr(type), TVI_ROOT, TVI_LAST);
+
+		tree.SetCheckState(item, InSelection(type));
 	}
 
 	UpdateUiState();
@@ -44,7 +53,18 @@ void SelectDebugDlg::InitializeList()
 
 void SelectDebugDlg::UpdateUiState()
 {
+	CTreeViewCtrl tree = GetDlgItem(IDC_TREE);
+	auto item = tree.GetChildItem(TVI_ROOT);
+	int count = IsDlgButtonChecked(IDC_TYPE) == BST_CHECKED ? 0 : 1;
+	while (count == 0 && item != nullptr)
+	{
+		if (tree.GetCheckState(item))
+			++count;
+		item = tree.GetNextSiblingItem(item);
+	}
+
 	GetDlgItem(IDC_TREE).EnableWindow(IsDlgButtonChecked(IDC_TYPE) == BST_CHECKED);
+	GetDlgItem(IDOK).EnableWindow(count > 0);
 }
 
 void SelectDebugDlg::OnClicked(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
@@ -52,19 +72,17 @@ void SelectDebugDlg::OnClicked(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndC
 	UpdateUiState();
 }
 
+LRESULT SelectDebugDlg::OnItemChanged(LPNMHDR /*pnmh*/)
+{
+	UpdateUiState();
+	return 0;
+}
+
 void SelectDebugDlg::OnOk(UINT /*uNotifyCode*/, int nID, CWindow /*wndCtl*/)
 {
-	EndDialog(nID);
-}
-
-void SelectDebugDlg::OnCancel(UINT /*uNotifyCode*/, int nID, CWindow /*wndCtl*/)
-{
-	EndDialog(nID);
-}
-
-std::wstring SelectDebugDlg::GetSelection() const
-{
 	CTreeViewCtrl tree = GetDlgItem(IDC_TREE);
+
+	std::vector<std::wstring> selection;
 
 	auto item = tree.GetChildItem(TVI_ROOT);
 	while (item != nullptr)
@@ -73,12 +91,30 @@ std::wstring SelectDebugDlg::GetSelection() const
 		{
 			ATL::CString value;
 			tree.GetItemText(item, value);
-			return value.GetString();
+			selection.push_back(value.GetString());
 		}
 		item = tree.GetNextSiblingItem(item);
 	}
+	m_selection = std::move(selection);
 
-	return std::wstring();
+	m_autoSelect = IsDlgButtonChecked(IDC_AUTO) == BST_CHECKED;
+
+	EndDialog(nID);
+}
+
+void SelectDebugDlg::OnCancel(UINT /*uNotifyCode*/, int nID, CWindow /*wndCtl*/)
+{
+	EndDialog(nID);
+}
+
+bool SelectDebugDlg::GetAutoSelect() const
+{
+	return m_autoSelect;
+}
+
+std::vector<std::wstring> SelectDebugDlg::GetSelection() const
+{
+	return m_selection;
 }
 
 } // namespace gj
