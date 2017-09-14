@@ -63,7 +63,9 @@ void SelectDebugDlg::UpdateUiState()
 		item = tree.GetNextSiblingItem(item);
 	}
 
-	GetDlgItem(IDC_TREE).EnableWindow(IsDlgButtonChecked(IDC_TYPE) == BST_CHECKED);
+	bool enable = IsDlgButtonChecked(IDC_TYPE) == BST_CHECKED;
+	tree.EnableWindow(enable);
+	tree.SetBkColor(GetSysColor(enable ? COLOR_WINDOW : COLOR_3DFACE));
 	GetDlgItem(IDOK).EnableWindow(count > 0);
 }
 

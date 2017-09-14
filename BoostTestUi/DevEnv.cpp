@@ -163,6 +163,9 @@ bool DevEnv::Attach(EnvDTE80::Process2* pIProcess2)
 	if (dlg.DoModal() != IDOK)
 		return false;
 
+	m_autoSelectEngine = dlg.GetAutoSelect();
+	m_engineSelection = dlg.GetSelection();
+
 	if (dlg.GetAutoSelect())
 	{
 		hr = pIProcess2->Attach();
