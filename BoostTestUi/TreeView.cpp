@@ -125,6 +125,12 @@ void CTreeView::OnContextMenu(HWND /*hWnd*/, CPoint pt)
 	menuPopup.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, *m_pMainFrame);
 }
 
+void CTreeView::CheckSingle(unsigned id)
+{
+	for (auto& item : m_items)
+		CheckTreeItem(item.second, item.first == id);
+}
+
 void CTreeView::CheckAll()
 {
 	CheckSubTreeItems(GetRootItem(), true);

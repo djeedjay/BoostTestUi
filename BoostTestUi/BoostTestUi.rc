@@ -485,6 +485,7 @@ BEGIN
     ID_TREE_RUN             "Run the selected unit test and all checked child tests\nRun Selected"
     ID_TREE_RUN_CHECKED     "Run the checked unit tests\nRun Checked"
     ID_TREE_RUN_ALL         "Run all unit tests\nRun All"
+    ID_TREE_CHECK           "Check only this test\nCheck"
     ID_TREE_CHECK_ALL       "Check all tests\nCheck All"
     ID_TREE_UNCHECK_ALL     "Uncheck all tests\nUncheck All"
 END
@@ -574,6 +575,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Wait for Debugger",           ID_TEST_DEBUGGER
         MENUITEM SEPARATOR
+        MENUITEM "Check Single",                ID_TREE_CHECK
         MENUITEM "Check All",                   ID_TREE_CHECK_ALL
         MENUITEM "Uncheck All",                 ID_TREE_UNCHECK_ALL
         MENUITEM "Check Failed",                ID_TREE_CHECK_FAILED

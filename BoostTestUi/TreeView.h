@@ -58,8 +58,7 @@ public:
 	void SelectTestItem(unsigned id);
 	unsigned GetSelectedTestItem() const;
 
-	bool IsSelected(unsigned id) const;
-
+	void CheckSingle(unsigned id);
 	void CheckAll();
 	void UncheckAll();
 	void CheckFailed();

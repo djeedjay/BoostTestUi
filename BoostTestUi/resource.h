@@ -66,9 +66,8 @@
 #define IDC_AUTO                        1032
 #define IDC_TYPE                        1033
 #define IDC_LIST                        1034
-#define IDC_TREE1                       1035
 #define IDC_TREE                        1035
-#define ID_TEST_ABORT                   32773
+#define ID_TEST_ABORT                   32775
 #define ID_LOG_SELECTALL                32776
 #define ID_LOG_CLEARSELECTION           32777
 #define ID_LOG_COPY                     32778
@@ -83,39 +82,40 @@
 #define ID_FILE_CREATE_BOOST_HPP        32787
 #define ID_FILE_CREATE_CATCH_HPP        32788
 #define ID_FILE_CREATE_GOOGLE_HPP       32789
-#define ID_LOGLEVEL                     32794
-#define ID_TREE_RUN                     32795
-#define ID_TREE_RUN_CHECKED             32796
-#define ID_TREE_RUN_ALL                 32797
-#define ID_TREE_CHECK_ALL               32798
-#define ID_TREE_UNCHECK_ALL             32799
-#define ID_TREE_CHECK_FAILED            32800
-#define ID_TREE_COPY_NAME               32801
-#define ID_TREE_COPY_COMMAND            32802
-#define IDR_LIST_CONTEXTMENU            32803
-#define IDR_SAMPLE_CONTEXTMENU          32804
-#define ID_SAMPLE_COPY                  32805
-#define ID_TREE_WAITFORDEBUGGER         32806
-#define ID_TEST_REPEAT                  32807
-#define ID_HELP_BOOST                   32808
-#define ID_HELP_CATCH                   32809
-#define ID_HELP_GOOGLE                  32810
-#define ID_HELP_NUNIT                   32811
-#define ID_LOG_TIME                     32812
-#define ID_LOG_SHOWCLOCKTIME            32813
-#define ID_RESET_SELECTION              32814
-#define ID_TEST_CATEGORIES              32815
-#define ID_TEST_COMMANDLINEARGS         32816
-#define ID_TEST_RUNNERARGS              32817
-#define ID_LOG_FIND                     32818
-#define ID_PROGRESS                     32819
+#define ID_LOGLEVEL                     32790
+#define ID_TREE_RUN                     32791
+#define ID_TREE_RUN_CHECKED             32792
+#define ID_TREE_RUN_ALL                 32793
+#define ID_TREE_CHECK                   32794
+#define ID_TREE_CHECK_ALL               32795
+#define ID_TREE_UNCHECK_ALL             32796
+#define ID_TREE_CHECK_FAILED            32797
+#define ID_TREE_COPY_NAME               32798
+#define ID_TREE_COPY_COMMAND            32799
+#define IDR_LIST_CONTEXTMENU            32800
+#define IDR_SAMPLE_CONTEXTMENU          32801
+#define ID_SAMPLE_COPY                  32802
+#define ID_TREE_WAITFORDEBUGGER         32803
+#define ID_TEST_REPEAT                  32804
+#define ID_HELP_BOOST                   32805
+#define ID_HELP_CATCH                   32806
+#define ID_HELP_GOOGLE                  32807
+#define ID_HELP_NUNIT                   32808
+#define ID_LOG_TIME                     32809
+#define ID_LOG_SHOWCLOCKTIME            32810
+#define ID_RESET_SELECTION              32811
+#define ID_TEST_CATEGORIES              32812
+#define ID_TEST_COMMANDLINEARGS         32813
+#define ID_TEST_RUNNERARGS              32814
+#define ID_LOG_FIND                     32815
+#define ID_PROGRESS                     32816
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        218
-#define _APS_NEXT_COMMAND_VALUE         32822
+#define _APS_NEXT_COMMAND_VALUE         32817
 #define _APS_NEXT_CONTROL_VALUE         1036
 #define _APS_NEXT_SYMED_VALUE           105
 #endif

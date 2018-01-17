@@ -161,6 +161,7 @@ private:
 	void OnTreeRun(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTreeRunChecked(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTreeRunAll(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnTreeCheckSingle(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTreeCheckAll(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTreeUncheckAll(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTreeCheckFailed(UINT uNotifyCode, int nID, CWindow wndCtl);

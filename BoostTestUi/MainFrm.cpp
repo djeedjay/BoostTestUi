@@ -81,6 +81,7 @@ BEGIN_MSG_MAP2(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_TREE_RUN, OnTreeRun)
 	COMMAND_ID_HANDLER_EX(ID_TREE_RUN_CHECKED, OnTreeRunChecked)
 	COMMAND_ID_HANDLER_EX(ID_TREE_RUN_ALL, OnTreeRunAll)
+	COMMAND_ID_HANDLER_EX(ID_TREE_CHECK, OnTreeCheckSingle)
 	COMMAND_ID_HANDLER_EX(ID_TREE_CHECK_ALL, OnTreeCheckAll)
 	COMMAND_ID_HANDLER_EX(ID_TREE_UNCHECK_ALL, OnTreeUncheckAll)
 	COMMAND_ID_HANDLER_EX(ID_TREE_CHECK_FAILED, OnTreeCheckFailed)
@@ -200,7 +201,7 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 	m_statusBar.SetPanes(paneIds, 5, false);
 
 	// client rect for vertical splitter
-	WTL::CRect rcVert;
+	CRect rcVert;
 	GetClientRect(&rcVert);
 
 	m_hWndClient = m_vSplit.Create(*this, rcVert, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
@@ -1191,6 +1192,11 @@ void CMainFrame::OnTreeRunChecked(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*w
 void CMainFrame::OnTreeRunAll(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	RunAll();
+}
+
+void CMainFrame::OnTreeCheckSingle(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
+{
+	m_treeView.CheckSingle(m_treeView.GetSelectedTestItem());
 }
 
 void CMainFrame::OnTreeCheckAll(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
