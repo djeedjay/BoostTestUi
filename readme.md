@@ -1,7 +1,7 @@
 BoostTestUi (needs a better name because it supports multiple frameworks now)
 -----------
 
-[Download the latest release here](https://github.com/janwilmans/BoostTestUi/releases/tag/v1.1.0)
+[Download the latest release here](https://github.com/janwilmans/BoostTestUi/releases)
 
 BoostTestUi provides a Windows gui runner for [boost.test](http://www.boost.org/doc/libs/1_64_0/libs/test/doc/html/index.html), [google test](https://github.com/google/googletest) and [catch](https://github.com/philsquared/Catch)
 based unit test executables.
