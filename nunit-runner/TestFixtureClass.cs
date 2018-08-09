@@ -76,6 +76,9 @@ namespace TestRunner
                     !hasNUnitAttribute && methodInfo.Name.Substring(0, 4).ToLower() == "test" && methodInfo.GetParameters().Length == 0)
                     Tests.Add(new Test(methodInfo));
 
+                if (hasTestFixtureSetUpAttribute)
+                    testFixtureSetUp.Add(methodInfo);
+
                 if (hasSetUpAttribute)
                     setUp.Add(methodInfo);
 
