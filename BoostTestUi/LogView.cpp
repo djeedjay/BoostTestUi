@@ -188,7 +188,7 @@ bool CLogView::FindPrevious(const std::wstring& text)
 
 void CLogView::Add(unsigned id, const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg)
 {
-	int focus = GetNextItem(0, LVNI_FOCUSED);
+	int focus = GetNextItem(-1, LVNI_FOCUSED);
 	bool selectLast = focus < 0 || focus == GetItemCount() - 1;
 
 	int item = m_logLines.size();
