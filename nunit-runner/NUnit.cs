@@ -26,6 +26,10 @@ namespace NUnit.Framework
     public static class TestCaseAttribute { }
     public static class TestCaseSourceAttribute { }
 
+    // NUnit 3 attributes:
+    public static class OneTimeSetUpAttribute { }
+    public static class OneTimeTearDownAttribute { }
+
     public class NoExpectedException : System.Exception
 	{
 		public NoExpectedException(string message)

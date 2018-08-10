@@ -57,17 +57,21 @@ namespace TestRunner
             if (ctorInfo == null)
                 throw new System.Exception("No default constructor");
 
-            var methods = type.GetMethods();
+            var methods = type.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.DeclaredOnly);
             System.Array.Sort(methods, CompareMethodInfoByName);
             foreach (var methodInfo in methods)
             {
                 var hasTestAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestAttribute), false);
                 var hasTestCaseAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestCaseAttribute), false);
                 var hasTestCaseSourceAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestCaseSourceAttribute), false);
-                var hasTestFixtureSetUpAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestFixtureSetUpAttribute), false);
+                var hasTestFixtureSetUpAttribute =
+                     Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestFixtureSetUpAttribute), false) ||
+                     Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.OneTimeSetUpAttribute), false);
                 var hasSetUpAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.SetUpAttribute), false);
                 var hasTearDownAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TearDownAttribute), false);
-                var hasTestFixtureTearDownAttribute = Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestFixtureTearDownAttribute), false);
+                var hasTestFixtureTearDownAttribute =
+                    Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.TestFixtureTearDownAttribute), false) ||
+                    Reflection.HasAttribute(methodInfo, typeof(NUnit.Framework.OneTimeTearDownAttribute), false);
                 var hasNUnitAttribute = hasTestAttribute || hasTestFixtureSetUpAttribute || hasSetUpAttribute || hasTearDownAttribute || hasTestFixtureTearDownAttribute;
 
                 if (hasTestAttribute ||
