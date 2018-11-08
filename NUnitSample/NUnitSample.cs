@@ -274,7 +274,7 @@ namespace BoostTestUI
         public void SetUp()
         {
             System.Console.WriteLine("SetUp");
-            Assert.AreEqual(1 + 1, 3);
+            Assert.AreEqual(1 + 1, 2);
         }
 
         [Test]
