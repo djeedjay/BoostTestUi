@@ -1,6 +1,6 @@
 // (C) Copyright Gert-Jan de Vos 2012.
 // Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at 
+// (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
@@ -104,7 +104,7 @@ std::wstring ArgumentBuilder::GetExePathName()
 
 std::wstring ArgumentBuilder::GetListArg()
 {
-	return L"--list-tests";
+	return L"--list-tests ~[.],[.]";
 }
 
 std::string FullName(const std::string& testCaseName, const std::string& testName)

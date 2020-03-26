@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="Boost Test Runner 1.1.7" Language="1033" Version="1.1.7.0" Manufacturer="Boost" UpgradeCode="b25897f6-501e-491a-9a2f-2f815d19b007">
+	<Product Id="*" Name="Boost Test Runner 1.1.8" Language="1033" Version="1.1.8" Manufacturer="Boost" UpgradeCode="b25897f6-501e-491a-9a2f-2f815d19b007">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 
-    <Media Id='1' Cabinet='BoostTestUi.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
-    <Property Id='DiskPrompt' Value="Boost Test Runner 1.1.7 Installation [1]" />
+    <Media Id='1' Cabinet='BoostTestUi.cab' EmbedCab='yes' />
+    <Icon Id="BoostTestUi.exe" SourceFile="$(var.BoostTestUi.ProjectDir)\res\BoostTestUI.ico" />
+    <Property Id="ARPPRODUCTICON" Value="BoostTestUi.ico" />
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="BoostTestUi">
           <Component Id="MainExecutable" Guid="81A400AD-0B40-44B5-B925-FF5C9A014455">
-            <File Id="BoostTestUiEXE" Name="BoostTestUi.exe" DiskId="1" Source="$(var.BoostTestUi.TargetPath)" KeyPath="yes">
+            <File Id="BoostTestUiEXE" Name="BoostTestUi.exe" Source="$(var.BoostTestUi.TargetPath)" KeyPath="yes">
               <Shortcut Id="StartMenuBoostTestUi" Directory="ProgramMenuDir" Name="BoostTestUi" WorkingDirectory="INSTALLDIR" Icon="BoostTestUi.exe" IconIndex="0" Advertise="yes" />
               <Shortcut Id="DesktopBoostTestUi" Directory="DesktopFolder" Name="BoostTestUi" WorkingDirectory="INSTALLDIR" Icon="BoostTestUi.exe" IconIndex="0" Advertise="yes" />
             </File>
-            <File Id="NunitRunnerExe" Name="nunit-runner.exe" DiskId="1" Source="$(var.nunit-runner.TargetPath)" />
-            <File Id="NunitRunnerConfigExe" Name="nunit-runner.exe.config" DiskId="1" Source="$(var.nunit-runner.TargetPath).config" />
-            <File Id="NunitRunnerX86Exe" Name="nunit-runner-x86.exe" DiskId="1" Source="$(var.nunit-runner-x86.TargetPath)" />
-            <File Id="NunitRunnerConfigX86Exe" Name="nunit-runner-x86.exe.config" DiskId="1" Source="$(var.nunit-runner-x86.TargetPath).config" />
+            <File Id="NunitRunnerExe" Name="nunit-runner.exe" Source="$(var.nunit-runner.TargetPath)" />
+            <File Id="NunitRunnerConfigExe" Name="nunit-runner.exe.config" Source="$(var.nunit-runner.TargetPath).config" />
+            <File Id="NunitRunnerX86Exe" Name="nunit-runner-x86.exe" Source="$(var.nunit-runner-x86.TargetPath)" />
+            <File Id="NunitRunnerConfigX86Exe" Name="nunit-runner-x86.exe.config" Source="$(var.nunit-runner-x86.TargetPath).config" />
           </Component>
         </Directory>
       </Directory>
@@ -40,8 +41,6 @@
       <ComponentRef Id='MainExecutable' />
       <ComponentRef Id='ProgramMenuDir' />
     </Feature>
-
-    <Icon Id="BoostTestUi.exe" SourceFile="$(var.BoostTestUi.ProjectDir)\res\BoostTestUI.ico" />
 
   </Product>
 </Wix>

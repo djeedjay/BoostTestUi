@@ -16,6 +16,18 @@
     <Filter Include="Header Files\include">
       <UniqueIdentifier>{eb5a3b33-0c04-46fe-a4e6-3aac1b378760}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\include\catch">
+      <UniqueIdentifier>{bd8c5908-a432-4388-a47e-1288f70de1f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include\catch2">
+      <UniqueIdentifier>{ea3bedf5-c87f-40a6-8848-71126551b705}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include\boost">
+      <UniqueIdentifier>{2288b44e-1bb6-4330-be5f-21448796aaa2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include\gtest">
+      <UniqueIdentifier>{f8533cf6-69f7-45ae-a7e7-376b9300d3b7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AboutDlg.cpp">
@@ -90,6 +102,9 @@
     <ClCompile Include="SelectDebugDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="OptionsDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDlg.h">
@@ -140,12 +155,6 @@
     <ClInclude Include="GetUnitTestType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\boost\test\unit_test_gui.hpp">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\gtest\gtest-gui.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
     <ClInclude Include="version.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
@@ -176,9 +185,6 @@
     <ClInclude Include="SampleCodeDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\catch\catch-gui.hpp">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
     <ClInclude Include="SelectDevEnvDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -196,6 +202,21 @@
     </ClInclude>
     <ClInclude Include="SelectDebugDlg.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionsDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\catch2\catch-gui.hpp">
+      <Filter>Header Files\include\catch2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\catch\catch-gui.hpp">
+      <Filter>Header Files\include\catch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gtest\gtest-gui.h">
+      <Filter>Header Files\include\gtest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\boost\test\unit_test_gui.hpp">
+      <Filter>Header Files\include\boost</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -234,6 +255,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="CatchTestSample.rtf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Catch2TestSample.rtf">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

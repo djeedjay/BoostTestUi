@@ -1,6 +1,6 @@
 // (C) Copyright Gert-Jan de Vos 2012.
 // Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at 
+// (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
@@ -16,6 +16,7 @@
 #include <boost/filesystem.hpp>
 #include "Utilities.h"
 #include "CategoryDlg.h"
+#include "OptionsDlg.h"
 #include "SampleCodeDlg.h"
 #include "AboutDlg.h"
 #include "ArgumentsDlg.h"
@@ -59,6 +60,7 @@ BEGIN_MSG_MAP2(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_FILE_AUTO_RUN, OnFileAutoRun)
 	COMMAND_ID_HANDLER_EX(ID_FILE_CREATE_BOOST_HPP, OnFileCreateBoostHpp)
 	COMMAND_ID_HANDLER_EX(ID_FILE_CREATE_CATCH_HPP, OnFileCreateCatchHpp)
+	COMMAND_ID_HANDLER_EX(ID_FILE_CREATE_CATCH2_HPP, OnFileCreateCatch2Hpp)
 	COMMAND_ID_HANDLER_EX(ID_FILE_CREATE_GOOGLE_HPP, OnFileCreateGoogleHpp)
 	COMMAND_ID_HANDLER_EX(ID_LOG_AUTO_CLEAR, OnLogAutoClear)
 	COMMAND_ID_HANDLER_EX(ID_RESET_SELECTION, OnResetSelection)
@@ -73,8 +75,10 @@ BEGIN_MSG_MAP2(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_TEST_RUNNERARGS, OnTestRunnerArgs)
 	COMMAND_ID_HANDLER_EX(ID_TEST_ABORT, OnTestAbort)
 	COMMAND_ID_HANDLER_EX(ID_TEST_CATEGORIES, OnTestCategories)
+	COMMAND_ID_HANDLER_EX(ID_TEST_OPTIONS, OnTestOptions)
 	COMMAND_ID_HANDLER_EX(ID_HELP_BOOST, OnHelpBoost)
 	COMMAND_ID_HANDLER_EX(ID_HELP_CATCH, OnHelpCatch)
+	COMMAND_ID_HANDLER_EX(ID_HELP_CATCH2, OnHelpCatch2)
 	COMMAND_ID_HANDLER_EX(ID_HELP_GOOGLE, OnHelpGoogle)
 	COMMAND_ID_HANDLER_EX(ID_HELP_NUNIT, OnHelpNUnit)
 	COMMAND_ID_HANDLER_EX(ID_APP_ABOUT, OnAppAbout)
@@ -103,7 +107,8 @@ CMainFrame::CMainFrame(const std::wstring& fileName, const std::wstring& argumen
 	m_logAutoClear(true),
 	m_randomize(false),
 	m_repeat(false),
-	m_debugger(false)
+	m_debugger(false),
+	m_reloadDelay(5)
 {
 }
 
@@ -146,7 +151,7 @@ void CMainFrame::UpdateUI()
 	UIEnable(ID_FILE_SAVE_AS, isLoaded);
 	UIEnable(ID_TEST_RANDOMIZE, (enabled & TestRunner::Randomize) != 0);
 	UIEnable(ID_TEST_REPEAT, isLoaded);
-	UIEnable(ID_TEST_DEBUGGER, (enabled & TestRunner::WaitForDebugger) != 0);
+	UIEnable(ID_TEST_DEBUGGER, !m_repeat && (enabled & TestRunner::WaitForDebugger) != 0);
 	UIEnable(ID_TEST_RUNNERARGS, isLoaded);
 	UIEnable(ID_TREE_RUN, isRunnable);
 	UIEnable(ID_TREE_RUN_CHECKED, isRunnable);
@@ -214,7 +219,7 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 	CRect rcHor;
 	GetClientRect(&rcHor);
 	m_hSplit.Create(m_vSplit.m_hWnd, rcHor, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
-	m_hSplit.SetSplitterExtendedStyle(SPLIT_NONINTERACTIVE); 
+	m_hSplit.SetSplitterExtendedStyle(SPLIT_NONINTERACTIVE);
 	m_hSplit.SetSplitterPos(20);
 	m_vSplit.SetSplitterPane(1, m_hSplit);
 
@@ -546,6 +551,21 @@ FILETIME GetLastWriteTime(const std::wstring& fileName)
 	return GetLastWriteTime(hFile, fileName);
 }
 
+FILETIME GetSystemTimeAsFileTime()
+{
+	FILETIME ft;
+	GetSystemTimeAsFileTime(&ft);
+	return ft;
+}
+
+uint64_t ToUInt64(const FILETIME& ft)
+{
+	ULARGE_INTEGER li;
+	li.LowPart = ft.dwLowDateTime;
+	li.HighPart = ft.dwHighDateTime;
+	return li.QuadPart;
+}
+
 bool operator==(const FILETIME& ft1, const FILETIME& ft2)
 {
 	return
@@ -612,9 +632,9 @@ void CMainFrame::OnTimer(UINT_PTR /*nIDEvent*/)
 	}
 
 	FILETIME fileTime = GetLastWriteTime(hFile, m_pathName);
-	if (fileTime == m_fileTime)
+	if (fileTime == m_fileTime || ToUInt64(GetSystemTimeAsFileTime()) < ToUInt64(fileTime) + m_reloadDelay * 10'000'000)
 		return;
-
+	int age = ToUInt64(GetSystemTimeAsFileTime()) - ToUInt64(fileTime);
 	SaveTestSelection();
 	Reload();
 	if (m_autoRun)
@@ -639,8 +659,9 @@ void CMainFrame::OnHelp(LPHELPINFO /*lpHelpInfo*/)
 	{
 	case UnitTestType::Boost: return OnHelpBoost(0, 0, *this);
 	case UnitTestType::Catch: return OnHelpCatch(0, 0, *this);
-	case UnitTestType::Google: return OnHelpGoogle(0, 0, *this); 
-	case UnitTestType::NUnit: return OnHelpNUnit(0, 0, *this); 
+	case UnitTestType::Catch2: return OnHelpCatch2(0, 0, *this);
+	case UnitTestType::Google: return OnHelpGoogle(0, 0, *this);
+	case UnitTestType::NUnit: return OnHelpNUnit(0, 0, *this);
 	}
 }
 
@@ -790,6 +811,18 @@ void CMainFrame::OnFileCreateCatchHpp(UINT /*uNotifyCode*/, int /*nID*/, CWindow
 
 	ScopedCursor cursor(::LoadCursor(nullptr, IDC_WAIT));
 	CreateHpp(IDR_CATCH_GUI_HPP, dlg.m_szFileName);
+}
+
+void CMainFrame::OnFileCreateCatch2Hpp(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
+{
+	CFileDialog dlg(FALSE, L".hpp", L"catch-gui.hpp", OFN_OVERWRITEPROMPT, L"C++ Header Files (*.hpp)\0*.hpp\0All Files\0*.*\0\0", 0);
+	dlg.m_ofn.nFilterIndex = 0;
+	dlg.m_ofn.lpstrTitle = L"Create catch-gui.hpp";
+	if (dlg.DoModal() != IDOK)
+		return;
+
+	ScopedCursor cursor(::LoadCursor(nullptr, IDC_WAIT));
+	CreateHpp(IDR_CATCH2_GUI_HPP, dlg.m_szFileName);
 }
 
 void CMainFrame::OnFileCreateGoogleHpp(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
@@ -974,7 +1007,7 @@ void CMainFrame::UpdateProgressBar()
 		m_ignoredTestCount > 0 || m_testCaseState == TestCaseState::Ignored ? PBST_PAUSED : PBST_NORMAL;
 	m_progressBar.SendMessage(PBM_SETSTATE, pbst);
 	COLORREF color =
-		pbst == PBST_ERROR ? FailColor : 
+		pbst == PBST_ERROR ? FailColor :
 		pbst == PBST_PAUSED ? WarnColor : SuccessColor;
 	m_progressBar.SetBarColor(color);
 	m_progressBar.SetPos(m_progressBar.GetPos()); // Win7 progress bar is one off when calling SetPos() just once ?!
@@ -1138,6 +1171,13 @@ void CMainFrame::OnTestCategories(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*w
 	m_treeView.RedrawWindow();
 }
 
+void CMainFrame::OnTestOptions(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
+{
+	OptionsDlg dlg(m_reloadDelay);
+	if (dlg.DoModal() == IDOK)
+		m_reloadDelay = dlg.ReloadDelay();
+}
+
 void LoadRichEditLibrary()
 {
 	static HINSTANCE h = ::LoadLibrary(CRichEditCtrl::GetLibraryName());
@@ -1156,6 +1196,13 @@ void CMainFrame::OnHelpCatch(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl
 {
 	LoadRichEditLibrary();
 	SampleCodeDlg dlg(IDD_CATCHHELP, IDR_CATCHTESTSAMPLE_RTF);
+	dlg.DoModal();
+}
+
+void CMainFrame::OnHelpCatch2(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
+{
+	LoadRichEditLibrary();
+	SampleCodeDlg dlg(IDD_CATCH2HELP, IDR_CATCH2TESTSAMPLE_RTF);
 	dlg.DoModal();
 }
 
@@ -1264,15 +1311,23 @@ const wchar_t* RegistryPath = L"Software\\Boost\\BoostTestUi";
 
 bool CMainFrame::LoadSettings()
 {
-	DWORD x, y, cx, cy;
+	DWORD x, y, width, height;
 	CRegKey reg;
 	if (reg.Open(HKEY_CURRENT_USER, RegistryPath, KEY_READ) != ERROR_SUCCESS)
 		return false;
 	reg.QueryDWORDValue(L"x", x);
 	reg.QueryDWORDValue(L"y", y);
-	reg.QueryDWORDValue(L"width", cx);
-	reg.QueryDWORDValue(L"height", cy);
-	SetWindowPos(0, x, y, cx, cy, SWP_NOZORDER);
+	reg.QueryDWORDValue(L"width", width);
+	reg.QueryDWORDValue(L"height", height);
+
+	WINDOWPLACEMENT placement = { sizeof(WINDOWPLACEMENT) };
+	placement.flags = 0;
+	placement.showCmd = SW_SHOW;
+	placement.ptMinPosition = CPoint(0, 0);
+	placement.ptMaxPosition = CPoint(0, 0);
+	placement.rcNormalPosition = CRect(x, y, x + width, y + height);
+	SetWindowPlacement(&placement);
+
 	DWORD split;
 	reg.QueryDWORDValue(L"vSplit", split);
 	m_vSplit.SetSplitterPos(split);
@@ -1289,6 +1344,10 @@ bool CMainFrame::LoadSettings()
 		m_repeat = (options & TestRunner::Repeat) != 0;
 		m_debugger = (options & TestRunner::WaitForDebugger) != 0;
 	}
+
+	DWORD reloadDelay;
+	if (reg.QueryDWORDValue(L"reloadDelay", reloadDelay) == ERROR_SUCCESS)
+		m_reloadDelay = reloadDelay;
 
 	DWORD logLevel;
 	if (reg.QueryDWORDValue(L"LogLevel", logLevel) == ERROR_SUCCESS)
@@ -1316,6 +1375,7 @@ void CMainFrame::SaveSettings()
 	reg.SetDWORDValue(L"vSplit", m_vSplit.GetSplitterPos());
 	m_logView.SaveSettings(reg);
 	reg.SetDWORDValue(L"Options", GetOptions());
+	reg.SetDWORDValue(L"reloadDelay", m_reloadDelay);
 	reg.SetDWORDValue(L"LogLevel", m_combo.GetCurSel());
 
 	m_mru.WriteToRegistry(RegistryPath);

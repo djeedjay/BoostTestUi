@@ -1,6 +1,6 @@
 // (C) Copyright Gert-Jan de Vos 2012.
 // Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at 
+// (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
@@ -139,6 +139,7 @@ private:
 	void OnFileAutoRun(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnFileCreateBoostHpp(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnFileCreateCatchHpp(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnFileCreateCatch2Hpp(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnFileCreateGoogleHpp(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnLogAutoClear(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnResetSelection(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -153,8 +154,10 @@ private:
 	void OnTestRunnerArgs(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestAbort(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestCategories(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnTestOptions(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnHelpBoost(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnHelpCatch(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnHelpCatch2(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnHelpGoogle(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnHelpNUnit(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnAppAbout(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -217,6 +220,7 @@ private:
 	bool m_randomize;
 	bool m_repeat;
 	bool m_debugger;
+	int m_reloadDelay;
 	bool m_resetTimer;
 	Timer m_timer;
 	int m_testIterationCount;

@@ -431,7 +431,7 @@ LRESULT CLogView::OnDblClick(NMHDR* pnmh)
 	auto& nmhdr = *reinterpret_cast<NMITEMACTIVATE*>(pnmh);
 
 	std::string line = GetItemText(nmhdr.iItem, 1);
-	static const std::regex re1("(.+)\\((\\d+)\\): .*");
+	static const std::regex re1("(.+)\\((\\d+)\\)");
 	static const std::regex re2("file (.+), line (\\d+)");
 	static const std::regex re3(" in (.+):line (\\d+)");
 

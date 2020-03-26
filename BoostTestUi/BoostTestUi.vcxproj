@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2B211D41-9EA2-42FB-9A85-B0B1C1722EF1}</ProjectGuid>
     <RootNamespace>BoostTestUi</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -20,12 +21,12 @@
     <UseOfAtl>Static</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -49,6 +50,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -66,7 +70,6 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\Libraries\boost;..\Libraries\wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;STRICT;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -148,6 +151,7 @@
     <ClCompile Include="CatchTest.cpp" />
     <ClCompile Include="CategoryDlg.cpp" />
     <ClCompile Include="CategoryList.cpp" />
+    <ClCompile Include="OptionsDlg.cpp" />
     <ClCompile Include="SelectDebugDlg.cpp" />
     <ClCompile Include="ExeRunner.cpp" />
     <ClCompile Include="FindDlg.cpp" />
@@ -170,6 +174,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\boost\test\unit_test_gui.hpp" />
+    <ClInclude Include="..\include\catch2\catch-gui.hpp" />
     <ClInclude Include="..\include\catch\catch-gui.hpp" />
     <ClInclude Include="..\include\gtest\gtest-gui.h" />
     <ClInclude Include="AboutDlg.h" />
@@ -181,6 +186,7 @@
     <ClInclude Include="catch\catch-gui.hpp" />
     <ClInclude Include="CategoryDlg.h" />
     <ClInclude Include="CategoryList.h" />
+    <ClInclude Include="OptionsDlg.h" />
     <ClInclude Include="SelectDebugDlg.h" />
     <ClInclude Include="ExeRunner.h" />
     <ClInclude Include="FindDlg.h" />
@@ -207,6 +213,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BoostTestSample.rtf" />
+    <None Include="Catch2TestSample.rtf" />
     <None Include="CatchTestSample.rtf" />
     <None Include="GoogleTestSample.rtf" />
     <None Include="NUnitSample.rtf" />

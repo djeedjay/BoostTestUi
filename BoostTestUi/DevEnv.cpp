@@ -1,6 +1,6 @@
 // (C) Copyright Gert-Jan de Vos 2012.
 // Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at 
+// (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
@@ -91,7 +91,7 @@ bool DevEnv::ShowSourceLine(const std::string& fileName, int lineNr)
 	auto pIDte = GetDte();
 	if (!pIDte)
 		return false;
-	
+
 	CComPtr<EnvDTE::ItemOperations> pIOps;
 	HRESULT hr = pIDte->get_ItemOperations(&pIOps);
 	if (FAILED(hr))
@@ -260,7 +260,7 @@ CComPtr<EnvDTE::_DTE> DevEnv::GetDte()
 	SelectDevEnvDlg dlg(instances, m_index);
 	if (dlg.DoModal() != IDOK)
 		return nullptr;
-	
+
 	m_index = dlg.GetIndex();
 	return m_index >= 0 && static_cast<size_t>(m_index) < instances.size() ? instances[m_index].pIDte : nullptr;
 }
