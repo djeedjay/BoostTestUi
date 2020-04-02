@@ -7,6 +7,7 @@
 
 #include "stdafx.h"
 #include <algorithm>
+#include <array>
 #include <atlsafe.h>
 #include "SelectDevEnvDlg.h"
 #include "SelectDebugDlg.h"
@@ -86,9 +87,9 @@ DevEnv::DevEnv() :
 {
 }
 
-bool DevEnv::ShowSourceLine(const std::string& fileName, int lineNr)
+bool DevEnv::ShowSourceLine(HWND parent, const std::string& fileName, int lineNr)
 {
-	auto pIDte = GetDte();
+	auto pIDte = GetDte(parent);
 	if (!pIDte)
 		return false;
 
@@ -123,7 +124,7 @@ bool DevEnv::ShowSourceLine(const std::string& fileName, int lineNr)
 	return true;
 }
 
-bool DevEnv::Attach(EnvDTE80::Process2* pIProcess2)
+bool DevEnv::Attach(HWND parent, EnvDTE80::Process2* pIProcess2)
 {
 	CComPtr<EnvDTE80::Transport> pITransport;
 	HRESULT hr = pIProcess2->get_Transport(&pITransport);
@@ -160,7 +161,7 @@ bool DevEnv::Attach(EnvDTE80::Process2* pIProcess2)
 
 	std::sort(debugEngines.begin(), debugEngines.end());
 	SelectDebugDlg dlg(debugEngines, m_autoSelectEngine, m_engineSelection);
-	if (dlg.DoModal() != IDOK)
+	if (dlg.DoModal(parent) != IDOK)
 		return false;
 
 	m_autoSelectEngine = dlg.GetAutoSelect();
@@ -191,9 +192,9 @@ bool DevEnv::Attach(EnvDTE80::Process2* pIProcess2)
 	return true;
 }
 
-bool DevEnv::AttachDebugger(unsigned processId)
+bool DevEnv::AttachDebugger(HWND parent, unsigned processId)
 {
-	auto pIDte = GetDte();
+	auto pIDte = GetDte(parent);
 	if (!pIDte)
 		return false;
 
@@ -229,7 +230,7 @@ bool DevEnv::AttachDebugger(unsigned processId)
 
 		if (auto pIProcess2 = com_cast<EnvDTE80::Process2>(pIProcess))
 		{
-			if (!Attach(pIProcess2))
+			if (!Attach(parent, pIProcess2))
 				return false;
 		}
 		else
@@ -245,7 +246,7 @@ bool DevEnv::AttachDebugger(unsigned processId)
 	return true;
 }
 
-CComPtr<EnvDTE::_DTE> DevEnv::GetDte()
+CComPtr<EnvDTE::_DTE> DevEnv::GetDte(HWND parent)
 {
 	CComPtr<EnvDTE::_DTE> pIDte2;
 	if (m_pIDte && SUCCEEDED(m_pIDte->get_DTE(&pIDte2)))
@@ -258,11 +259,52 @@ CComPtr<EnvDTE::_DTE> DevEnv::GetDte()
 		return instances[0].pIDte;
 
 	SelectDevEnvDlg dlg(instances, m_index);
-	if (dlg.DoModal() != IDOK)
+	if (dlg.DoModal(parent) != IDOK)
 		return nullptr;
 
 	m_index = dlg.GetIndex();
 	return m_index >= 0 && static_cast<size_t>(m_index) < instances.size() ? instances[m_index].pIDte : nullptr;
+}
+
+void DevEnv::LoadSettings(CRegKey& reg)
+{
+	DWORD value;
+	if (reg.QueryDWORDValue(L"AutoSelectEngine", value) == ERROR_SUCCESS)
+		m_autoSelectEngine = value != 0;
+
+	CRegKey regEngines;
+	if (regEngines.Open(reg, L"Engines") == ERROR_SUCCESS)
+	{
+		std::vector<std::wstring> engineSelection;
+		for (int index = 0; ; ++index)
+		{
+			std::array<wchar_t, 1024> buf;
+			ULONG size = buf.size();
+			if (regEngines.QueryStringValue(std::to_wstring(index).c_str(), buf.data(), &size) != ERROR_SUCCESS)
+				break;
+			if (size > 0)
+				--size;
+			engineSelection.push_back(std::wstring(buf.data(), size));
+		}
+		m_engineSelection = engineSelection;
+	}
+}
+
+void DevEnv::SaveSettings(CRegKey& reg) const
+{
+	reg.SetDWORDValue(L"AutoSelectEngine", m_autoSelectEngine ? 1 : 0);
+	reg.DeleteSubKey(L"Engines");
+
+	CRegKey regEngines;
+	if (regEngines.Create(reg, L"Engines") == ERROR_SUCCESS)
+	{
+		int index = 0;
+		for (auto engine : m_engineSelection)
+		{
+			regEngines.SetStringValue(std::to_wstring(index).c_str(), engine.c_str());
+			++index;
+		}
+	}
 }
 
 } // namespace gj

@@ -21,7 +21,7 @@
 #include "AboutDlg.h"
 #include "ArgumentsDlg.h"
 #include "ExeRunner.h"
-#include "MainFrm.h"
+#include "MainFrame.h"
 
 // ComCtrl.h
 // Needs _WIN32_WINNT >= 0x0600 which breaks XP compatibility..
@@ -234,11 +234,8 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 
 	LoadSettings();
 
-	// register object for message filtering and idle updates
-	CMessageLoop* pLoop = _Module.GetMessageLoop();
-	ATLASSERT(pLoop != nullptr);
-	pLoop->AddMessageFilter(this);
-	pLoop->AddIdleHandler(this);
+	_Module.GetMessageLoop()->AddMessageFilter(this);
+	_Module.GetMessageLoop()->AddIdleHandler(this);
 
 	if (!m_pathName.empty())
 		Load(m_pathName);
@@ -916,7 +913,7 @@ void CMainFrame::test_waiting(const std::wstring& processName, unsigned processI
 {
 	EnQueue([this, processName, processId]()
 	{
-		if (m_devEnv.AttachDebugger(processId) ||
+		if (m_devEnv.AttachDebugger(*this, processId) ||
 			this->MessageBox(
 			WStr(wstringbuilder() << L"Attach debugger to " << processName << L", pid: "<< processId),
 			LoadString(IDR_APPNAME).c_str(),
@@ -1355,6 +1352,10 @@ bool CMainFrame::LoadSettings()
 		m_combo.SetCurSel(logLevel);
 	}
 
+	CRegKey regDevEnv;
+	if (regDevEnv.Open(reg, L"DevEnv", KEY_READ) == ERROR_SUCCESS)
+		m_devEnv.LoadSettings(regDevEnv);
+
 	m_mru.ReadFromRegistry(RegistryPath);
 
 	return true;
@@ -1377,6 +1378,10 @@ void CMainFrame::SaveSettings()
 	reg.SetDWORDValue(L"Options", GetOptions());
 	reg.SetDWORDValue(L"reloadDelay", m_reloadDelay);
 	reg.SetDWORDValue(L"LogLevel", m_combo.GetCurSel());
+
+	CRegKey regDevEnv;
+	if (regDevEnv.Create(reg, L"DevEnv") == ERROR_SUCCESS)
+		m_devEnv.SaveSettings(regDevEnv);
 
 	m_mru.WriteToRegistry(RegistryPath);
 }

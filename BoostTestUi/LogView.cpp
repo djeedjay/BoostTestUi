@@ -1,6 +1,6 @@
 // (C) Copyright Gert-Jan de Vos 2012.
 // Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at 
+// (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
@@ -12,7 +12,7 @@
 #include <array>
 #include "Resource.h"
 #include "Utilities.h"
-#include "MainFrm.h"
+#include "MainFrame.h"
 #include "LogView.h"
 
 namespace gj {
@@ -439,7 +439,7 @@ LRESULT CLogView::OnDblClick(NMHDR* pnmh)
 	if (std::regex_match(line, sm, re1) ||
 		std::regex_search(line, sm, re2) ||
 		std::regex_search(line, sm, re3))
-		m_pMainFrame->GetDevEnv().ShowSourceLine(sm[1], to_int(sm[2]));
+		m_pMainFrame->GetDevEnv().ShowSourceLine(*this, sm[1], to_int(sm[2]));
 
 	return 0;
 }
@@ -518,7 +518,7 @@ void CLogView::DoPaint(CDCHandle dc)
 
 	RECT rect;
 	dc.GetClipBox(&rect);
-	dc.FillSolidRect(&rect, GetSysColor(COLOR_WINDOW)); 
+	dc.FillSolidRect(&rect, GetSysColor(COLOR_WINDOW));
 	DefWindowProc(WM_PAINT, reinterpret_cast<WPARAM>(dc.m_hDC), 0);
 
 	m_insidePaint = false;

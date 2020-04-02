@@ -1,6 +1,6 @@
 // (C) Copyright Gert-Jan de Vos 2012.
 // Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at 
+// (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
@@ -8,7 +8,7 @@
 #include "stdafx.h"
 #include "resource.h"
 #include "Utilities.h"
-#include "MainFrm.h"
+#include "MainFrame.h"
 #include "FindDlg.h"
 
 namespace gj {
@@ -26,21 +26,13 @@ BOOL CFindDlg::PreTranslateMessage(MSG* pMsg)
 BOOL CFindDlg::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
 	DlgResize_Init();
-
-	// register object for message filtering and idle updates
-	CMessageLoop* pLoop = _Module.GetMessageLoop();
-	ATLASSERT(pLoop != nullptr);
-	pLoop->AddMessageFilter(this);
-
+	_Module.GetMessageLoop()->AddMessageFilter(this);
 	return TRUE;
 }
 
 void CFindDlg::OnDestroy()
 {
-	// register object for message filtering and idle updates
-	CMessageLoop* pLoop = _Module.GetMessageLoop();
-	ATLASSERT(pLoop != nullptr);
-	pLoop->RemoveMessageFilter(this);
+	_Module.GetMessageLoop()->RemoveMessageFilter(this);
 }
 
 void CFindDlg::OnGetMinMaxInfo(MINMAXINFO* pInfo)

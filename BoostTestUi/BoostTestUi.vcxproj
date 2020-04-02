@@ -158,7 +158,7 @@
     <ClCompile Include="GoogleTest.cpp" />
     <ClCompile Include="GetUnitTestType.cpp" />
     <ClCompile Include="LogView.cpp" />
-    <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="MainFrame.cpp" />
     <ClCompile Include="NUnitTest.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="SampleCodeDlg.cpp" />
@@ -195,7 +195,7 @@
     <ClInclude Include="hstream.h" />
     <ClInclude Include="GetUnitTestType.h" />
     <ClInclude Include="LogView.h" />
-    <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="MainFrame.h" />
     <ClInclude Include="NUnitTest.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="resource.h" />
