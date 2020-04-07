@@ -188,15 +188,6 @@
     <ClInclude Include="DevEnv.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="boost\test\unit_test_gui.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="catch\catch-gui.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gtest\gtest-gui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SelectDebugDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -216,6 +207,9 @@
       <Filter>Header Files\include\boost</Filter>
     </ClInclude>
     <ClInclude Include="MainFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BoostTest2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

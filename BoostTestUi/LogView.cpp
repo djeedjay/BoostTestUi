@@ -7,7 +7,6 @@
 
 #include "stdafx.h"
 #include <iomanip>
-#include <regex>
 #include <fstream>
 #include <array>
 #include "Resource.h"
@@ -275,7 +274,7 @@ std::string CLogView::GetItemText(int item, int subItem) const
 {
 	CComBSTR bstr;
 	GetItemText(item, subItem, bstr.m_str);
-	return std::string(bstr.m_str, bstr.m_str + bstr.Length());
+	return ToString(bstr);
 }
 
 void CLogView::Copy()
@@ -429,18 +428,7 @@ LRESULT CLogView::OnCustomDraw(NMHDR* pnmh)
 LRESULT CLogView::OnDblClick(NMHDR* pnmh)
 {
 	auto& nmhdr = *reinterpret_cast<NMITEMACTIVATE*>(pnmh);
-
-	std::string line = GetItemText(nmhdr.iItem, 1);
-	static const std::regex re1("(.+)\\((\\d+)\\)");
-	static const std::regex re2("file (.+), line (\\d+)");
-	static const std::regex re3(" in (.+):line (\\d+)");
-
-	std::smatch sm;
-	if (std::regex_match(line, sm, re1) ||
-		std::regex_search(line, sm, re2) ||
-		std::regex_search(line, sm, re3))
-		m_pMainFrame->GetDevEnv().ShowSourceLine(*this, sm[1], to_int(sm[2]));
-
+	m_pMainFrame->ActivateItemText(GetItemText(nmhdr.iItem, 1));
 	return 0;
 }
 

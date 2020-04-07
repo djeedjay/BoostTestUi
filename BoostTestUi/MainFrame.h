@@ -10,15 +10,12 @@
 
 #pragma once
 
-#pragma warning(disable: 4481) // nonstandard extension used: override specifier 'override'
-
 #include <string>
 #include <vector>
 #include <queue>
 #include <memory>
-#pragma warning(push, 3) // conversion from 'int' to 'unsigned short', possible loss of data
-#include <boost/thread.hpp>
-#pragma warning(pop)
+#include <mutex>
+#include <functional>
 #include "AtlWinExt.h"
 #include "Utilities.h"
 #include "TreeView.h"
@@ -62,11 +59,10 @@ public:
 	void FindPrevious(const std::wstring& text);
 
 	void AddLogMessage(const SYSTEMTIME& localTime, double t, Severity::type severity, const std::string& msg);
+	void ActivateItemText(const std::string& s);
 	void SelectItem(unsigned id);
 	bool IsActiveItem(unsigned id) const;
 	TestUnit GetTestItem(unsigned id) const;
-
-	DevEnv& GetDevEnv();
 
 	void EnQueue(const std::function<void ()>& fn);
 
@@ -101,31 +97,31 @@ private:
 	void OnException();
 	void OnException(const std::exception& ex);
 
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	virtual BOOL OnIdle();
+	BOOL PreTranslateMessage(MSG* pMsg) override;
+	BOOL OnIdle() override;
 
-	virtual void test_message(Severity::type, const std::string& msg) override;
+	void test_message(Severity::type, const std::string& msg) override;
 
-	virtual void test_waiting(const std::wstring& processName, unsigned processId) override;
-	virtual void test_start() override;
-	virtual void test_finish() override;
-	virtual void test_aborted() override;
-	virtual void test_iteration_start(unsigned test_cases_amount) override;
-	virtual void test_iteration_finish() override;
-	virtual void test_suite_start(unsigned id) override;
-	virtual void test_case_start(unsigned id) override;
-	virtual void test_case_finish(unsigned id, unsigned long elapsed) override;
-	virtual void test_case_finish(unsigned id, unsigned long /*elapsed*/, TestCaseState::type state) override;
-	virtual void test_suite_finish(unsigned id, unsigned long elapsed) override;
-	virtual void test_unit_skipped(unsigned id) override;
-	virtual void test_unit_aborted(unsigned id) override;
+	void test_waiting(const std::wstring& processName, unsigned processId) override;
+	void test_start() override;
+	void test_finish() override;
+	void test_aborted() override;
+	void test_iteration_start(unsigned test_cases_amount) override;
+	void test_iteration_finish() override;
+	void test_suite_start(unsigned id) override;
+	void test_case_start(unsigned id) override;
+	void test_case_finish(unsigned id, unsigned long elapsed) override;
+	void test_case_finish(unsigned id, unsigned long /*elapsed*/, TestCaseState::type state) override;
+	void test_suite_finish(unsigned id, unsigned long elapsed) override;
+	void test_unit_skipped(unsigned id) override;
+	void test_unit_aborted(unsigned id) override;
 
-	virtual void test_unit_ignored(const std::string& msg) override;
-	virtual void assertion_result(bool passed) override;
-	virtual void exception_caught(const std::string& what) override;
+	void test_unit_ignored(const std::string& msg) override;
+	void assertion_result(bool passed) override;
+	void exception_caught(const std::string& what) override;
 
-	virtual void TestStarted() override;
-	virtual void TestFinished() override;
+	void TestStarted() override;
+	void TestFinished() override;
 
 	LRESULT OnCreate(const CREATESTRUCT* pCreate);
 	LRESULT OnDeQueue(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/);
@@ -190,9 +186,9 @@ private:
 	void SaveSettings();
 	bool IsRunnable() const;
 	void RunSingle(unsigned id);
-	void RunChecked();
+	void RunChecked(bool interactiveRun);
 	void RunAll();
-	void Run();
+	void Run(bool interactiveRun);
 	void EndTestCase(unsigned id, unsigned long /*elapsed*/, TestCaseState::type state);
 
 	std::wstring m_pathName;
@@ -222,6 +218,7 @@ private:
 	bool m_debugger;
 	int m_reloadDelay;
 	bool m_resetTimer;
+	bool m_interactiveRun;
 	Timer m_timer;
 	int m_testIterationCount;
 	int m_testCaseCount;
@@ -231,7 +228,7 @@ private:
 	TestCaseState::type m_testCaseState;
 	DevEnv m_devEnv;
 
-	boost::mutex m_mtx;
+	std::mutex m_mtx;
 	std::queue<std::function<void ()>> m_q;
 };
 

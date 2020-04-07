@@ -172,7 +172,7 @@ TEST_P(ParamTest, MustBeEven)
 	EXPECT_TRUE(GetParam() % 2 == 0);
 }
 
-INSTANTIATE_TEST_CASE_P(InstantiationName, ParamTest, ::testing::Range(0, 6));
+INSTANTIATE_TEST_SUITE_P(InstantiationName, ParamTest, ::testing::Range(0, 6));
 
 template <typename T>
 struct ContainerTest : ::testing::Test
@@ -181,12 +181,12 @@ struct ContainerTest : ::testing::Test
 };
 
 typedef ::testing::Types<std::vector<int>, std::string, std::list<std::string>> TestTypes;
-TYPED_TEST_CASE(ContainerTest, TestTypes);
+TYPED_TEST_SUITE(ContainerTest, TestTypes);
 
 TYPED_TEST(ContainerTest, TypedTest)
 {
 	this->container.resize(10);
-	EXPECT_EQ(10, this->container.size());
+	EXPECT_EQ(10U, this->container.size());
 
 	int count = 0;
 	for (auto it = this->container.begin(); it != this->container.end(); ++it)

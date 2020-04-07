@@ -124,7 +124,7 @@ bool DevEnv::ShowSourceLine(HWND parent, const std::string& fileName, int lineNr
 	return true;
 }
 
-bool DevEnv::Attach(HWND parent, EnvDTE80::Process2* pIProcess2)
+bool DevEnv::SelectDebugType(HWND parent, EnvDTE80::Process2* pIProcess2)
 {
 	CComPtr<EnvDTE80::Transport> pITransport;
 	HRESULT hr = pIProcess2->get_Transport(&pITransport);
@@ -166,33 +166,42 @@ bool DevEnv::Attach(HWND parent, EnvDTE80::Process2* pIProcess2)
 
 	m_autoSelectEngine = dlg.GetAutoSelect();
 	m_engineSelection = dlg.GetSelection();
+	return true;
+}
 
-	if (dlg.GetAutoSelect())
+bool DevEnv::Attach(HWND parent, EnvDTE80::Process2* pIProcess2, bool selectDebugType)
+{
+	if (selectDebugType)
 	{
-		hr = pIProcess2->Attach();
+		if (!SelectDebugType(parent, pIProcess2))
+			return false;
+	}
+
+	if (m_autoSelectEngine)
+	{
+		HRESULT hr = pIProcess2->Attach();
 		if (FAILED(hr))
 			return false;
 
 		return true;
 	}
 
-	auto selection = dlg.GetSelection();
-	CComSafeArray<BSTR> coll(selection.size());
+	CComSafeArray<BSTR> coll(m_engineSelection.size());
 	int index = 0;
-	for (auto& item : selection)
+	for (auto& item : m_engineSelection)
 	{
 		coll[index] = item.c_str();
 		++index;
 	}
 
-	hr = pIProcess2->Attach2(CComVariant(coll));
+	HRESULT hr = pIProcess2->Attach2(CComVariant(coll));
 	if (FAILED(hr))
 		return false;
 
 	return true;
 }
 
-bool DevEnv::AttachDebugger(HWND parent, unsigned processId)
+bool DevEnv::AttachDebugger(HWND parent, unsigned processId, bool selectDebugType)
 {
 	auto pIDte = GetDte(parent);
 	if (!pIDte)
@@ -230,7 +239,7 @@ bool DevEnv::AttachDebugger(HWND parent, unsigned processId)
 
 		if (auto pIProcess2 = com_cast<EnvDTE80::Process2>(pIProcess))
 		{
-			if (!Attach(parent, pIProcess2))
+			if (!Attach(parent, pIProcess2, selectDebugType))
 				return false;
 		}
 		else

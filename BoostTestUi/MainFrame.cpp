@@ -23,13 +23,6 @@
 #include "ExeRunner.h"
 #include "MainFrame.h"
 
-// ComCtrl.h
-// Needs _WIN32_WINNT >= 0x0600 which breaks XP compatibility..
-#define PBM_SETSTATE            (WM_USER + 16) // wParam = PBST_[State] (NORMAL, ERROR, PAUSED)
-#define PBST_NORMAL             0x0001
-#define PBST_ERROR              0x0002
-#define PBST_PAUSED             0x0003
-
 namespace gj {
 
 const COLORREF FailColor = RGB(255, 64, 64);
@@ -257,7 +250,7 @@ public:
 	{
 	}
 
-	virtual void VisitTestCase(TestCase& /*tc*/) override
+	void VisitTestCase(TestCase& /*tc*/) override
 	{
 		++m_count;
 	}
@@ -278,7 +271,7 @@ public:
 	{
 	}
 
-	virtual void VisitTestCase(TestCase& tc) override
+	void VisitTestCase(TestCase& tc) override
 	{
 		if (tc.enabled)
 			++m_count;
@@ -305,20 +298,20 @@ public:
 	{
 	}
 
-	virtual void VisitTestCase(TestCase& tc) override
+	void VisitTestCase(TestCase& tc) override
 	{
 		GetCategories(tc);
 		m_treeView.AddTestCase(tc.id, tc.name, tc.enabled);
 		++m_testCaseCount;
 	}
 
-	virtual void EnterTestSuite(TestSuite& ts) override
+	void EnterTestSuite(TestSuite& ts) override
 	{
 		GetCategories(ts);
 		m_treeView.EnterTestSuite(ts.id, ts.name, ts.enabled);
 	}
 
-	virtual void LeaveTestSuite() override
+	void LeaveTestSuite() override
 	{
 		m_treeView.LeaveTestSuite();
 	}
@@ -351,20 +344,20 @@ public:
 	{
 	}
 
-	virtual void VisitTestCase(TestCase& tc) override
+	void VisitTestCase(TestCase& tc) override
 	{
 		tc.active = Match(tc.categories);
 		m_treeView.EnableItem(tc.id, tc.active);
 	}
 
-	virtual void EnterTestSuite(TestSuite& ts) override
+	void EnterTestSuite(TestSuite& ts) override
 	{
 		ts.active = Match(ts.categories);
 		m_treeView.EnableItem(ts.id, ts.active);
 		m_suites.push_back(ts.active);
 	}
 
-	virtual void LeaveTestSuite() override
+	void LeaveTestSuite() override
 	{
 		m_suites.pop_back();
 	}
@@ -428,12 +421,12 @@ public:
 	{
 	}
 
-	virtual void VisitTestCase(TestCase& tc)
+	void VisitTestCase(TestCase& tc)
 	{
 		EnterTestUnit(tc);
 	}
 
-	virtual void EnterTestSuite(TestSuite& ts)
+	void EnterTestSuite(TestSuite& ts)
 	{
 		EnterTestUnit(ts);
 	}
@@ -460,14 +453,14 @@ public:
 	{
 	}
 
-	virtual void VisitTestCase(TestCase& tc) override
+	void VisitTestCase(TestCase& tc) override
 	{
 		if (tc.id == m_id)
 			EnableSuites();
 		tc.enabled = IsEnabled(tc.id);
 	}
 
-	virtual void EnterTestSuite(TestSuite& ts) override
+	void EnterTestSuite(TestSuite& ts) override
 	{
 		if (ts.id == m_id)
 		{
@@ -478,7 +471,7 @@ public:
 		m_suites.push_back(&ts);
 	}
 
-	virtual void LeaveTestSuite() override
+	void LeaveTestSuite() override
 	{
 		if (m_suites.back()->id == m_id)
 			m_enable = false;
@@ -505,7 +498,7 @@ private:
 
 void CMainFrame::EnQueue(const std::function<void ()>& fn)
 {
-	boost::mutex::scoped_lock lock(m_mtx);
+	std::lock_guard<std::mutex> lock(m_mtx);
 	bool notify = m_q.empty();
 	m_q.push(fn);
 	if (notify)
@@ -516,7 +509,7 @@ LRESULT CMainFrame::OnDeQueue(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*
 {
 	std::queue<std::function<void ()>> fnq;
 	{
-		boost::mutex::scoped_lock lock(m_mtx);
+		std::lock_guard<std::mutex> lock(m_mtx);
 		std::swap(m_q, fnq);
 	}
 	while (!fnq.empty())
@@ -631,11 +624,10 @@ void CMainFrame::OnTimer(UINT_PTR /*nIDEvent*/)
 	FILETIME fileTime = GetLastWriteTime(hFile, m_pathName);
 	if (fileTime == m_fileTime || ToUInt64(GetSystemTimeAsFileTime()) < ToUInt64(fileTime) + m_reloadDelay * 10'000'000)
 		return;
-	int age = ToUInt64(GetSystemTimeAsFileTime()) - ToUInt64(fileTime);
 	SaveTestSelection();
 	Reload();
 	if (m_autoRun)
-		RunChecked();
+		RunChecked(false);
 }
 
 void CMainFrame::OnDropFiles(HDROP hDropInfo)
@@ -683,7 +675,7 @@ try
 
 	namespace fs = boost::filesystem;
 	fs::wpath fullPath = fs::system_complete(fs::wpath(fileName));
-	m_pRunner.reset(new ExeRunner(fullPath.wstring(), *this));
+	m_pRunner = std::make_unique<ExeRunner>(fullPath.wstring(), *this);
 
 	m_testIterationCount = 0;
 	m_testCaseCount = 0;
@@ -717,7 +709,7 @@ std::string GetListViewText(const CListViewCtrl& listView, int item, int subItem
 {
 	CComBSTR bstr;
 	listView.GetItemText(item, subItem, bstr.m_str);
-	return std::string(bstr.m_str, bstr.m_str + bstr.Length());
+	return ToString(bstr);
 }
 
 void CMainFrame::CreateHpp(int resourceId, const std::wstring& fileName)
@@ -889,6 +881,14 @@ void CMainFrame::AddLogMessage(const SYSTEMTIME& localTime, double t, Severity::
 	m_logView.Add(m_currentId, localTime, t, severity, msg);
 }
 
+void CMainFrame::ActivateItemText(const std::string& s)
+{
+	if (!m_pRunner)
+		return;
+	if (auto info = m_pRunner->FindLineNumberInfo(s))
+		m_devEnv.ShowSourceLine(*this, info.Filename(), info.LineNumber());
+}
+
 void CMainFrame::SelectItem(unsigned id)
 {
 	m_treeView.SelectTestItem(id);
@@ -904,20 +904,15 @@ TestUnit CMainFrame::GetTestItem(unsigned id) const
 	return m_pRunner->GetTestUnit(id);
 }
 
-DevEnv& CMainFrame::GetDevEnv()
-{
-	return m_devEnv;
-}
-
 void CMainFrame::test_waiting(const std::wstring& processName, unsigned processId)
 {
 	EnQueue([this, processName, processId]()
 	{
-		if (m_devEnv.AttachDebugger(*this, processId) ||
+		if (m_devEnv.AttachDebugger(*this, processId, m_interactiveRun) ||
 			this->MessageBox(
-			WStr(wstringbuilder() << L"Attach debugger to " << processName << L", pid: "<< processId),
-			LoadString(IDR_APPNAME).c_str(),
-			MB_OKCANCEL) == IDOK)
+				WStr(wstringbuilder() << L"Attach debugger to " << processName << L", pid: "<< processId),
+				LoadString(IDR_APPNAME).c_str(),
+				MB_OKCANCEL) == IDOK)
 		{
 			m_pRunner->Continue();
 		}
@@ -1230,7 +1225,7 @@ void CMainFrame::OnTreeRun(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/
 
 void CMainFrame::OnTreeRunChecked(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
-	RunChecked();
+	RunChecked(true);
 }
 
 void CMainFrame::OnTreeRunAll(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
@@ -1272,7 +1267,7 @@ void CMainFrame::OnTreeCopyCommand(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*
 
 void CMainFrame::OnMruMenuItem(UINT /*uCode*/, int nID, HWND /*hwndCtrl*/)
 {
-	wchar_t pathName[m_mru.m_cchMaxItemLen_Max + 1];
+	wchar_t pathName[decltype(m_mru)::m_cchMaxItemLen_Max + 1];
 	if (!m_mru.GetFromList(nID, pathName, m_mru.m_cchMaxItemLen_Max))
 		return;
 
@@ -1393,7 +1388,7 @@ void CMainFrame::RunSingle(unsigned id)
 
 	SingleTestCaseSelector selector(m_treeView, id);
 	m_pRunner->TraverseTestTree(selector);
-	Run();
+	Run(true);
 }
 
 class CheckedTestCaseSelector : public TestTreeVisitor
@@ -1404,12 +1399,12 @@ public:
 	{
 	}
 
-	virtual void VisitTestCase(TestCase& tc) override
+	void VisitTestCase(TestCase& tc) override
 	{
 		tc.enabled = m_pTreeView->IsChecked(tc.id);
 	}
 
-	virtual void EnterTestSuite(TestSuite& ts) override
+	void EnterTestSuite(TestSuite& ts) override
 	{
 		ts.enabled = m_pTreeView->IsChecked(ts.id);
 	}
@@ -1423,14 +1418,14 @@ bool CMainFrame::IsRunnable() const
 	return m_pRunner && !m_pRunner->IsRunning();
 }
 
-void CMainFrame::RunChecked()
+void CMainFrame::RunChecked(bool interactiveRun)
 {
 	if (!IsRunnable())
 		return;
 
 	CheckedTestCaseSelector selector(m_treeView);
 	m_pRunner->TraverseTestTree(selector);
-	Run();
+	Run(interactiveRun);
 }
 
 struct TestCaseSelector : TestTreeVisitor
@@ -1453,10 +1448,10 @@ void CMainFrame::RunAll()
 
 	TestCaseSelector selector;
 	m_pRunner->TraverseTestTree(selector);
-	Run();
+	Run(true);
 }
 
-void CMainFrame::Run()
+void CMainFrame::Run(bool interactiveRun)
 {
 	if (!IsRunnable())
 		return;
@@ -1475,6 +1470,7 @@ void CMainFrame::Run()
 	if (m_logAutoClear)
 		m_logView.Clear();
 	m_resetTimer = m_logView.Empty();
+	m_interactiveRun = interactiveRun;
 	m_pRunner->Run(m_combo.GetCurSel(), GetOptions(), m_arguments);
 }
 

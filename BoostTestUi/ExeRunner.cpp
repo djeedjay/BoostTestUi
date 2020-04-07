@@ -1,12 +1,13 @@
 // (C) Copyright Gert-Jan de Vos 2012.
 // Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at 
+// (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
 
 #include "stdafx.h"
 #include <stdexcept>
+#include <chrono>
 #include <boost/filesystem.hpp>
 #include "Utilities.h"
 #include "hstream.h"
@@ -23,19 +24,19 @@ namespace gj {
 class PathNameVisitor : public TestTreeVisitor
 {
 public:
-	virtual void VisitTestCase(TestCase& tc) override
+	void VisitTestCase(TestCase& tc) override
 	{
-		tc.fullName = GetFullName(tc.name); 
+		tc.fullName = GetFullName(tc.name);
 	}
 
-	virtual void EnterTestSuite(TestSuite& ts) override
+	void EnterTestSuite(TestSuite& ts) override
 	{
 		m_path = GetFullName(ts.name);
 		ts.fullName = m_path;
 		m_suites.push_back(&ts);
 	}
 
-	virtual void LeaveTestSuite() override
+	void LeaveTestSuite() override
 	{
 		m_suites.pop_back();
 		m_path = m_suites.empty() ? "" : m_suites.back()->fullName;
@@ -80,17 +81,17 @@ std::unique_ptr<ArgumentBuilder> CreateArgumentBuilder(const std::wstring& fileN
 {
 	std::string type = GetUnitTestType(WideCharToMultiByte(fileName));
 	if (type == "boost")
-		return std::unique_ptr<ArgumentBuilder>(new BoostTest::ArgumentBuilder(fileName, runner, observer));
+		return std::make_unique<BoostTest::ArgumentBuilder>(fileName, runner, observer);
 	if (type == "boost2")
-		return std::unique_ptr<ArgumentBuilder>(new BoostTest2::ArgumentBuilder(fileName, runner, observer));
+		return std::make_unique<BoostTest2::ArgumentBuilder>(fileName, runner, observer);
 	if (type == "catch")
-		return std::unique_ptr<ArgumentBuilder>(new CatchTest::ArgumentBuilder(fileName, runner, observer));
+		return std::make_unique<CatchTest::ArgumentBuilder>(fileName, runner, observer);
 	if (type == "google")
-		return std::unique_ptr<ArgumentBuilder>(new GoogleTest::ArgumentBuilder(fileName, runner, observer));
+		return std::make_unique<GoogleTest::ArgumentBuilder>(fileName, runner, observer);
 	if (type == "nunit")
-		return std::unique_ptr<ArgumentBuilder>(new NUnitTest::ArgumentBuilder(L"nunit-runner.exe", fileName, runner, observer));
+		return std::make_unique<NUnitTest::ArgumentBuilder>(L"nunit-runner.exe", fileName, runner, observer);
 	if (type == "nunit-x86")
-		return std::unique_ptr<ArgumentBuilder>(new NUnitTest::ArgumentBuilder(L"nunit-runner-x86.exe", fileName, runner, observer));
+		return std::make_unique<NUnitTest::ArgumentBuilder>(L"nunit-runner-x86.exe", fileName, runner, observer);
 
 	if (type == "boost/noheader")
 		throw NoHeaderError("Did you forget to #include <boost/test/unit_test_gui.hpp>?", UnitTestType::Boost);
@@ -190,12 +191,12 @@ void ExeRunner::Run(int logLevel, unsigned options, const std::wstring& argument
 	m_testArgs = m_pArgBuilder->BuildArgs(*this, logLevel, options) + L" " + arguments;
 	m_repeat = (options & ExeRunner::Repeat) != 0;
 	StartTestProcess();
-	m_pThread.reset(new boost::thread([this]() { RunTest(); }));
+	m_pThread = std::make_unique<std::thread>([this]() { RunTest(); });
 }
 
 void ExeRunner::StartTestProcess()
 {
-	m_pProcess.reset(new Process(m_pArgBuilder->GetExePathName(), m_testArgs));
+	m_pProcess = std::make_unique<Process>(m_pArgBuilder->GetExePathName(), m_testArgs);
 	m_hProcess = m_pProcess->GetProcessHandle();
 	m_pObserver->test_start();
 	m_pObserver->test_message(Severity::Info, stringbuilder() << "Process " << m_pProcess->GetProcessId() << ": " << Str(m_pProcess->GetName()) << ", started");
@@ -241,6 +242,11 @@ void ExeRunner::Wait()
 	m_pThread->join();
 	WaitForTestProcess();
 	m_pThread.reset();
+}
+
+LineNumberInfo ExeRunner::FindLineNumberInfo(const std::string& s) const
+{
+	return m_pArgBuilder->FindLineNumberInfo(s);
 }
 
 void ExeRunner::OnWaiting()
@@ -361,7 +367,7 @@ try
 			break;
 
 		// Limit to 10 iterations/s to allow GUI to catch up.
-		boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(100));
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		StartTestProcess();
 	}
 }

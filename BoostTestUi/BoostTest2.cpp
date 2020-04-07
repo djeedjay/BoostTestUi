@@ -52,7 +52,7 @@ public:
 		return arg;
 	}
 
-	virtual void VisitTestCase(TestCase& tc) override
+	void VisitTestCase(TestCase& tc) override
 	{
 		if (tc.enabled)
 			m_suites.back().cases.push_back(tc.name);
@@ -60,12 +60,12 @@ public:
 			m_suites.back().all = false;
 	}
 
-	virtual void EnterTestSuite(TestSuite& ts) override
+	void EnterTestSuite(TestSuite& ts) override
 	{
 		m_suites.push_back(Suite(ts.name));
 	}
 
-	virtual void LeaveTestSuite() override
+	void LeaveTestSuite() override
 	{
 		if (m_suites.size() <= 2)
 			return; // Skip top level

@@ -6,14 +6,11 @@
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
 
 #include "stdafx.h"
+#include <cassert>
 #include "Resource.h"
 #include "Utilities.h"
 #include "MainFrame.h"
 #include "TreeView.h"
-
-// ComCtrl.h
-// Needs _WIN32_WINNT >= 0x0600 which breaks XP compatibility..
-#define TVIS_EX_DISABLED        0x0002
 
 namespace gj {
 

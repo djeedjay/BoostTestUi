@@ -22,14 +22,15 @@ public:
 	DevEnv();
 
 	bool ShowSourceLine(HWND parent, const std::string& fileName, int lineNr);
-	bool AttachDebugger(HWND parent, unsigned processId);
+	bool AttachDebugger(HWND parent, unsigned processId, bool selectDebugType);
 
 	void LoadSettings(CRegKey& reg);
 	void SaveSettings(CRegKey& reg) const;
 
 private:
 	CComPtr<EnvDTE::_DTE> GetDte(HWND parent);
-	bool Attach(HWND parent, EnvDTE80::Process2* pIProcess2);
+	bool Attach(HWND parent, EnvDTE80::Process2* pIProcess2, bool selectDebugType);
+	bool SelectDebugType(HWND parent, EnvDTE80::Process2* pIProcess2);
 
 	int m_index;
 	CComPtr<EnvDTE::_DTE> m_pIDte;

@@ -1,6 +1,6 @@
 // (C) Copyright Gert-Jan de Vos 2012.
 // Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at 
+// (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
@@ -258,6 +258,18 @@ void CopyToClipboard(const std::wstring& text, HWND owner)
 		hdst.release();
 		CloseClipboard();
 	}
+}
+
+std::string ToString(const CComBSTR& bstr)
+{
+	if (bstr == nullptr)
+		return std::string();
+	std::string s;
+	s.reserve(bstr.Length());
+	auto end = bstr.m_str + bstr.Length();
+	for (auto p = bstr.m_str; p != end; ++p)
+		s += static_cast<char>(*p);
+	return s;
 }
 
 } // namespace gj

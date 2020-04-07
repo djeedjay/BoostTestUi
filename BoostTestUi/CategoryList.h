@@ -10,8 +10,6 @@
 
 #pragma once
 
-#pragma warning(disable: 4481) // nonstandard extension used: override specifier 'override'
-
 #include <string>
 #include <map>
 

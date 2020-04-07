@@ -1,6 +1,6 @@
 // (C) Copyright Gert-Jan de Vos 2012.
 // Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at 
+// (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
@@ -146,14 +146,14 @@ void CheckHr(HRESULT hr);
 template <typename F>
 class scope_guard : boost::noncopyable
 {
-public: 
+public:
 	explicit scope_guard(const F& x) :
 		m_action(x),
 		m_released(false)
 	{
 	}
 
-	scope_guard(scope_guard&& rhs) : 
+	scope_guard(scope_guard&& rhs) :
 		m_action(std::move(rhs.m_action)),
 		m_released(rhs.m_released)
 	{
@@ -236,6 +236,8 @@ std::wstring GetDlgItemText(const CWindow& wnd, int idc);
 
 void CopyToClipboard(const std::string& text, HWND owner);
 void CopyToClipboard(const std::wstring& text, HWND owner);
+
+std::string ToString(const CComBSTR& bstr);
 
 } // namespace gj
 

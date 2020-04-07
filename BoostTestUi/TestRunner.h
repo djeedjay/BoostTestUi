@@ -1,6 +1,6 @@
 // (C) Copyright Gert-Jan de Vos 2012.
 // Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at 
+// (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
@@ -102,6 +102,22 @@ protected:
 	~TestObserver();
 };
 
+class LineNumberInfo
+{
+public:
+	LineNumberInfo();
+	LineNumberInfo(std::string filename, int lineNumber);
+
+	explicit operator bool() const;
+	std::string Filename() const;
+	int LineNumber() const;
+
+private:
+	bool m_valid;
+	std::string m_filename;
+	int m_lineNumber;
+};
+
 struct TestRunner
 {
 	enum Options
@@ -127,6 +143,8 @@ struct TestRunner
 	virtual void Abort() = 0;
 	virtual void Wait() = 0;
 
+	virtual LineNumberInfo FindLineNumberInfo(const std::string& s) const = 0;
+
 	virtual ~TestRunner();
 };
 
@@ -140,6 +158,7 @@ struct ArgumentBuilder
 	virtual std::wstring BuildArgs(TestRunner& runner, int logLevel, unsigned& options) = 0;
 	virtual std::wstring BuildPublicArgs(TestRunner& runner, int logLevel, unsigned options);
 	virtual void FilterMessage(const std::string& msg);
+	virtual LineNumberInfo FindLineNumberInfo(const std::string& s) const;
 
 	virtual ~ArgumentBuilder();
 };

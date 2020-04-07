@@ -1,6 +1,6 @@
 // (C) Copyright Gert-Jan de Vos 2012.
 // Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at 
+// (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
@@ -11,9 +11,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 // Change these values to use different versions
-#define WINVER		0x0501
-#define _WIN32_WINNT 0x0501
-#define _WIN32_IE	0x0603
+#define WINVER		    0x0601
+#define _WIN32_WINNT    0x0601
+#define _WIN32_IE	    0x0603
 #define _RICHEDIT_VER	0x0300
 
 #define _WTL_NO_CSTRING

@@ -1,6 +1,6 @@
 // (C) Copyright Gert-Jan de Vos 2012.
 // Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at 
+// (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 // See http://boosttestui.wordpress.com/ for the boosttestui home page.
@@ -10,8 +10,7 @@
 
 #pragma once
 
-#pragma warning(disable: 4481) // nonstandard extension used: override specifier 'override'
-
+#include <map>
 #include "TestRunner.h"
 
 namespace gj {
@@ -22,13 +21,13 @@ class ArgumentBuilder : public gj::ArgumentBuilder
 public:
 	explicit ArgumentBuilder(const std::wstring& fileName, ExeRunner& runner, TestObserver& observer);
 
-	virtual std::wstring GetExePathName() override;
-	virtual std::wstring GetListArg() override;
-	virtual void LoadTestUnits(TestUnitNode& tree, std::istream& is, const std::string& testName) override;
+	std::wstring GetExePathName() override;
+	std::wstring GetListArg() override;
+	void LoadTestUnits(TestUnitNode& tree, std::istream& is, const std::string& testName) override;
 
 	unsigned GetEnabledOptions(unsigned options) const override;
-	virtual std::wstring BuildArgs(TestRunner& runner, int logLevel, unsigned& options) override;
-	virtual void FilterMessage(const std::string& msg) override;
+	std::wstring BuildArgs(TestRunner& runner, int logLevel, unsigned& options) override;
+	void FilterMessage(const std::string& msg) override;
 
 private:
 	unsigned GetId(const std::string& name);

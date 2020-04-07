@@ -32,7 +32,7 @@ public:
 		return m_arg;
 	}
 
-	virtual void VisitTestCase(TestCase& tc) override
+	void VisitTestCase(TestCase& tc) override
 	{
 		if (tc.enabled)
 			m_cases.push_back(tc.name);
@@ -40,13 +40,13 @@ public:
 			m_allCases = m_allCasesInSuite = false;
 	}
 
-	virtual void EnterTestSuite(TestSuite& ts) override
+	void EnterTestSuite(TestSuite& ts) override
 	{
 		m_pTestSuite = &ts;
 		m_allCasesInSuite = true;
 	}
 
-	virtual void LeaveTestSuite() override
+	void LeaveTestSuite() override
 	{
 		if (m_allCasesInSuite)
 		{

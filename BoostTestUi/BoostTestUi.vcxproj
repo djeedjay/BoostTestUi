@@ -181,9 +181,8 @@
     <ClInclude Include="ArgumentsDlg.h" />
     <ClInclude Include="AtlWinExt.h" />
     <ClInclude Include="BoostTest.h" />
-    <ClInclude Include="boost\test\unit_test_gui.hpp" />
+    <ClInclude Include="BoostTest2.h" />
     <ClInclude Include="CatchTest.h" />
-    <ClInclude Include="catch\catch-gui.hpp" />
     <ClInclude Include="CategoryDlg.h" />
     <ClInclude Include="CategoryList.h" />
     <ClInclude Include="OptionsDlg.h" />
@@ -191,7 +190,6 @@
     <ClInclude Include="ExeRunner.h" />
     <ClInclude Include="FindDlg.h" />
     <ClInclude Include="GoogleTest.h" />
-    <ClInclude Include="gtest\gtest-gui.h" />
     <ClInclude Include="hstream.h" />
     <ClInclude Include="GetUnitTestType.h" />
     <ClInclude Include="LogView.h" />
