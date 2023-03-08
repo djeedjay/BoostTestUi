@@ -69,6 +69,17 @@ public:
 		std::cout << "#unit_aborted " << tu.p_id << std::endl;
 	}
 
+	virtual void assertion_result(unit_test::assertion_result ar)
+	{
+		switch (ar)
+		{
+		case AR_PASSED: assertion_result(true); break;
+		case AR_FAILED: assertion_result(false); break;
+		case AR_TRIGGERED: break;
+		default: break;
+		}
+	}
+
 	virtual void assertion_result(bool passed)
 	{
 		std::cout << "#assertion " << passed << std::endl;
