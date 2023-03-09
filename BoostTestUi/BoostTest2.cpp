@@ -266,14 +266,17 @@ void ArgumentBuilder::FilterMessage(const std::string& msg)
 
 	Severity::type severity = Severity::Info;
 
-	static const std::regex reError("\\): (fatal )?error ");
-	std::smatch sm;
-	if (std::regex_search(msg, sm, reError))
-		severity = sm[1].matched? Severity::Fatal: Severity::Error;
-
+	static const std::regex reWarning("\\): warning:? in \"");
+	static const std::regex reError("\\): (fatal )?error:? in \"");
 	static const std::regex reAssertion("Assertion failed:");
-	if (std::regex_search(msg, reAssertion))
-		severity =  Severity::Assertion;
+
+	std::smatch sm;
+	if (std::regex_search(msg, reWarning))
+		severity = Severity::Warning;
+	else if (std::regex_search(msg, sm, reError))
+		severity = sm[1].matched ? Severity::Fatal : Severity::Error;
+	else if (std::regex_search(msg, reAssertion))
+		severity = Severity::Assertion;
 
 	m_pObserver->test_message(severity, msg);
 }

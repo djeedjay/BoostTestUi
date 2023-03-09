@@ -159,7 +159,7 @@ bool CLogView::Find(const std::string& text, int direction)
 	while (line != begin)
 	{
 		if (line < 0)
-			line += m_logLines.size();
+			line += static_cast<int>(m_logLines.size());
 		if (static_cast<size_t>(line) == m_logLines.size())
 			line = 0;
 
@@ -190,9 +190,9 @@ void CLogView::Add(unsigned id, const SYSTEMTIME& localTime, double t, Severity:
 	int focus = GetNextItem(-1, LVNI_FOCUSED);
 	bool selectLast = focus < 0 || focus == GetItemCount() - 1;
 
-	int item = m_logLines.size();
+	int item = static_cast<int>(m_logLines.size());
 	m_logLines.push_back(LogLine(id, localTime, t, severity, msg));
-	SetItemCount(m_logLines.size());
+	SetItemCountEx(static_cast<int>(m_logLines.size()), LVSICF_NOSCROLL);
 
 	if (selectLast)
 	{
@@ -228,7 +228,7 @@ void CLogView::Save(const std::wstring& fileName)
 void CLogView::LoadSettings(CRegKey& reg)
 {
 	std::array<wchar_t, 100> buf;
-	DWORD len = buf.size();
+	DWORD len = static_cast<DWORD>(buf.size());
 	if (reg.QueryStringValue(L"ColWidths", buf.data(), &len) == ERROR_SUCCESS)
 	{
 		std::wistringstream ss(buf.data());
@@ -303,6 +303,7 @@ COLORREF CLogView::GetHighLightBkColor(Severity::type sev, int item) const
 	switch (sev)
 	{
 	case Severity::Info: return highLight ? RGB(224, 224, 224) : GetSysColor(COLOR_WINDOW);
+	case Severity::Warning: return RGB(240, 240, 16);
 	case Severity::Error: return RGB(255, 188, 0);
 	case Severity::Fatal: return RGB(255, 64, 64);
 	case Severity::Assertion: return RGB(200, 0, 224);
@@ -381,7 +382,7 @@ void CLogView::DrawSubItem(CDCHandle dc, int iItem, int iSubItem) const
 	HDITEM item;
 	item.mask = HDI_FORMAT;
 	unsigned align = (GetHeader().GetItem(iSubItem, &item)) ? GetTextAlign(item) : HDF_LEFT;
-	::DrawTextA(dc, text.c_str(), text.size(), &rect, align | DT_NOCLIP | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
+	::DrawTextA(dc, text.c_str(), static_cast<int>(text.size()), &rect, align | DT_NOCLIP | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
 }
 
 void CLogView::DrawItem(CDCHandle dc, int iItem, unsigned /*iItemState*/) const
@@ -418,7 +419,7 @@ LRESULT CLogView::OnCustomDraw(NMHDR* pnmh)
 		return CDRF_NOTIFYITEMDRAW;
 
 	case CDDS_ITEMPREPAINT:
-		DrawItem(nmhdr.nmcd.hdc, nmhdr.nmcd.dwItemSpec, nmhdr.nmcd.uItemState);
+		DrawItem(nmhdr.nmcd.hdc, static_cast<int>(nmhdr.nmcd.dwItemSpec), nmhdr.nmcd.uItemState);
 		return CDRF_SKIPDEFAULT;
 	}
 

@@ -230,11 +230,13 @@ LRESULT CMainFrame::OnCreate(const CREATESTRUCT* /*pCreate*/)
 	_Module.GetMessageLoop()->AddMessageFilter(this);
 	_Module.GetMessageLoop()->AddIdleHandler(this);
 
-	if (!m_pathName.empty())
-		Load(m_pathName);
-
-	SetTimer(1, 1000);
 	DragAcceptFiles(true);
+
+	if (!m_pathName.empty())
+	{
+		Load(m_pathName);
+		SetTimer(1, 1000);
+	}
 	return 0;
 }
 
@@ -634,10 +636,10 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 {
 	auto guard = make_guard([hDropInfo]() { DragFinish(hDropInfo); });
 
-	if (DragQueryFile(hDropInfo, 0xFFFFFFFF, nullptr, 0) == 1)
+	if (DragQueryFileW(hDropInfo, 0xFFFFFFFF, nullptr, 0) == 1)
 	{
 		std::vector<wchar_t> fileName(DragQueryFile(hDropInfo, 0, nullptr, 0) + 1);
-		if (DragQueryFile(hDropInfo, 0, fileName.data(), fileName.size()))
+		if (DragQueryFileW(hDropInfo, 0, fileName.data(), static_cast<unsigned>(fileName.size())))
 			LoadNew(fileName.data());
 	}
 }
@@ -675,8 +677,8 @@ try
 
 	namespace fs = boost::filesystem;
 	fs::wpath fullPath = fs::system_complete(fs::wpath(fileName));
-	m_pRunner = std::make_unique<ExeRunner>(fullPath.wstring(), *this);
 
+	m_pRunner.reset();
 	m_testIterationCount = 0;
 	m_testCaseCount = 0;
 	m_testsRunCount = 0;
@@ -685,6 +687,7 @@ try
 	m_treeView.Clear();
 	m_logView.Clear();
 	m_categories.Clear();
+	m_pRunner = std::make_unique<ExeRunner>(fullPath.wstring(), *this);
 	TestCaseLoader loadTestCases(m_treeView, m_categories);
 	m_pRunner->TraverseTestTree(loadTestCases);
 	m_testCaseCount = loadTestCases.TestCaseCount();

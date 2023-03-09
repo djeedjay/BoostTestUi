@@ -224,7 +224,7 @@ std::string LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pO
 
 		node.children.push_back(TestUnit(id, type, normalize_type(name), enable));
 		if (type == TestUnit::TestSuite)
-			line = LoadTestUnits(node.children.back(), is, pObserver, sm[1].length() + 1);
+			line = LoadTestUnits(node.children.back(), is, pObserver, static_cast<int>(sm[1].length()) + 1);
 		else
 			std::getline(is, line);
 	}

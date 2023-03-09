@@ -17,6 +17,7 @@ struct Severity
 	enum type
 	{
 		Info = 0,
+		Warning,
 		Error,
 		Fatal,
 		Assertion

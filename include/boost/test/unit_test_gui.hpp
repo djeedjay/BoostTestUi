@@ -154,9 +154,11 @@ boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
 	return init_unit_test_suite2(argc, argv);
 }
 
+#ifdef _MSC_VER
 extern "C" __declspec(dllexport) inline void unit_test_type_boost2()
 {
 }
+#endif
 
 #endif // !BOOST_TEST_NO_GUI_INIT
 
@@ -362,9 +364,11 @@ boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
 	return p;
 }
 
+#ifdef _MSC_VER
 extern "C" __declspec(dllexport) inline void unit_test_type_boost()
 {
 }
+#endif
 
 #endif // !BOOST_TEST_NO_GUI_INIT
 

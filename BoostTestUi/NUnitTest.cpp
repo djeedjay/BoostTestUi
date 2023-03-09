@@ -161,7 +161,7 @@ fs::wpath GetParentPath(const std::wstring& fileName)
 fs::wpath GetTestUiPath()
 {
 	std::array<wchar_t, MAX_PATH> buf;
-	DWORD size = GetModuleFileNameW(nullptr, buf.data(), buf.size());
+	DWORD size = GetModuleFileNameW(nullptr, buf.data(), static_cast<DWORD>(buf.size()));
 	if (size == 0)
 		ThrowLastError("GetModuleFileName");
 	return GetParentPath(buf.data());
@@ -288,7 +288,7 @@ std::string LoadTestUnits(TestUnitNode& node, std::istream& is, TestObserver* pO
 		tu.categories = GetCategories(sm[4]);
 		node.children.push_back(tu);
 		if (type == TestUnit::TestSuite)
-			line = LoadTestUnits(node.children.back(), is, pObserver, sm[1].length() + 1);
+			line = LoadTestUnits(node.children.back(), is, pObserver, static_cast<int>(sm[1].length() + 1));
 		else
 			std::getline(is, line);
 	}

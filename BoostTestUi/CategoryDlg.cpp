@@ -39,7 +39,7 @@ void ClearListBox(CListBox& box)
 int GetTextWidth(HDC hdc, const std::string& text)
 {
 	SIZE sz;
-	if (!GetTextExtentPoint32A(hdc, text.c_str(), text.length(), &sz))
+	if (!GetTextExtentPoint32A(hdc, text.c_str(), static_cast<int>(text.length()), &sz))
 		ThrowLastError("GetTextExtentPoint32A");
 
 	return sz.cx;

@@ -20,7 +20,7 @@ namespace {
 int GetTextWidth(HDC hdc, const std::wstring& text)
 {
 	SIZE sz;
-	if (!GetTextExtentPoint32W(hdc, text.c_str(), text.length(), &sz))
+	if (!GetTextExtentPoint32W(hdc, text.c_str(), static_cast<int>(text.length()), &sz))
 		ThrowLastError("GetTextExtentPoint32W");
 
 	return sz.cx;

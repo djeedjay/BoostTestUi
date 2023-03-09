@@ -148,7 +148,7 @@ LRESULT CTreeView::OnSelChanged(NMHDR* pnmh)
 {
 	NMTREEVIEW* pNmTreeView = reinterpret_cast<NMTREEVIEW*>(pnmh);
 	if (pNmTreeView->action != TVC_UNKNOWN)
-		m_pMainFrame->SetLogHighLight(GetItemData(pNmTreeView->itemNew.hItem));
+		m_pMainFrame->SetLogHighLight(static_cast<unsigned>(GetItemData(pNmTreeView->itemNew.hItem)));
 	return 0;
 }
 
@@ -164,7 +164,7 @@ LRESULT CTreeView::OnCustomDraw(NMHDR* pnmh)
 	case CDDS_ITEMPREPAINT:
 	{
 		HTREEITEM hItem = reinterpret_cast<HTREEITEM>(pCustomDraw->nmcd.dwItemSpec);
-		if (!m_pMainFrame->IsActiveItem(GetItemData(hItem)))
+		if (!m_pMainFrame->IsActiveItem(static_cast<unsigned>(GetItemData(hItem))))
 		{
 			pCustomDraw->clrText = GetSysColor(COLOR_GRAYTEXT);
 			pCustomDraw->clrTextBk = GetSysColor(COLOR_3DLIGHT);
@@ -179,7 +179,7 @@ LRESULT CTreeView::OnCustomDraw(NMHDR* pnmh)
 LRESULT CTreeView::OnGetInfoTip(NMHDR* pnmh)
 {
 	NMTVGETINFOTIP* pNmGetInfoTip = reinterpret_cast<NMTVGETINFOTIP*>(pnmh);
-	std::wstring tooltip = WStr(m_pMainFrame->GetTestItem(GetItemData(pNmGetInfoTip->hItem)).fullName).str();
+	std::wstring tooltip = WStr(m_pMainFrame->GetTestItem(static_cast<unsigned>(GetItemData(pNmGetInfoTip->hItem))).fullName).str();
 	size_t maxSize = pNmGetInfoTip->cchTextMax;
 	if (tooltip.size() + 1 > maxSize)
 		tooltip = tooltip.substr(maxSize - 4) + L"...";
@@ -459,7 +459,7 @@ void CTreeView::SelectTestItem(unsigned id)
 
 unsigned CTreeView::GetSelectedTestItem() const
 {
-	return GetItemData(GetSelectedItem());
+	return static_cast<unsigned>(GetItemData(GetSelectedItem()));
 }
 
 void CTreeView::SetItemImage(HTREEITEM hItem, int img)

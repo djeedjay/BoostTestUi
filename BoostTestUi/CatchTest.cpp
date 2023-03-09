@@ -199,7 +199,7 @@ unsigned ArgumentBuilder::GetId(const std::string& name)
 	if (it != m_ids.end())
 		return it->second;
 
-	unsigned id = m_ids.size();
+	unsigned id = static_cast<unsigned>(m_ids.size());
 	m_ids[name] = id;
 	return id;
 }
