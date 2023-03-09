@@ -185,7 +185,7 @@ void ArgumentBuilder::LoadTestUnits(TestUnitNode& tree, std::istream& is, const 
 
 unsigned ArgumentBuilder::GetEnabledOptions(unsigned /*options*/) const
 {
-	return ExeRunner::Randomize | ExeRunner::WaitForDebugger;
+	return ExeRunner::Randomize | ExeRunner::WaitForDebugger | ExeRunner::DebugBreak;
 }
 
 std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsigned& options)
@@ -206,6 +206,8 @@ std::wstring ArgumentBuilder::BuildArgs(TestRunner& runner, int logLevel, unsign
 	if (!getArg.AllCases())
 		args << L" " << getArg.GetArg();
 	args << L" -- --gui_run";
+	if (options & ExeRunner::DebugBreak)
+		args << L" --gui_break";
 	return args.str();
 }
 

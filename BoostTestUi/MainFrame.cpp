@@ -65,6 +65,7 @@ BEGIN_MSG_MAP2(CMainFrame)
 	COMMAND_ID_HANDLER_EX(ID_TEST_RANDOMIZE, OnTestRandomize)
 	COMMAND_ID_HANDLER_EX(ID_TEST_REPEAT, OnTestRepeat)
 	COMMAND_ID_HANDLER_EX(ID_TEST_DEBUGGER, OnTestDebugger)
+	COMMAND_ID_HANDLER_EX(ID_TEST_BREAK, OnTestBreak)
 	COMMAND_ID_HANDLER_EX(ID_TEST_RUNNERARGS, OnTestRunnerArgs)
 	COMMAND_ID_HANDLER_EX(ID_TEST_ABORT, OnTestAbort)
 	COMMAND_ID_HANDLER_EX(ID_TEST_CATEGORIES, OnTestCategories)
@@ -101,6 +102,7 @@ CMainFrame::CMainFrame(const std::wstring& fileName, const std::wstring& argumen
 	m_randomize(false),
 	m_repeat(false),
 	m_debugger(false),
+	m_debugBreak(false),
 	m_reloadDelay(5)
 {
 }
@@ -140,11 +142,13 @@ void CMainFrame::UpdateUI()
 	bool isRunning = isLoaded && m_pRunner->IsRunning();
 	bool isRunnable = IsRunnable();
 	unsigned enabled = isLoaded ? m_pRunner->GetEnabledOptions(GetOptions()) : 0;
+	bool enableDebug = !m_repeat && (enabled & TestRunner::WaitForDebugger) != 0;
 	UIEnable(ID_FILE_SAVE, isLoaded);
 	UIEnable(ID_FILE_SAVE_AS, isLoaded);
 	UIEnable(ID_TEST_RANDOMIZE, (enabled & TestRunner::Randomize) != 0);
 	UIEnable(ID_TEST_REPEAT, isLoaded);
-	UIEnable(ID_TEST_DEBUGGER, !m_repeat && (enabled & TestRunner::WaitForDebugger) != 0);
+	UIEnable(ID_TEST_DEBUGGER, enableDebug);
+	UIEnable(ID_TEST_BREAK, enableDebug && (enabled & TestRunner::DebugBreak) != 0 && m_debugger);
 	UIEnable(ID_TEST_RUNNERARGS, isLoaded);
 	UIEnable(ID_TREE_RUN, isRunnable);
 	UIEnable(ID_TREE_RUN_CHECKED, isRunnable);
@@ -158,6 +162,7 @@ void CMainFrame::UpdateUI()
 	UISetCheck(ID_TEST_RANDOMIZE, m_randomize);
 	UISetCheck(ID_TEST_REPEAT, m_repeat);
 	UISetCheck(ID_TEST_DEBUGGER, m_debugger);
+	UISetCheck(ID_TEST_BREAK, m_debugBreak);
 	UpdateStatusBar();
 }
 
@@ -1125,6 +1130,11 @@ void CMainFrame::OnTestDebugger(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wnd
 	m_debugger = !m_debugger;
 }
 
+void CMainFrame::OnTestBreak(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
+{
+	m_debugBreak = !m_debugBreak;
+}
+
 void CMainFrame::OnTestRunnerArgs(UINT /*uNotifyCode*/, int /*nID*/, CWindow /*wndCtl*/)
 {
 	CArgumentsDlg dlg(m_arguments);
@@ -1143,6 +1153,8 @@ unsigned CMainFrame::GetOptions() const
 		options |= Options::LogAutoClear;
 	if (m_debugger)
 		options |= TestRunner::WaitForDebugger;
+	if (m_debugger && m_debugBreak)
+		options |= TestRunner::DebugBreak;
 	if (m_randomize)
 		options |= TestRunner::Randomize;
 	if (m_repeat)
@@ -1338,6 +1350,7 @@ bool CMainFrame::LoadSettings()
 		m_randomize = (options & TestRunner::Randomize) != 0;
 		m_repeat = (options & TestRunner::Repeat) != 0;
 		m_debugger = (options & TestRunner::WaitForDebugger) != 0;
+		m_debugBreak = (options & TestRunner::DebugBreak) != 0;
 	}
 
 	DWORD reloadDelay;

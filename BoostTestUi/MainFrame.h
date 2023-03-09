@@ -73,6 +73,7 @@ public:
 	    UPDATE_ELEMENT(ID_TEST_RANDOMIZE, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
 	    UPDATE_ELEMENT(ID_TEST_REPEAT, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
 	    UPDATE_ELEMENT(ID_TEST_DEBUGGER, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
+	    UPDATE_ELEMENT(ID_TEST_BREAK, UPDUI_MENUPOPUP)
 		UPDATE_ELEMENT(ID_TEST_RUNNERARGS, UPDUI_MENUPOPUP)
 	    UPDATE_ELEMENT(ID_TREE_RUN, UPDUI_MENUPOPUP)
 	    UPDATE_ELEMENT(ID_TREE_RUN_CHECKED, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
@@ -147,6 +148,7 @@ private:
 	void OnTestRandomize(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestRepeat(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestDebugger(UINT uNotifyCode, int nID, CWindow wndCtl);
+	void OnTestBreak(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestRunnerArgs(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestAbort(UINT uNotifyCode, int nID, CWindow wndCtl);
 	void OnTestCategories(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -216,6 +218,7 @@ private:
 	bool m_randomize;
 	bool m_repeat;
 	bool m_debugger;
+	bool m_debugBreak;
 	int m_reloadDelay;
 	bool m_resetTimer;
 	bool m_interactiveRun;

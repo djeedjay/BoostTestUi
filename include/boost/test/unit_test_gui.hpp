@@ -34,6 +34,17 @@ namespace gui {
 class gui_observer : public test_observer
 {
 public:
+	static gui_observer& instance()
+	{
+		static gui_observer object;
+		return object;
+	}
+
+	void set_break()
+	{
+		m_break = true;
+	}
+
 	virtual void test_start(counter_t test_cases_amount)
 	{
 		std::cout << "#start " << test_cases_amount << std::endl;
@@ -83,12 +94,31 @@ public:
 	virtual void assertion_result(bool passed)
 	{
 		std::cout << "#assertion " << passed << std::endl;
+		if (!passed)
+			debug_break();
 	}
 
 	virtual void exception_caught(boost::execution_exception const& e)
 	{
 		std::cout << "#exception " << e.what() << std::endl;
+		debug_break();
 	}
+
+private:
+	gui_observer() :
+		m_break(false)
+	{
+	}
+
+	void debug_break()
+	{
+#ifdef _MSC_VER
+		if (m_break)
+			__debugbreak();
+#endif
+	}
+
+	bool m_break;
 };
 
 } // namespace gui
@@ -137,18 +167,16 @@ boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
 	for (int i = 1; i < argc; ++i)
 	{
 		if (argv[i] == std::string("--gui_run"))
-		{
-			static boost::unit_test::gui::gui_observer observer;
-			boost::unit_test::framework::register_observer(observer);
+			boost::unit_test::framework::register_observer(boost::unit_test::gui::gui_observer::instance());
+		else if (argv[i] == std::string("--gui_break"))
+			boost::unit_test::gui::gui_observer::instance().set_break();
+		else
+			continue;
 
-			while (i < argc)
-			{
-				argv[i] = argv[i + 1];
-				++i;
-			}
-			--argc;
-			break;
-		}
+		for (int j = i; j < argc; ++j)
+			argv[j] = argv[j + 1];
+		--argc;
+		--i;
 	}
 
 	return init_unit_test_suite2(argc, argv);

@@ -186,7 +186,7 @@ bool DevEnv::Attach(HWND parent, EnvDTE80::Process2* pIProcess2, bool selectDebu
 		return true;
 	}
 
-	CComSafeArray<BSTR> coll(m_engineSelection.size());
+	CComSafeArray<BSTR> coll(static_cast<unsigned>(m_engineSelection.size()));
 	int index = 0;
 	for (auto& item : m_engineSelection)
 	{
@@ -288,7 +288,7 @@ void DevEnv::LoadSettings(CRegKey& reg)
 		for (int index = 0; ; ++index)
 		{
 			std::array<wchar_t, 1024> buf;
-			ULONG size = buf.size();
+			ULONG size = static_cast<ULONG>(buf.size());
 			if (regEngines.QueryStringValue(std::to_wstring(index).c_str(), buf.data(), &size) != ERROR_SUCCESS)
 				break;
 			if (size > 0)

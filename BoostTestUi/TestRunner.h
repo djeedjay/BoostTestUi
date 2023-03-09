@@ -125,6 +125,7 @@ struct TestRunner
 		Randomize = 1 << 0,
 		WaitForDebugger = 1 << 1,
 		Repeat = 1 << 2,
+		DebugBreak = 1 << 3,
 	};
 	virtual TestSuite& RootTestSuite() = 0;
 	virtual void TraverseTestTree(TestTreeVisitor& v) = 0;

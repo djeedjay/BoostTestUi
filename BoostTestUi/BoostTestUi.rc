@@ -111,6 +111,7 @@ BEGIN
         MENUITEM "Randomize",                   ID_TEST_RANDOMIZE
         MENUITEM "Repeat",                      ID_TEST_REPEAT
         MENUITEM "&Wait for Debugger",          ID_TEST_DEBUGGER
+        MENUITEM "&Break on Fail",              ID_TEST_BREAK
         MENUITEM "TestRunner Arguments...",     ID_TEST_RUNNERARGS
         MENUITEM SEPARATOR
         MENUITEM "&Run Checked\tF5",            ID_TREE_RUN_CHECKED
@@ -522,6 +523,7 @@ BEGIN
     ID_LOG_CLEAR            "Clear log display\nClear Log"
     ID_TEST_RANDOMIZE       "Run the selected test cases in random order\nRandomize"
     ID_TEST_DEBUGGER        "Provide a prompt to attach the debugger when the test is run\nWait for Debugger"
+    ID_TEST_BREAK           "Trigger a breakpoint on a failed test.\nBreak on Fail"
 END
 
 STRINGTABLE
